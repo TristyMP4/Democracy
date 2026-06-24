@@ -130,7 +130,7 @@ module.exports = {
         const noVotes = new Set();
 
         const voteDuration = 60_000; // 60 seconds
-        const requiredVotes = Math.ceil(onlineCount * 0.6);
+        const requiredVotes = Math.ceil(onlineCount * 0.75);
         // const requiredVotes = 1
 
         const embed = new EmbedBuilder()
@@ -141,7 +141,7 @@ module.exports = {
                     `Target: ${target}`,
                     `Started by: ${interaction.user}`,
                     '> A kick vote has been started.',
-                    `> If **60%** of online members vote **Yes**, the user will be kick out of the server.`,
+                    `> If **75%** of online members vote **Yes**, the user will be kicked out of the server.`,
                     '',
                     `*Required Votes to win:* ***${requiredVotes}***`,
                     `*Online Members:* **${onlineCount}**`,
