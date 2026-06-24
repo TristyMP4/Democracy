@@ -139,8 +139,8 @@ module.exports = {
         const noVotes = new Set();
 
         const voteDuration = 60_000; // 60 seconds
-        // const requiredVotes = Math.ceil(onlineCount * 0.6);
-        const requiredVotes = 1
+        const requiredVotes = Math.ceil(onlineCount * 0.6);
+        // const requiredVotes = 1
 
         const embed = new EmbedBuilder()
             .setTitle('🗳️ Vote Mute')
