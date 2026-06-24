@@ -1,14 +1,13 @@
 const { SlashCommandBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-	owner: true,
 	data: new SlashCommandBuilder()
 		.setName('say')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.setDescription('Say something!'),
 	async execute(interaction, client) {
 		const modal = new ModalBuilder()
-		 .setTitle('Say something!')
+		 .setTitle('Say something using the bot!')
 		.setCustomId('say')
 
 		const input = new TextInputBuilder()
