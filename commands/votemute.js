@@ -25,7 +25,7 @@ module.exports = {
                 .setDescription('Mute duration in minutes (1-5)')
                 .setRequired(true)
                 .setMinValue(1)
-                .setMaxValue(5)
+                .setMaxValue(15)
         ),
 
     async execute(interaction) {
@@ -66,7 +66,7 @@ module.exports = {
             });
         }
 
-        if (duration < 1 || duration > 5) {
+        if (duration < 1 || duration > 15) {
             return interaction.reply({
                 embeds: [
                     new EmbedBuilder()
