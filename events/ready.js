@@ -5,7 +5,7 @@ module.exports = {
     once: true,
     async execute(client) { 
         client.user.setActivity({
-            name: 'Promoting freedom',
+            name: 'We love voting 💯',
             type: ActivityType.Custom,
          //   url: 'https://www.twitch.tv/discord'
         });
