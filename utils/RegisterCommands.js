@@ -33,23 +33,23 @@ module.exports = (client) => {
 
 	// Error if you set a dev command but no guild ID
 	// Nothing will break but it won't register the commands
-    if (devCommands.length > 0 && !client.config.DEV_GUILD_ID) {
-        console.warn(`You have dev commands but no DEV_GUILD_ID in config.json - These will not be registered!`);
+    if (devCommands.length > 0 && !process.env.DEV_GUILD_ID) {
+        console.warn(`You have dev commands but no DEV_GUILD_ID in .env - These will not be registered!`);
     }
 
-    const rest = new REST({ version: '10' }).setToken(client.config.TOKEN);
+    const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     try {
         // public commands
         rest.put(
-            Routes.applicationCommands(client.config.APP_ID),
+            Routes.applicationCommands(process.env.APP_ID),
             { body: commands },
         );
 
 		// Only do this if there is a guild id set
-        if (typeof client.config.DEV_GUILD_ID === 'string') {
+        if (typeof process.env.DEV_GUILD_ID === 'string') {
             // dev commands
             rest.put(
-                Routes.applicationGuildCommands(client.config.APP_ID, client.config.DEV_GUILD_ID),
+                Routes.applicationGuildCommands(process.env.APP_ID, process.env.DEV_GUILD_ID),
                 { body: devCommands },
             );
         }

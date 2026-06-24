@@ -1,5 +1,6 @@
 const { Client, PermissionsBitField } = require('discord.js');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const client = new Client({
     intents: [
@@ -13,7 +14,6 @@ const client = new Client({
     partials: ['CHANNEL', 'MESSAGE']
 });
 
-client.config = require('./config.json');
 client.cooldowns = new Map();
 client.cache = new Map();
 
@@ -33,12 +33,12 @@ require('./utils/RegisterCommands.js')(client);
 // [Application startup] -> [Database connection] -> [client.login()] -> [Discord responds] -> [Ready event]
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ( async function() {
-	if (!client.config.MONGOURL) return console.warn('MongoDB URL is not provided in the config.json file, skipping database connection...');
-	await mongoose.connect(client.config.MONGOURL);
+	if (!process.env.MONGOURL) return console.warn('MongoDB URL is not provided in the .env file, skipping database connection...');
+	await mongoose.connect(process.env.MONGOURL);
 })();
 
 console.log(`Logging in...`);
-client.login(client.config.TOKEN);
+client.login(process.env.TOKEN);
 client.on('ready', function () {
     console.log(`Logged in as ${client.user.tag}!`);
 
