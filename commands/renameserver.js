@@ -54,16 +54,16 @@ module.exports = {
         });
 
         const onlineCount = onlineMembers.size;
-        if (onlineCount < 2) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ Not enough online users to start a vote.')
-                ],
-                ephemeral: true
-            });
-        }
+        // if (onlineCount < 2) {
+        //     return interaction.reply({
+        //         embeds: [
+        //             new EmbedBuilder()
+        //                 .setColor(0xe74c3c)
+        //                 .setDescription('❌ Not enough online users to start a vote.')
+        //         ],
+        //         ephemeral: true
+        //     });
+        // }
 
         await Cooldown.findOneAndUpdate(
             {
