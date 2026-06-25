@@ -98,6 +98,15 @@ module.exports = {
         });
 
         const onlineCount = onlineMembers.size;
+        const getCurrentOnlineCount = () => {
+            return interaction.guild.members.cache.filter(member => {
+                if (member.user.bot) return false;
+
+                const status = member.presence?.status ?? 'offline';
+                return status !== 'offline';
+            }).size;
+        };
+
         if (onlineCount < 2) {
             return interaction.reply({
                 embeds: [
@@ -139,7 +148,8 @@ module.exports = {
         const noVotes = new Set();
 
         const voteDuration = 60_000; // 60 seconds
-        const requiredVotes = Math.ceil(onlineCount * 0.6);
+        const requiredPercentage = 0.6 // 60%
+        const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
         // const requiredVotes = 1
 
         const embed = new EmbedBuilder()
@@ -233,19 +243,36 @@ module.exports = {
                 noVotes.add(userId);
             }
 
-            const updatedEmbed = EmbedBuilder.from(embed).setFields(
-                {
-                    name: 'Yes',
-                    value: `${yesVotes.size}`,
-                    inline: true
-                },
-                {
-                    name: 'No',
-                    value: `${noVotes.size}`,
-                    inline: true
-                }
-            );
+            const currentOnlineCount = getCurrentOnlineCount();
+            const currentRequiredVotes = Math.ceil(currentOnlineCount * requiredPercentage);
 
+            const updatedEmbed = new EmbedBuilder()
+                .setTitle('🗳️ Vote Mute')
+                .setColor(0xf1c40f)
+                .setDescription(
+                    [
+                        `Target: ${target}`,
+                        `Started by: ${interaction.user}`,
+                        '> A timeout vote has been started.',
+                        `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
+                        '',
+                        `*Required Votes to win:* ***${currentRequiredVotes}***`,
+                        `*Online Members:* **${currentOnlineCount}**`,
+                        `**Voting ends** <t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
+                    ].join('\n')
+                )
+                .addFields(
+                    {
+                        name: 'Yes',
+                        value: `${yesVotes.size}`,
+                        inline: true
+                    },
+                    {
+                        name: 'No',
+                        value: `${noVotes.size}`,
+                        inline: true
+                    }
+                );
             await buttonInteraction.update({
                 embeds: [updatedEmbed],
                 components: [row]
@@ -253,7 +280,10 @@ module.exports = {
         });
 
         collector.on('end', async () => {
-            const passed = yesVotes.size >= requiredVotes;
+            const finalOnlineCount = getCurrentOnlineCount();
+            const finalRequiredVotes = Math.ceil(finalOnlineCount * requiredPercentage);
+
+            const passed = yesVotes.size >= finalRequiredVotes;
 
             const disabledRow = new ActionRowBuilder().addComponents(
                 ButtonBuilder.from(row.components[0]).setDisabled(true),
@@ -280,7 +310,7 @@ module.exports = {
 
                     await targetMember.timeout(
                         duration * 60 * 1000,
-                        `Vote mute passed (${yesVotes.size}/${onlineCount} online users voted yes)`
+                        `Vote mute passed (${yesVotes.size}/${finalOnlineCount} online users voted yes)`
                     );
 
                     const resultEmbed = new EmbedBuilder()
@@ -290,7 +320,7 @@ module.exports = {
                             `${target} has been muted for **${duration} minute${duration === 1 ? '' : 's'}**.\n` +
                             `> Yes: **${yesVotes.size}**\n` +
                             `> No: **${noVotes.size}**\n` +
-                            `> Required Votes to win: **${requiredVotes}**`
+                            `> Required Votes to win: **${finalRequiredVotes}**`
                         );
 
                     try {
@@ -344,7 +374,7 @@ module.exports = {
                         `${target} will not be muted.\n` +
                         `> Yes: **${yesVotes.size}**\n` +
                         `> No: **${noVotes.size}**\n` +
-                        `> Required Votes to win: **${requiredVotes}**`
+                        `> Required Votes to win: **${finalRequiredVotes}**`
                     );
 
                 await message.edit({
