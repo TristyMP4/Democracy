@@ -150,6 +150,7 @@ module.exports = {
         const voteDuration = 60_000; // 60 seconds
         const requiredPercentage = 0.6 // 60%
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
+        const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R></t:$>`
         // const requiredVotes = 1
 
         const embed = new EmbedBuilder()
@@ -164,7 +165,7 @@ module.exports = {
                     '',
                     `*Required Votes to win:* ***${requiredVotes}***`,
                     `*Online Members:* **${onlineCount}**`,
-                    `**Voting ends** <t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
+                    `**Voting ends** ${voteDurationString}`
                 ].join('\n')
             )
             .addFields(
@@ -258,7 +259,7 @@ module.exports = {
                         '',
                         `*Required Votes to win:* ***${currentRequiredVotes}***`,
                         `*Online Members:* **${currentOnlineCount}**`,
-                        `**Voting ends** <t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
+                        `**Voting ends** ${voteDurationString}`
                     ].join('\n')
                 )
                 .addFields(
