@@ -389,15 +389,24 @@ module.exports = {
                         `Vote mute passed (${yesVotes.size}/${finalOnlineCount} online users voted yes)`
                     );
 
+                    const descriptionLines = [
+                        `${target} has been muted for **${duration} minute${duration === 1 ? '' : 's'}**`,
+                    ];
+
+                    if (reason?.trim()) {
+                        descriptionLines.push(`**Reason:** \`${reason}\``);
+                    }
+
+                    descriptionLines.push(
+                        `> Yes: **${yesVotes.size}**`,
+                        `> No: **${noVotes.size}**`,
+                        `> Required Votes to win: **${finalRequiredVotes}**`,
+                    );
+
                     const resultEmbed = new EmbedBuilder()
                         .setTitle('✅ Vote Passed')
                         .setColor(0x2ecc71)
-                        .setDescription(
-                            `${target} has been muted for **${duration} minute${duration === 1 ? '' : 's'}**.\n` +
-                            `> Yes: **${yesVotes.size}**\n` +
-                            `> No: **${noVotes.size}**\n` +
-                            `> Required Votes to win: **${finalRequiredVotes}**`
-                        );
+                        .setDescription(descriptionLines.join('\n'))
 
                     try {
                         await target.send({
@@ -408,6 +417,7 @@ module.exports = {
                                     .setDescription(
                                         `You were muted in **${interaction.guild.name}** via a community vote.\n\n` +
                                         `> ⏱ Duration: **${duration} minute${duration === 1 ? '' : 's'}**\n` +
+                                        `> ⚙️ Reason: \`${reason}\`\n` +
                                         `> 📋 Initial Voter: **${interaction.user.tag}**`
                                     )
                                     .setTimestamp()

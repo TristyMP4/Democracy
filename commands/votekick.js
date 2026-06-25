@@ -374,16 +374,25 @@ module.exports = {
                     );
 
                     await targetMember.kick(`Vote kick passed (${yesVotes.size}/${finalOnlineCount} online users voted yes)`);
+                    const descriptionLines = [
+                        `${target} has been **kicked from the server.**`,
+                    ];
+
+                    if (reason?.trim()) {
+                        descriptionLines.push(`**Reason:** \`${reason}\``);
+                    }
+
+                    descriptionLines.push(
+                        `> Yes: **${yesVotes.size}**`,
+                        `> No: **${noVotes.size}**`,
+                        `> Required Votes to win: **${finalRequiredVotes}**`,
+                    );
+
                     const resultEmbed = new EmbedBuilder()
                         .setTitle('✅ Vote Passed')
                         .setColor(0x2ecc71)
-                        .setDescription(
-                            `${target} has been kicked from the server.\n` +
-                            `> Yes: **${yesVotes.size}**\n` +
-                            `> No: **${noVotes.size}**\n` +
-                            `> Required Votes to win: **${finalRequiredVotes}**`
-                        )
-                        .setTimestamp();
+                        .setDescription(descriptionLines.join('\n'))
+
                     await message.edit({
                         embeds: [resultEmbed],
                         components: [disabledRow]
