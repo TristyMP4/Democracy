@@ -86,7 +86,6 @@ module.exports = {
                 [
                     `Started by: ${interaction.user}`,
                     `Now Playing: **${currentTrack.title}**`,
-                    '',
                     '> A skip vote has been started.',
                     `> If **50%** of listeners vote **Yes**, the song will be **skipped**.`,
                     '',
