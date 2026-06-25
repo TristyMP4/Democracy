@@ -24,11 +24,8 @@ client.cache = new Map();
 
 const player = new Player(client);
 (async () => {
-    // Load default extractors but EXCLUDE the broken built-in YouTube one
-    // (it conflicts with the working YoutubeiExtractor)
-    await player.extractors.loadMulti(DefaultExtractors, {
-        YouTubeExtractor: { disabled: true }
-    });
+    // Load default extractors (SoundCloud, Spotify, Vimeo, etc.)
+    await player.extractors.loadMulti(DefaultExtractors);
 
     const ytCredentials = process.env.YT_CREDENTIALS || '';
     console.log(`[MUSIC] YouTube credentials: ${ytCredentials ? `found (${ytCredentials.length} chars)` : 'not set'}`);
