@@ -26,7 +26,9 @@ const player = new Player(client);
 player.extractors.loadMulti(DefaultExtractors).then(() => {
     console.log('Loaded music extractors');
 });
-player.extractors.register(YoutubeiExtractor, {});
+player.extractors.register(YoutubeiExtractor, {
+    authentication: process.env.YT_CREDENTIALS || ''
+});
 require('./utils/MusicEvents.js')(player);
 
 // Each of these exports a function, it's the same as doing
