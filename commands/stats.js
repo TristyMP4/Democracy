@@ -47,6 +47,7 @@ module.exports = {
 
         const votemutes = data.votemutes;
         const votekicks = data.votekicks;
+        const voteskips = data.voteskips;
 
         const embed = new EmbedBuilder()
             .setTitle(`📊 Voting Stats - ${user.tag}`)
@@ -69,6 +70,14 @@ module.exports = {
                         `Passed: **${votekicks.passed}**\n` +
                         `Failed: **${votekicks.failed}**\n` +
                         `Received: **${votekicks.received}**`,
+                    inline: true
+                },
+                {
+                    name: '⏭️ Voteskips',
+                    value:
+                        `Initiated: **${voteskips.initiated}**\n` +
+                        `Passed: **${voteskips.passed}**\n` +
+                        `Failed: **${voteskips.failed}**`,
                     inline: true
                 }
             )

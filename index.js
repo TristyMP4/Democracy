@@ -2,6 +2,8 @@ const { Client, PermissionsBitField, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const Stats = require("./schemas/stats.js")
 require('dotenv').config();
+const { Player } = require('discord-player');
+const { DefaultExtractors } = require('@discord-player/extractor');
 
 const client = new Client({
     intents: [
@@ -11,12 +13,19 @@ const client = new Client({
         'GuildPresences',
         'DirectMessages',
         'MessageContent',
+        'GuildVoiceStates',
     ],
     partials: ['CHANNEL', 'MESSAGE']
 });
 
 client.cooldowns = new Map();
 client.cache = new Map();
+
+const player = new Player(client);
+player.extractors.loadMulti(DefaultExtractors).then(() => {
+    console.log('Loaded music extractors');
+});
+require('./utils/MusicEvents.js')(player);
 
 // Each of these exports a function, it's the same as doing
 // const ComponentLoader = require('./utils/ComponentLoader.js');
