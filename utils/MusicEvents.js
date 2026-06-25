@@ -12,6 +12,13 @@ module.exports = function (player) {
         const channel = queue.metadata?.channel;
         if (!channel) return;
 
+        // Skip if this was triggered directly by a /play command (within 2s)
+        // The play command already sends its own response — this avoids a double message.
+        // Auto-advance notifications (when one song ends and the next starts) still fire.
+        if (queue.metadata?.lastPlayCommand && Date.now() - queue.metadata.lastPlayCommand < 2000) {
+            return;
+        }
+
         const embed = new EmbedBuilder()
             .setTitle('🎶 Now Playing')
             .setDescription(`[**${track.title}**](${track.url})`)

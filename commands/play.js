@@ -59,6 +59,12 @@ module.exports = {
                 requestedBy: interaction.user
             });
 
+            // Suppress the duplicate "Now Playing" from MusicEvents
+            // (this command already responds with track info)
+            if (result.queue?.metadata) {
+                result.queue.metadata.lastPlayCommand = Date.now();
+            }
+
             const track = result.track;
 
             const embed = new EmbedBuilder()
