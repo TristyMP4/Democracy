@@ -26,11 +26,18 @@ module.exports = {
                 .setRequired(true)
                 .setMinValue(1)
                 .setMaxValue(15)
+        )
+        .addStringOption(option =>
+            option
+                .setName('reason')
+                .setDescription('Reason for the vote')
+                .setRequired(false)
         ),
 
     async execute(interaction) {
         const target = interaction.options.getUser('user');
         const duration = interaction.options.getInteger('duration');
+        const reason = interaction.options.getString('reason');
 
         const commandName = 'votemute';
         const existingCooldown = await Cooldown.findOne({
@@ -153,21 +160,28 @@ module.exports = {
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
         // const requiredVotes = 1
 
+        const descriptionLines = [
+            `Target: ${target}`,
+            `Started by: ${interaction.user}`
+        ];
+
+        if (reason?.trim()) {
+            descriptionLines.push(`Reason: ${reason}`);
+        }
+
+        descriptionLines.push(
+            '> A timeout vote has been started.',
+            `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
+            '',
+            `*Required Votes to win:* ***${requiredVotes}***`,
+            `*Online Members:* **${onlineCount}**`,
+            `**Voting ends** ${voteDurationString}`
+        );
+
         const embed = new EmbedBuilder()
             .setTitle('🗳️ Vote Mute')
             .setColor(0xf1c40f)
-            .setDescription(
-                [
-                    `Target: ${target}`,
-                    `Started by: ${interaction.user}`,
-                    '> A timeout vote has been started.',
-                    `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
-                    '',
-                    `*Required Votes to win:* ***${requiredVotes}***`,
-                    `*Online Members:* **${onlineCount}**`,
-                    `**Voting ends** ${voteDurationString}`
-                ].join('\n')
-            )
+            .setDescription(descriptionLines.join('\n'))
             .addFields(
                 {
                     name: 'Yes',
@@ -179,8 +193,8 @@ module.exports = {
                     value: '0',
                     inline: true
                 }
-            );
-
+            )
+            .setTimestamp();
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('vote_yes')
@@ -190,7 +204,12 @@ module.exports = {
             new ButtonBuilder()
                 .setCustomId('vote_no')
                 .setLabel('No')
-                .setStyle(ButtonStyle.Danger)
+                .setStyle(ButtonStyle.Danger),
+
+            new ButtonBuilder()
+                .setCustomId('vote_list')
+                .setLabel('Votes')
+                .setStyle(ButtonStyle.Secondary)
         );
 
         await interaction.reply({
@@ -209,6 +228,36 @@ module.exports = {
         });
 
         collector.on('collect', async buttonInteraction => {
+            if (buttonInteraction.customId === 'vote_list') {
+
+                const yesUsers = [...yesVotes]
+                    .map(id => `<@${id}>`)
+                    .join('\n') || '*Nobody*';
+
+                const noUsers = [...noVotes]
+                    .map(id => `<@${id}>`)
+                    .join('\n') || '*Nobody*';
+
+                const votesEmbed = new EmbedBuilder()
+                    .setTitle('📊 Current Votes')
+                    .setColor(0x95a5a6)
+                    .addFields(
+                        {
+                            name: `✅ Yes (${yesVotes.size})`,
+                            value: yesUsers
+                        },
+                        {
+                            name: `❌ No (${noVotes.size})`,
+                            value: noUsers
+                        }
+                    );
+
+                return buttonInteraction.reply({
+                    embeds: [votesEmbed],
+                    ephemeral: true
+                });
+            }
+
             const member = await interaction.guild.members.fetch(
                 buttonInteraction.user.id
             );
@@ -247,21 +296,28 @@ module.exports = {
             const currentOnlineCount = getCurrentOnlineCount();
             const currentRequiredVotes = Math.ceil(currentOnlineCount * requiredPercentage);
 
+            const descriptionLines = [
+                `Target: ${target}`,
+                `Started by: ${interaction.user}`
+            ];
+
+            if (reason?.trim()) {
+                descriptionLines.push(`Reason: ${reason}`);
+            }
+
+            descriptionLines.push(
+                '> A timeout vote has been started.',
+                `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
+                '',
+                `*Required Votes to win:* ***${currentRequiredVotes}***`,
+                `*Online Members:* **${currentOnlineCount}**`,
+                `**Voting ends** ${voteDurationString}`
+            );
+
             const updatedEmbed = new EmbedBuilder()
                 .setTitle('🗳️ Vote Mute')
                 .setColor(0xf1c40f)
-                .setDescription(
-                    [
-                        `Target: ${target}`,
-                        `Started by: ${interaction.user}`,
-                        '> A timeout vote has been started.',
-                        `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
-                        '',
-                        `*Required Votes to win:* ***${currentRequiredVotes}***`,
-                        `*Online Members:* **${currentOnlineCount}**`,
-                        `**Voting ends** ${voteDurationString}`
-                    ].join('\n')
-                )
+                .setDescription(descriptionLines.join('\n'))
                 .addFields(
                     {
                         name: 'Yes',
@@ -273,7 +329,8 @@ module.exports = {
                         value: `${noVotes.size}`,
                         inline: true
                     }
-                );
+                )
+                .setTimestamp();
             await buttonInteraction.update({
                 embeds: [updatedEmbed],
                 components: [row]
@@ -288,7 +345,8 @@ module.exports = {
 
             const disabledRow = new ActionRowBuilder().addComponents(
                 ButtonBuilder.from(row.components[0]).setDisabled(true),
-                ButtonBuilder.from(row.components[1]).setDisabled(true)
+                ButtonBuilder.from(row.components[1]).setDisabled(true),
+                ButtonBuilder.from(row.components[2]).setDisabled(true)
             );
 
             if (passed) {
@@ -352,8 +410,8 @@ module.exports = {
                         .setColor(0xe74c3c)
                         .setDescription(
                             `The vote passed, but I couldn't mute the user.\n\`\`\`${err.message}\`\`\``
-                        );
-
+                        )
+                        .setTimestamp();
                     await message.edit({
                         embeds: [errorEmbed],
                         components: [disabledRow]
@@ -376,8 +434,8 @@ module.exports = {
                         `> Yes: **${yesVotes.size}**\n` +
                         `> No: **${noVotes.size}**\n` +
                         `> Required Votes to win: **${finalRequiredVotes}**`
-                    );
-
+                    )
+                    .setTimestamp();
                 await message.edit({
                     embeds: [failEmbed],
                     components: [disabledRow]
