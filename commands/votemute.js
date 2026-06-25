@@ -206,7 +206,11 @@ module.exports = {
 
             if (status === 'offline') {
                 return buttonInteraction.reply({
-                    content: '❌ You cannot vote while appearing offline.',
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(0xe74c3c)
+                            .setDescription('❌ You cannot vote while appearing offline.')
+                    ],
                     ephemeral: true
                 });
             }
