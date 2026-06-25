@@ -156,7 +156,7 @@ module.exports = {
 
         const voteDuration = 60_000; // 60 seconds
         const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
-        const requiredPercentage = 0.6 // 60%
+        const requiredPercentage = 0.1 // 60%
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
         // const requiredVotes = 1
 
@@ -170,8 +170,8 @@ module.exports = {
         }
 
         descriptionLines.push(
-            '> A timeout vote has been started.',
-            `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
+            '> A mute vote has been started.',
+            `> If **60%** of online members vote **Yes**, the user will be muted for **${duration} minute${duration === 1 ? '' : 's'}**.`,
             '',
             `*Required Votes to win:* ***${requiredVotes}***`,
             `*Online Members:* **${onlineCount}**`,
@@ -306,8 +306,8 @@ module.exports = {
             }
 
             descriptionLines.push(
-                '> A timeout vote has been started.',
-                `> If **60%** of online members vote **Yes**, the user will be timed out for **${duration} minute${duration === 1 ? '' : 's'}**.`,
+                '> A mute vote has been started.',
+                `> If **60%** of online members vote **Yes**, the user will be muted for **${duration} minute${duration === 1 ? '' : 's'}**.`,
                 '',
                 `*Required Votes to win:* ***${currentRequiredVotes}***`,
                 `*Online Members:* **${currentOnlineCount}**`,
