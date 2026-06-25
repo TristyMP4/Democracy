@@ -1,4 +1,4 @@
-const { Client, PermissionsBitField } = require('discord.js');
+const { Client, PermissionsBitField, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const Stats = require("./schemas/stats.js")
 require('dotenv').config();
