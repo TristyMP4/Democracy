@@ -178,6 +178,19 @@ module.exports = {
         });
 
         collector.on('collect', async buttonInteraction => {
+            const member = await interaction.guild.members.fetch(
+                buttonInteraction.user.id
+            );
+
+            const status = member.presence?.status ?? 'offline';
+
+            if (status === 'offline') {
+                return buttonInteraction.reply({
+                    content: '❌ You cannot vote while appearing offline.',
+                    ephemeral: true
+                });
+            }
+
             if (
                 buttonInteraction.customId !== 'vote_yes' &&
                 buttonInteraction.customId !== 'vote_no'
