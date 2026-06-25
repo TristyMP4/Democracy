@@ -25,11 +25,12 @@ client.cache = new Map();
 const player = new Player(client);
 (async () => {
     await player.extractors.loadMulti(DefaultExtractors);
+
+    const ytCredentials = process.env.YT_CREDENTIALS || '';
+    console.log(`[MUSIC] YouTube credentials: ${ytCredentials ? `found (${ytCredentials.length} chars)` : 'not set'}`);
+
     await player.extractors.register(YoutubeiExtractor, {
-        authentication: process.env.YT_CREDENTIALS || '',
-        streamOptions: {
-            useClient: 'WEB'
-        }
+        authentication: ytCredentials
     });
     console.log('Loaded music extractors');
 })().catch(err => console.error('Failed to load music extractors:', err));
