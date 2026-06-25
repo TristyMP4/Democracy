@@ -156,7 +156,7 @@ module.exports = {
 
         const voteDuration = 60_000; // 60 seconds
         const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
-        const requiredPercentage = 0.1 // 60%
+        const requiredPercentage = 0.6 // 60%
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
         // const requiredVotes = 1
 
