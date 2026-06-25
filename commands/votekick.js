@@ -252,11 +252,7 @@ module.exports = {
                         { upsert: true }
                     );
 
-                    await targetMember.timeout(
-                        duration * 60 * 1000,
-                        `Vote kick passed (${yesVotes.size}/${onlineCount} online users voted yes)`
-                    );
-
+                    await targetMember.kick(`Vote mute passed (${yesVotes.size}/${onlineCount} online users voted yes)`);
                     const resultEmbed = new EmbedBuilder()
                         .setTitle('✅ Vote Passed')
                         .setColor(0x2ecc71)

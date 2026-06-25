@@ -71,11 +71,11 @@ module.exports = {
                 embeds: [
                     new EmbedBuilder()
                         .setColor(0xe74c3c)
-                        .setDescription('❌ Mute duration must be between **1** and **5** minutes.')
+                        .setDescription('❌ Mute duration must be between **1** and **15** minutes.')
                 ],
                 ephemeral: true
             });
-        }
+        }z
 
         const targetMember = await interaction.guild.members.fetch(target.id);
         if (!targetMember.moderatable) {
