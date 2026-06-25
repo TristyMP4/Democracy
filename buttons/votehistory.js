@@ -4,6 +4,11 @@ module.exports = {
     async execute(interaction, client) {
         const userId = interaction.customId.split(':')[1];
 
+        return interaction.reply({
+            content: `User ID: ${userId}`,
+            ephemeral: true
+        });
+
         const data = await Stat.findOne({ userId });
 
         if (!data) {

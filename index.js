@@ -49,7 +49,13 @@ client.on('messageCreate', () => {} )
 
 async function InteractionHandler(interaction, type) {
 
-    const component = client[type].get( interaction.customId ?? interaction.commandName );
+    let key = interaction.customId ?? interaction.commandName;
+    if (interaction.isButton()) {
+        if (key.includes('_')) {
+            key = key.split(':')[0]; // safer delimiter approach (we fix next step)
+        }
+    }
+    const component = client[type].get(key);
     if (!component) {
         // console.error(`${type} not found: ${interaction.customId ?? interaction.commandName}`);
         return;
