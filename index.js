@@ -1,5 +1,6 @@
 const { Client, PermissionsBitField } = require('discord.js');
 const mongoose = require('mongoose');
+const Stats = require("./schemas/stats.js")
 require('dotenv').config();
 
 const client = new Client({
@@ -142,8 +143,7 @@ client.on('interactionCreate', async interaction => {
     if (!interaction.customId.startsWith('view_history_')) return;
 
     const userId = interaction.customId.split('_')[2];
-
-    const data = await Stat.findOne({ userId });
+    const data = await Stats.findOne({ userId });
 
     if (!data) {
         return interaction.reply({
