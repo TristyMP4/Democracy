@@ -4,7 +4,6 @@ const Stats = require("./schemas/stats.js")
 require('dotenv').config();
 const { Player } = require('discord-player');
 const { DefaultExtractors } = require('@discord-player/extractor');
-const { YoutubeiExtractor } = require('discord-player-youtubei');
 
 const client = new Client({
     intents: [
@@ -27,18 +26,6 @@ const player = new Player(client);
     // Load default extractors (SoundCloud, Spotify, Vimeo, etc.)
     await player.extractors.loadMulti(DefaultExtractors);
     console.log('[MUSIC] Default extractors loaded');
-
-    const ytCredentials = process.env.YT_CREDENTIALS || '';
-    console.log(`[MUSIC] YouTube credentials: ${ytCredentials ? `found (${ytCredentials.length} chars)` : 'not set'}`);
-
-    try {
-        await player.extractors.register(YoutubeiExtractor, {
-            authentication: ytCredentials
-        });
-        console.log('[MUSIC] YoutubeiExtractor registered successfully');
-    } catch (err) {
-        console.error('[MUSIC] YoutubeiExtractor FAILED to register:', err.message);
-    }
 
     // List all active extractors
     const registered = player.extractors.store;

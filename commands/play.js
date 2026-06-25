@@ -46,7 +46,7 @@ module.exports = {
 
         try {
             const result = await player.play(channel, query, {
-                searchEngine: 'com.retrouser955.discord-player.discord-player-youtubei',
+                searchEngine: 'spotifySearch',
                 nodeOptions: {
                     metadata: {
                         channel: interaction.channel,
