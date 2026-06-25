@@ -26,14 +26,26 @@ const player = new Player(client);
 (async () => {
     // Load default extractors (SoundCloud, Spotify, Vimeo, etc.)
     await player.extractors.loadMulti(DefaultExtractors);
+    console.log('[MUSIC] Default extractors loaded');
 
     const ytCredentials = process.env.YT_CREDENTIALS || '';
     console.log(`[MUSIC] YouTube credentials: ${ytCredentials ? `found (${ytCredentials.length} chars)` : 'not set'}`);
 
-    await player.extractors.register(YoutubeiExtractor, {
-        authentication: ytCredentials
-    });
-    console.log('Loaded music extractors');
+    try {
+        await player.extractors.register(YoutubeiExtractor, {
+            authentication: ytCredentials
+        });
+        console.log('[MUSIC] YoutubeiExtractor registered successfully');
+    } catch (err) {
+        console.error('[MUSIC] YoutubeiExtractor FAILED to register:', err.message);
+    }
+
+    // List all active extractors
+    const registered = player.extractors.store;
+    console.log(`[MUSIC] Active extractors (${registered.size}):`);
+    for (const [id] of registered) {
+        console.log(`  - ${id}`);
+    }
 })().catch(err => console.error('Failed to load music extractors:', err));
 require('./utils/MusicEvents.js')(player);
 
