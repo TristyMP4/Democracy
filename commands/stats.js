@@ -1,6 +1,9 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
 } = require('discord.js');
 
 const Stat = require('../schemas/stats');
@@ -72,8 +75,15 @@ module.exports = {
             .setFooter({ text: 'Vote statistics' })
             .setTimestamp();
 
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`view_history:${user.id}`)
+                .setLabel('View Vote History')
+                .setStyle(ButtonStyle.Secondary)
+        );
         return interaction.reply({
-            embeds: [embed]
+            embeds: [embed],
+            components: [row]
         });
     }
 };

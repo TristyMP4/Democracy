@@ -134,7 +134,7 @@ module.exports = {
         const yesVotes = new Set();
         const noVotes = new Set();
 
-        const voteDuration = 60_000; // 60 seconds
+        const voteDuration = 120_000; // 120 seconds
         const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
         const requiredPercentage = 0.75 // 75%
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
@@ -146,7 +146,7 @@ module.exports = {
         ];
 
         if (reason?.trim()) {
-            descriptionLines.push(`Reason: ${reason}`);
+            descriptionLines.push(`**Reason:** \`${reason}\``);
         }
 
         descriptionLines.push(
@@ -282,7 +282,7 @@ module.exports = {
             ];
 
             if (reason?.trim()) {
-                descriptionLines.push(`Reason: ${reason}`);
+                descriptionLines.push(`**Reason:** \`${reason}\``);
             }
 
             descriptionLines.push(
@@ -338,15 +338,7 @@ module.exports = {
                         },
                         { upsert: true }
                     );
-
-                    await Stat.findOneAndUpdate(
-                        { userId: target.id },
-                        {
-                            $inc: { 'votekicks.received': 1 }
-                        },
-                        { upsert: true }
-                    );
-
+                    
                     try {
                         await target.send({
                             embeds: [
@@ -363,6 +355,23 @@ module.exports = {
                     } catch (err) {
                         // user has DMs closed or blocked bot
                     }
+
+                    await Stat.findOneAndUpdate(
+                        { userId: target.id },
+                        {
+                            $inc: { 'votekicks.received': 1 },
+
+                            $push: {
+                                'votekicks.history': {
+                                    reason: reason || 'No reason provided',
+                                    duration,
+                                    initiatedBy: interaction.user.id,
+                                    date: new Date()
+                                }
+                            }
+                        },
+                        { upsert: true }
+                    );
 
                     await targetMember.kick(`Vote kick passed (${yesVotes.size}/${finalOnlineCount} online users voted yes)`);
                     const resultEmbed = new EmbedBuilder()

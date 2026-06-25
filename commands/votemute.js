@@ -166,7 +166,7 @@ module.exports = {
         ];
 
         if (reason?.trim()) {
-            descriptionLines.push(`Reason: ${reason}`);
+            descriptionLines.push(`**Reason:** \`${reason}\``);
         }
 
         descriptionLines.push(
@@ -302,7 +302,7 @@ module.exports = {
             ];
 
             if (reason?.trim()) {
-                descriptionLines.push(`Reason: ${reason}`);
+                descriptionLines.push(`**Reason:** \`${reason}\``);
             }
 
             descriptionLines.push(
@@ -363,6 +363,23 @@ module.exports = {
                         { userId: target.id },
                         {
                             $inc: { 'votemutes.received': 1 }
+                        },
+                        { upsert: true }
+                    );
+
+                    await Stat.findOneAndUpdate(
+                        { userId: target.id },
+                        {
+                            $inc: { 'votemutes.received': 1 },
+
+                            $push: {
+                                'votemutes.history': {
+                                    reason: reason || 'No reason provided',
+                                    duration,
+                                    initiatedBy: interaction.user.id,
+                                    date: new Date()
+                                }
+                            }
                         },
                         { upsert: true }
                     );
