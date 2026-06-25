@@ -70,7 +70,6 @@ module.exports = {
             .setDescription(
                 [
                     `Started by: ${interaction.user}`,
-                    '',
                     '> A stop vote has been started.',
                     `> If **50%** of listeners vote **Yes**, the music will be **stopped** and the queue **cleared**.`,
                     '',
