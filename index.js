@@ -4,6 +4,7 @@ const Stats = require("./schemas/stats.js")
 require('dotenv').config();
 const { Player } = require('discord-player');
 const { DefaultExtractors } = require('@discord-player/extractor');
+const { YoutubeiExtractor } = require('discord-player-youtubei');
 
 const client = new Client({
     intents: [
@@ -25,6 +26,7 @@ const player = new Player(client);
 player.extractors.loadMulti(DefaultExtractors).then(() => {
     console.log('Loaded music extractors');
 });
+player.extractors.register(YoutubeiExtractor, {});
 require('./utils/MusicEvents.js')(player);
 
 // Each of these exports a function, it's the same as doing
