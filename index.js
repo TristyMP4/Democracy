@@ -23,15 +23,16 @@ client.cooldowns = new Map();
 client.cache = new Map();
 
 const player = new Player(client);
-player.extractors.loadMulti(DefaultExtractors).then(() => {
+(async () => {
+    await player.extractors.loadMulti(DefaultExtractors);
+    await player.extractors.register(YoutubeiExtractor, {
+        authentication: process.env.YT_CREDENTIALS || '',
+        streamOptions: {
+            useClient: 'WEB'
+        }
+    });
     console.log('Loaded music extractors');
-});
-player.extractors.register(YoutubeiExtractor, {
-    authentication: process.env.YT_CREDENTIALS || '',
-    streamOptions: {
-        useClient: 'WEB'
-    }
-});
+})().catch(err => console.error('Failed to load music extractors:', err));
 require('./utils/MusicEvents.js')(player);
 
 // Each of these exports a function, it's the same as doing
