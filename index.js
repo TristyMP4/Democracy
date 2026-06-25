@@ -27,7 +27,10 @@ player.extractors.loadMulti(DefaultExtractors).then(() => {
     console.log('Loaded music extractors');
 });
 player.extractors.register(YoutubeiExtractor, {
-    authentication: process.env.YT_CREDENTIALS || ''
+    authentication: process.env.YT_CREDENTIALS || '',
+    streamOptions: {
+        useClient: 'WEB'
+    }
 });
 require('./utils/MusicEvents.js')(player);
 
