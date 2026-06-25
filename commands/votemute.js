@@ -99,8 +99,10 @@ module.exports = {
         await interaction.guild.members.fetch();
         const onlineMembers = interaction.guild.members.cache.filter(member => {
             if (member.user.bot) return false;
-
             const status = member.presence?.status ?? 'offline';
+                
+            // ignore target user if they are online
+            if (member.id === target.id && status !== 'offline') return false;
             return status !== 'offline';
         });
 
@@ -108,8 +110,10 @@ module.exports = {
         const getCurrentOnlineCount = () => {
             return interaction.guild.members.cache.filter(member => {
                 if (member.user.bot) return false;
-
                 const status = member.presence?.status ?? 'offline';
+                
+                // ignore target user if they are online
+                if (member.id === target.id && status !== 'offline') return false;
                 return status !== 'offline';
             }).size;
         };
@@ -257,11 +261,20 @@ module.exports = {
                     ephemeral: true
                 });
             }
+            if (buttonInteraction.user.id === target.id) {
+                return buttonInteraction.reply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(0xe74c3c)
+                            .setDescription('❌ You cannot vote on yourself!')
+                    ],
+                    ephemeral: true
+                });
+            }
 
             const member = await interaction.guild.members.fetch(
                 buttonInteraction.user.id
             );
-
             const status = member.presence?.status ?? 'offline';
 
             if (status === 'offline') {
