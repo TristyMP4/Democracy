@@ -57,17 +57,6 @@ module.exports = {
             });
         }
 
-        if (duration < 1 || duration > 15) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ Mute duration must be between **1** and **5** minutes.')
-                ],
-                ephemeral: true
-            });
-        }
-
         const targetMember = await interaction.guild.members.fetch(target.id);
         if (!targetMember.moderatable) {
             return interaction.reply({
