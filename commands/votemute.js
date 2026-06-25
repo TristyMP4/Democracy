@@ -75,7 +75,7 @@ module.exports = {
                 ],
                 ephemeral: true
             });
-        }z
+        }
 
         const targetMember = await interaction.guild.members.fetch(target.id);
         if (!targetMember.moderatable) {
