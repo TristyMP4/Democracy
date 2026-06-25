@@ -49,13 +49,7 @@ client.on('messageCreate', () => {} )
 
 async function InteractionHandler(interaction, type) {
 
-    let key = interaction.customId ?? interaction.commandName;
-    if (interaction.isButton()) {
-        if (key.includes('_')) {
-            key = key.split(':')[0]; // safer delimiter approach (we fix next step)
-        }
-    }
-    const component = client[type].get(key);
+    const component = client[type].get( interaction.customId ?? interaction.commandName );
     if (!component) {
         // console.error(`${type} not found: ${interaction.customId ?? interaction.commandName}`);
         return;
@@ -140,4 +134,57 @@ client.on('interactionCreate', async function(interaction) {
 client.on('interactionCreate', async function(interaction) {
     if (!interaction.isModalSubmit()) return;
     await InteractionHandler(interaction, 'modals');
+});
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isButton()) return;
+
+    if (!interaction.customId.startsWith('view_history_')) return;
+
+    const userId = interaction.customId.split('_')[2];
+
+    const data = await Stat.findOne({ userId });
+
+    if (!data) {
+        return interaction.reply({
+            content: 'No history found.',
+            ephemeral: true
+        });
+    }
+
+    const mutes = data.votemutes.history || [];
+    const kicks = data.votekicks.history || [];
+
+    const formatHistory = (items, type) => {
+        if (!items.length) return `No ${type} history.`;
+
+        return items
+            .slice(-5) // last 5 entries
+            .reverse()
+            .map((h, i) => {
+                const date = `<t:${Math.floor(new Date(h.date).getTime() / 1000)}:R>`;
+                return `**${i + 1}.** <@${h.initiatedBy}> — *${h.reason || 'No reason'}*\n⏱ ${date}`;
+            })
+            .join('\n\n');
+    };
+
+    const historyEmbed = new EmbedBuilder()
+        .setTitle('📜 Vote History')
+        .setColor(0x2f3136)
+        .addFields(
+            {
+                name: '🔇 Votemutes (last 5)',
+                value: formatHistory(mutes, 'mute')
+            },
+            {
+                name: '🛑 Votekicks (last 5)',
+                value: formatHistory(kicks, 'kick')
+            }
+        )
+        .setTimestamp();
+
+    return interaction.reply({
+        embeds: [historyEmbed],
+        ephemeral: true
+    });
 });

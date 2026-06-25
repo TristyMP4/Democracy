@@ -77,7 +77,7 @@ module.exports = {
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId(`view_history:${user.id}`)
+                .setCustomId(`view_history_${user.id}`)
                 .setLabel('View Vote History')
                 .setStyle(ButtonStyle.Secondary)
         );
