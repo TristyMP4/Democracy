@@ -148,9 +148,9 @@ module.exports = {
         const noVotes = new Set();
 
         const voteDuration = 60_000; // 60 seconds
+        const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
         const requiredPercentage = 0.6 // 60%
         const requiredVotes = Math.ceil(onlineCount * requiredPercentage);
-        const voteDurationString = `<t:${Math.floor((Date.now() + voteDuration) / 1000)}:R></t:$>`
         // const requiredVotes = 1
 
         const embed = new EmbedBuilder()
