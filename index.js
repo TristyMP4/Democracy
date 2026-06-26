@@ -2,9 +2,6 @@ const { Client, PermissionsBitField, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const Stats = require("./schemas/stats.js")
 require('dotenv').config();
-const { Player } = require('discord-player');
-const { DefaultExtractors } = require('@discord-player/extractor');
-
 const client = new Client({
     intents: [
         'Guilds',
@@ -20,22 +17,6 @@ const client = new Client({
 
 client.cooldowns = new Map();
 client.cache = new Map();
-
-const player = new Player(client);
-(async () => {
-    // Load default extractors (SoundCloud, Spotify, Vimeo, etc.)
-    await player.extractors.loadMulti(DefaultExtractors);
-    console.log('[MUSIC] Default extractors loaded');
-
-    // List all active extractors
-    const registered = player.extractors.store;
-    console.log(`[MUSIC] Active extractors (${registered.size}):`);
-    for (const [id] of registered) {
-        console.log(`  - ${id}`);
-    }
-})().catch(err => console.error('Failed to load music extractors:', err));
-require('./utils/MusicEvents.js')(player);
-
 // Each of these exports a function, it's the same as doing
 // const ComponentLoader = require('./utils/ComponentLoader.js');
 // ComponentLoader(client);
