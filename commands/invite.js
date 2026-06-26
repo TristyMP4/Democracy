@@ -40,7 +40,7 @@ module.exports = {
             // Format the invite list
             let inviteList = '';
             sortedInvites.forEach(invite => {
-                inviteList += `**discord.gg/${invite.code}`;
+                inviteList += `\`discord.gg/${invite.code}\``;
             });
 
             // Discord embed descriptions have a 4096 character limit. 
@@ -50,7 +50,7 @@ module.exports = {
             }
 
             const embed = new EmbedBuilder()
-                .setTitle(`📨 Active Invites for ${interaction.guild.name}`)
+                .setTitle(`📨 Active Invites`)
                 .setDescription(inviteList)
                 .setColor(0x5865f2)
                 .setFooter({ text: `Total Invites: ${invites.size}` });
