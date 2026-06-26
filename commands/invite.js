@@ -40,12 +40,7 @@ module.exports = {
             // Format the invite list
             let inviteList = '';
             sortedInvites.forEach(invite => {
-                const inviter = invite.inviter ? `<@${invite.inviter.id}>` : 'Unknown';
-                const uses = invite.maxUses ? `${invite.uses}/${invite.maxUses}` : `${invite.uses}`;
-                const expires = invite.expiresAt ? `<t:${Math.floor(invite.expiresTimestamp / 1000)}:R>` : 'Never';
-                
-                inviteList += `**[${invite.code}](${invite.url})**\n`;
-                inviteList += `└ Created by: ${inviter} | Uses: \`${uses}\` | Expires: ${expires}\n\n`;
+                inviteList += `**discord.gg/${invite.code}`;
             });
 
             // Discord embed descriptions have a 4096 character limit. 
