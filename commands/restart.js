@@ -13,7 +13,7 @@ module.exports = {
                 new EmbedBuilder()
                     .setColor(0xe74c3c)
                     .setTitle('🔄 Bot Reboot')
-                    .setDescription('🛠️ Democracy is restarting.. [PM2 RESTART]')
+                    .setDescription('🛠️ Democracy is restarting.. **[PM2 RESTART]**')
                     .setFooter({
                         text: 'PM2 will handle the reboot, bot should be back up shortly!'
                     })
