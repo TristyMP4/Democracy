@@ -62,7 +62,7 @@ async function InteractionHandler(interaction, type) {
         }
 
         if (component.owner) {
-            if (interaction.user.id !== 'YOURUSERID') return await interaction.reply({ content: `⚠️ Only bot owners can use this command!`, ephemeral: true });
+            if (interaction.user.id !== '1487846158540738660') return await interaction.reply({ content: `⚠️ Only bot owners can use this command!`, ephemeral: true });
         }
 
         //the mod command property requires additional setup, watch the video here to set it up: https://youtu.be/2Tqy6Cp_10I?si=bharHI_Vw7qjaG2Q
