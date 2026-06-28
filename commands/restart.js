@@ -12,12 +12,13 @@ module.exports = {
             embeds: [
                 new EmbedBuilder()
                     .setColor(0xe74c3c)
-                    .setDescription('🔄 Restarting Democracy, [PM2 RESTART]')
+                    .setTitle('🔄 Bot Restart')
+                    .setDescription('🛠️ Restarting Democracy, [PM2 RESTART]')
                     .setFooter({
                         text: 'PM2 will handle the restart, bot should be back up shortly!'
                     })
             ],
-            ephemeral: true
+            ephemeral: false // False so people can see the swag restart lmao
         });
         setTimeout(() => {
             process.exit(0);
