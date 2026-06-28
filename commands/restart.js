@@ -1,0 +1,26 @@
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+
+module.exports = {
+    owner: true,
+    data: new SlashCommandBuilder()
+        .setName('restart')
+        .setDescription('Initiates a bot restart [DEV COMMAND].')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+
+    async execute(interaction) {
+        await interaction.reply({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(0xe74c3c)
+                    .setDescription('🔄 Restarting Democracy, [PM2 RESTART]')
+                    .setFooter({
+                        text: 'PM2 will handle the restart, bot should be back up shortly!'
+                    })
+            ],
+            ephemeral: true
+        });
+        setTimeout(() => {
+            process.exit(0);
+        }, 1000); // 1s delay to ensure the Discord API has time to send the reply message
+    }
+};
