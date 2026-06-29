@@ -1,6 +1,7 @@
 const { Client, PermissionsBitField, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const Stats = require("./schemas/stats.js")
+const owners = ['1487846158540738660'];
 require('dotenv').config();
 const client = new Client({
     intents: [
