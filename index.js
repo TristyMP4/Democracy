@@ -75,7 +75,7 @@ async function InteractionHandler(interaction, type) {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('🔒 Economy Locked')
-                        .setDescription(`**This command cannot be executed right now!**\n> Economy features are currently disabled.\n**Reason:** \`${settings.economyDisabledReason || 'Maintenance.'}\``)
+                        .setDescription(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\`\n> Economy features are currently disabled.`)
                         .setColor(0xe74c3c);
                     
                     return await interaction.reply({ embeds: [embed], ephemeral: true });

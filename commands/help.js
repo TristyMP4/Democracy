@@ -61,7 +61,7 @@ module.exports = {
             .setColor(0x5865f2)
             .setThumbnail(client.user.displayAvatarURL());
 
-        const response = await interaction.reply({ embeds: [initialEmbed], components: [row], fetchReply: true });
+        const response = await interaction.reply({ embeds: [initialEmbed], components: [row], fetchReply: true, ephemeral: true });
 
         // Fetch application commands so we can get their IDs for clickable mentions
         const appCommands = await client.application.commands.fetch().catch(() => new Map());
