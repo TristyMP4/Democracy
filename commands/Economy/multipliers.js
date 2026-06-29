@@ -3,7 +3,7 @@ const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
-    owner: true, // Tied to the InteractionHandler in index.js
+    owner: true,
     economy: true,
     data: new SlashCommandBuilder()
         .setName('multipliers')
@@ -20,7 +20,7 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false }); // Can make ephemeral sometimes
 
         const moneyOpt = interaction.options.getNumber('money');
         const luckOpt = interaction.options.getNumber('luck');
