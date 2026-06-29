@@ -71,10 +71,13 @@ async function InteractionHandler(interaction, type) {
             if (settings && settings.economyDisabled) {
                 // Let owners bypass the lock
                 if (interaction.user.id !== '1487846158540738660') {
-                    return await interaction.reply({ 
-                        content: `⚠️ **Economy System is currently disabled.**\n\n*Reason: ${settings.economyDisabledReason}*`, 
-                        ephemeral: true 
-                    });
+                    const { EmbedBuilder } = require('discord.js');
+                    const embed = new EmbedBuilder()
+                        .setTitle('🔒 Economy Locked')
+                        .setDescription(`The economy system is currently disabled globally.\n\n**Reason:** ${settings.economyDisabledReason || 'Maintenance.'}`)
+                        .setColor(0xe74c3c);
+                    
+                    return await interaction.reply({ embeds: [embed], ephemeral: true });
                 }
             }
         }
