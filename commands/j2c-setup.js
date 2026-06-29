@@ -3,7 +3,7 @@ const JoinToCreate = require('../schemas/JoinToCreate.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('j2c-setup')
+        .setName('join-to-create-setup')
         .setDescription('Configure the Join-to-Create voice system.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption(option =>

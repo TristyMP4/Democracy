@@ -1,28 +1,17 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ChannelType } = require('discord.js');
 
 module.exports = {
+    owner: true,
     data: new SlashCommandBuilder()
         .setName('changelog')
         .setDescription('Create a formatted changelog message and send it to a specific channel.')
         .addChannelOption(option =>
             option.setName('channel')
                 .setDescription('The channel to send the changelog to')
-                .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
                 .setRequired(true)
         ),
 
     async execute(interaction, client) {
-        // Owner Check
-        if (!client.application.owner) await client.application.fetch();
-        const ownerId = client.application.owner.id || client.application.owner.ownerId; 
-
-        if (interaction.user.id !== ownerId) {
-            return interaction.reply({
-                content: '❌ You must be the application owner to use this command.',
-                ephemeral: true
-            });
-        }
-
         const channel = interaction.options.getChannel('channel');
 
         // Store the target channel in the client cache so the modal can access it
