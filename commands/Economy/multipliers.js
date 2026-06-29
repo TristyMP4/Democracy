@@ -17,10 +17,16 @@ module.exports = {
             option.setName('luck')
                 .setDescription('The global luck multiplier (default 1.0)')
                 .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('ephemeral')
+                .setDescription('Whether the response should be hidden from others (default true)')
+                .setRequired(false)
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: false }); // Can make ephemeral sometimes
+        const isEphemeral = interaction.options.getBoolean('ephemeral') ?? true;
+        await interaction.deferReply({ ephemeral: isEphemeral });
 
         const moneyOpt = interaction.options.getNumber('money');
         const luckOpt = interaction.options.getNumber('luck');

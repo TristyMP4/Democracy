@@ -15,10 +15,16 @@ module.exports = {
             option.setName('reason')
                 .setDescription('The reason shown to users when they try to run an economy command')
                 .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('ephemeral')
+                .setDescription('Whether the response should be hidden from others (default true)')
+                .setRequired(false)
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        const isEphemeral = interaction.options.getBoolean('ephemeral') ?? true;
+        await interaction.deferReply({ ephemeral: isEphemeral });
 
         const disabled = interaction.options.getBoolean('disabled');
         const reason = interaction.options.getString('reason') || 'Maintenance in progress. Please try again later.';
