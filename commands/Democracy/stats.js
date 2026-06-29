@@ -6,7 +6,7 @@ const {
     ButtonStyle
 } = require('discord.js');
 
-const Stat = require('../schemas/stats');
+const Stat = require('../../schemas/stats');
 
 module.exports = {
     data: new SlashCommandBuilder()

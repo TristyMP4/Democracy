@@ -32,6 +32,12 @@ module.exports = function (client) {
 				if (module === 'commands') {
 					// If it is a command we check it has a data property
 					if (!(data.data instanceof SlashCommandBuilder)) throw 'Invalid command - Must use the slash command builder';
+					
+					// Determine category based on folder structure
+					const pathParts = path.split('/');
+					// path is e.g. "commands/economy/balance.js" or "commands/help.js"
+					data.category = pathParts.length > 2 ? pathParts[1] : 'Miscellaneous';
+
 					// And then add it to the cache by name
 					client[module].set(data.data.name, data);
 				} else {

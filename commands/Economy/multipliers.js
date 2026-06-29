@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const EconomySettings = require('../schemas/EconomySettings.js');
-const EconomyConfig = require('../utils/EconomyConfig.js');
+const EconomySettings = require('../../schemas/EconomySettings.js');
+const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
     owner: true, // Tied to the InteractionHandler in index.js

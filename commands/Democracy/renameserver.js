@@ -5,7 +5,7 @@ const {
     ButtonBuilder,
     ButtonStyle
 } = require('discord.js');
-const Cooldown = require('../schemas/cooldown');
+const Cooldown = require('../../schemas/cooldown');
 const cooldownMinutes = 10;
 
 module.exports = {

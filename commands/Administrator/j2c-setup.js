@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
-const JoinToCreate = require('../schemas/JoinToCreate.js');
+const JoinToCreate = require('../../schemas/JoinToCreate.js');
 
 module.exports = {
     data: new SlashCommandBuilder()

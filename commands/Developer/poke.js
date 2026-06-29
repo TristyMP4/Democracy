@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-	owner: true,
+    dev: true,
 	data: new SlashCommandBuilder()
 		.setName('poke')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
