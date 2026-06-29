@@ -1,0 +1,75 @@
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const EconomyUser = require('../schemas/EconomyUser.js');
+const EconomyConfig = require('../utils/EconomyConfig.js');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('use')
+        .setDescription('Use an item from your inventory.')
+        .addStringOption(option => {
+            const opt = option.setName('item')
+                .setDescription('The item to use')
+                .setRequired(true);
+            
+            // Build choices dynamically from config
+            Object.keys(EconomyConfig.items).forEach(key => {
+                if (EconomyConfig.items[key].usable) {
+                    opt.addChoices({ name: EconomyConfig.items[key].name, value: key });
+                }
+            });
+            return opt;
+        }),
+
+    async execute(interaction) {
+        await interaction.deferReply();
+
+        const itemId = interaction.options.getString('item');
+        const itemConfig = EconomyConfig.items[itemId];
+
+        try {
+            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
+            if (!userData || !userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
+                return interaction.followUp({ content: `❌ You do not have a **${itemConfig.name}** in your inventory!` });
+            }
+
+            // Consume item
+            userData.inventory.set(itemId, userData.inventory.get(itemId) - 1);
+
+            // Execute custom logic based on item
+            if (itemId === 'supply-signal') {
+                // Determine 1 to 3 items
+                const numItems = Math.floor(Math.random() * 3) + 1;
+                const allItemKeys = Object.keys(EconomyConfig.items);
+                
+                let receivedText = '';
+                for (let i = 0; i < numItems; i++) {
+                    const randomKey = allItemKeys[Math.floor(Math.random() * allItemKeys.length)];
+                    const receivedItem = EconomyConfig.items[randomKey];
+                    
+                    // Add to inventory
+                    const currentCount = userData.inventory.get(randomKey) || 0;
+                    userData.inventory.set(randomKey, currentCount + 1);
+
+                    receivedText += `${receivedItem.emoji} **${receivedItem.name}**\n`;
+                }
+
+                await userData.save();
+
+                const embed = new EmbedBuilder()
+                    .setTitle('🚁 Supply Drop Arrived!')
+                    .setDescription(`You threw the Supply Signal and a chopper dropped off a crate!\n\n**You received:**\n${receivedText}`)
+                    .setColor(EconomyConfig.successColor);
+
+                return interaction.followUp({ embeds: [embed] });
+            }
+
+            // Fallback for generic items
+            await userData.save();
+            await interaction.followUp({ content: `✅ You used **${itemConfig.name}**.` });
+
+        } catch (error) {
+            console.error('Use Error:', error);
+            await interaction.followUp({ content: '❌ An error occurred while using the item.' });
+        }
+    }
+};
