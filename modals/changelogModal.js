@@ -32,7 +32,7 @@ module.exports = {
             .setTimestamp();
 
         try {
-            await targetChannel.send({ content: '@here', embeds: [embed] });
+            await targetChannel.send({ content: '@everyone', embeds: [embed] });
             
             // Clean up cache
             client.cache.delete(`changelogChannel_${interaction.user.id}`);
