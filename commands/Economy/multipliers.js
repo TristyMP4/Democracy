@@ -4,6 +4,7 @@ const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
     owner: true, // Tied to the InteractionHandler in index.js
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('multipliers')
         .setDescription('Set the global economy multipliers.')

@@ -3,6 +3,7 @@ const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('inventory')
         .setDescription('Check your items.')

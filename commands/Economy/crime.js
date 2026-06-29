@@ -4,6 +4,7 @@ const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('crime')
         .setDescription('Commit a random crime. High risk, high reward.'),

@@ -4,6 +4,7 @@ const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('search')
         .setDescription('Search a location for money.'),
@@ -83,38 +84,104 @@ module.exports = {
                     await settings.save();
                 }
 
-                // Calculate chance
-                const chance = Math.random();
-                const requiredChance = 1 - (chosenLocation.successChance * settings.luckMultiplier);
-                
-                const isSuccess = chance >= requiredChance;
+                // Weighted RNG for outcomes (Luck boosts good outcomes)
+                const outcomesConfig = EconomyConfig.searchSettings.outcomes;
+                const weights = [
+                    { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * settings.luckMultiplier },
+                    { type: 'itemOnly', weight: outcomesConfig.itemOnly * settings.luckMultiplier },
+                    { type: 'moneyOnly', weight: outcomesConfig.moneyOnly * settings.luckMultiplier },
+                    { type: 'nothing', weight: outcomesConfig.nothing } // Luck doesn't boost bad outcomes
+                ];
+
+                const totalWeight = weights.reduce((acc, curr) => acc + curr.weight, 0);
+                let random = Math.random() * totalWeight;
+                let selectedOutcome = 'nothing';
+
+                for (const w of weights) {
+                    if (random < w.weight) {
+                        selectedOutcome = w.type;
+                        break;
+                    }
+                    random -= w.weight;
+                }
 
                 // Make sure we fetch the latest user data to prevent desync
                 userData = await EconomyUser.findOne({ userId: interaction.user.id });
+                if (!userData.inventory) userData.inventory = new Map();
 
-                if (isSuccess) {
+                let rewardMoney = 0;
+                let droppedItem = null;
+
+                // Process Money
+                if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
                     let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                    reward = Math.floor(reward * settings.moneyMultiplier);
+                    rewardMoney = Math.floor(reward * settings.moneyMultiplier);
+                    userData.wallet += rewardMoney;
+                }
 
-                    userData.wallet += reward;
-                    await userData.save();
+                // Process Item
+                if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'itemOnly') {
+                    if (chosenLocation.possibleItems && chosenLocation.possibleItems.length > 0) {
+                        
+                        // Calculate total weight of possible items for this location
+                        let totalItemWeight = 0;
+                        const itemWeights = [];
+                        for (const key of chosenLocation.possibleItems) {
+                            const weight = EconomyConfig.items[key].dropWeight || 100;
+                            totalItemWeight += weight;
+                            itemWeights.push({ key, weight });
+                        }
 
-                    const msgTemplate = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
-                    const resultMessage = msgTemplate.replace('${amount}', `$${reward.toLocaleString()}`);
+                        let itemRandom = Math.random() * totalItemWeight;
+                        let randomItemKey = chosenLocation.possibleItems[0]; // fallback
+                        
+                        for (const iw of itemWeights) {
+                            if (itemRandom < iw.weight) {
+                                randomItemKey = iw.key;
+                                break;
+                            }
+                            itemRandom -= iw.weight;
+                        }
 
-                    const resultEmbed = new EmbedBuilder()
-                        .setTitle(`🔍 Searched: ${chosenLocation.name}`)
-                        .setDescription(resultMessage)
-                        .setColor(EconomyConfig.successColor);
+                        droppedItem = EconomyConfig.items[randomItemKey];
+                        
+                        const currentCount = userData.inventory.get(randomItemKey) || 0;
+                        userData.inventory.set(randomItemKey, currentCount + 1);
+                    } else if (selectedOutcome === 'itemOnly') {
+                        // Fallback to money if no items exist for this location
+                        selectedOutcome = 'moneyOnly';
+                        let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
+                        rewardMoney = Math.floor(reward * settings.moneyMultiplier);
+                        userData.wallet += rewardMoney;
+                    }
+                }
 
-                    await interaction.editReply({ embeds: [resultEmbed] });
-                } else {
+                await userData.save();
+
+                // Format the Result Embed
+                if (selectedOutcome === 'nothing') {
                     const msgTemplate = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
                     
                     const resultEmbed = new EmbedBuilder()
                         .setTitle(`🔍 Searched: ${chosenLocation.name}`)
                         .setDescription(msgTemplate)
                         .setColor(EconomyConfig.failColor);
+
+                    await interaction.editReply({ embeds: [resultEmbed] });
+                } else {
+                    const msgTemplate = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
+                    let resultMessage = msgTemplate.replace('${amount}', `$${rewardMoney.toLocaleString()}`);
+
+                    if (droppedItem && rewardMoney > 0) {
+                        resultMessage += `\n\n🎁 **Bonus Drop!** You also found a ${droppedItem.emoji} **${droppedItem.name}**!`;
+                    } else if (droppedItem && rewardMoney === 0) {
+                        resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find a ${droppedItem.emoji} **${droppedItem.name}**!`;
+                    }
+
+                    const resultEmbed = new EmbedBuilder()
+                        .setTitle(`🔍 Searched: ${chosenLocation.name}`)
+                        .setDescription(resultMessage)
+                        .setColor(EconomyConfig.successColor);
 
                     await interaction.editReply({ embeds: [resultEmbed] });
                 }

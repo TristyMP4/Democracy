@@ -65,6 +65,20 @@ async function InteractionHandler(interaction, type) {
             if (interaction.user.id !== '1487846158540738660') return await interaction.reply({ content: `⚠️ Only bot owners can use this command!`, ephemeral: true });
         }
 
+        if (component.economy) {
+            const EconomySettings = require('./schemas/EconomySettings.js');
+            const settings = await EconomySettings.findOne({ id: 'global' });
+            if (settings && settings.economyDisabled) {
+                // Let owners bypass the lock
+                if (interaction.user.id !== '1487846158540738660') {
+                    return await interaction.reply({ 
+                        content: `⚠️ **Economy System is currently disabled.**\n\n*Reason: ${settings.economyDisabledReason}*`, 
+                        ephemeral: true 
+                    });
+                }
+            }
+        }
+
         //the mod command property requires additional setup, watch the video here to set it up: https://youtu.be/2Tqy6Cp_10I?si=bharHI_Vw7qjaG2Q
 
         /*

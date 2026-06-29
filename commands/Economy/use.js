@@ -3,6 +3,7 @@ const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
 module.exports = {
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('use')
         .setDescription('Use an item from your inventory.')
@@ -39,11 +40,29 @@ module.exports = {
             if (itemId === 'supply-signal') {
                 // Determine 1 to 3 items
                 const numItems = Math.floor(Math.random() * 3) + 1;
+                // Pre-calculate global total item weight for the drops
                 const allItemKeys = Object.keys(EconomyConfig.items);
-                
+                let totalWeight = 0;
+                const itemWeights = [];
+                for (const key of allItemKeys) {
+                    const w = EconomyConfig.items[key].dropWeight || 100;
+                    totalWeight += w;
+                    itemWeights.push({ key, weight: w });
+                }
+
                 let receivedText = '';
                 for (let i = 0; i < numItems; i++) {
-                    const randomKey = allItemKeys[Math.floor(Math.random() * allItemKeys.length)];
+                    let itemRandom = Math.random() * totalWeight;
+                    let randomKey = allItemKeys[0];
+                    
+                    for (const iw of itemWeights) {
+                        if (itemRandom < iw.weight) {
+                            randomKey = iw.key;
+                            break;
+                        }
+                        itemRandom -= iw.weight;
+                    }
+
                     const receivedItem = EconomyConfig.items[randomKey];
                     
                     // Add to inventory
