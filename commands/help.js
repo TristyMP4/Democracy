@@ -56,12 +56,15 @@ module.exports = {
             );
 
         const initialEmbed = new EmbedBuilder()
-            .setTitle('🤖 Democracy Command Center')
-            .setDescription('Please select a command category from the dropdown menu below to see what I can do!')
+            .setTitle('❓ Command Help')
+            .setDescription('Use the dropdown below to select a command category for Democracy.')
             .setColor(0x5865f2)
             .setThumbnail(client.user.displayAvatarURL());
 
         const response = await interaction.reply({ embeds: [initialEmbed], components: [row], fetchReply: true });
+
+        // Fetch application commands so we can get their IDs for clickable mentions
+        const appCommands = await client.application.commands.fetch().catch(() => new Map());
 
         // Create collector for 1 minute
         const collector = response.createMessageComponentCollector({ 
@@ -78,7 +81,12 @@ module.exports = {
             cmds.forEach(cmd => {
                 // If the command is admin/owner locked, we can visually indicate it (optional)
                 const lockIcon = cmd.admin ? ' *(Admin)*' : cmd.owner ? ' *(Owner)*' : '';
-                commandList += `**/${cmd.data.name}**${lockIcon} - ${cmd.data.description}\n\n`;
+                
+                // Match the local command to the API command to get its ID
+                const apiCmd = appCommands.find(c => c.name === cmd.data.name);
+                const clickableCommand = apiCmd ? `</${apiCmd.name}:${apiCmd.id}>` : `**/${cmd.data.name}**`;
+
+                commandList += `${clickableCommand}${lockIcon} - ${cmd.data.description}\n\n`;
             });
 
             const embed = new EmbedBuilder()
