@@ -62,7 +62,7 @@ async function InteractionHandler(interaction, type) {
         }
 
         if (component.owner) {
-            if (interaction.user.id !== '1487846158540738660') return await interaction.reply({ content: `⚠️ Only bot owners can use this command!`, ephemeral: true });
+            if (!owners.includes(interaction.user.id)) return await interaction.reply({ content: `⚠️ Only bot owners can use this command!`, ephemeral: true });
         }
 
         if (component.economy) {
@@ -70,11 +70,11 @@ async function InteractionHandler(interaction, type) {
             const settings = await EconomySettings.findOne({ id: 'global' });
             if (settings && settings.economyDisabled) {
                 // Let owners bypass the lock
-                if (interaction.user.id !== '1487846158540738660') {
+                if (!owners.includes(interaction.user.id)) {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('🔒 Economy Locked')
-                        .setDescription(`The economy system is currently disabled globally.\n\n**Reason:** ${settings.economyDisabledReason || 'Maintenance.'}`)
+                        .setDescription(`**This command cannot be executed right now!**\n> Economy features are currently disabled.\n**Reason:** \`${settings.economyDisabledReason || 'Maintenance.'}\``)
                         .setColor(0xe74c3c);
                     
                     return await interaction.reply({ embeds: [embed], ephemeral: true });
