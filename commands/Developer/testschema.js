@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const testschema = require('../../schemas/example');
-const { owner } = require('../say');
 
 module.exports = {
     dev: true,
