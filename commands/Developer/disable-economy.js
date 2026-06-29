@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 
 module.exports = {
-    owner: true, // Only owners can run this command
+    owner: true,
     data: new SlashCommandBuilder()
         .setName('disable-economy')
         .setDescription('Globally toggle the economy system on or off.')
