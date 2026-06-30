@@ -11,7 +11,7 @@ module.exports = {
         .setDescription('Sell an item from your inventory for money.')
         .addStringOption(option => 
             option.setName('item')
-                .setDescription('The ID of the item you want to sell (e.g. ak-alpha, semi-automatic-pistol)')
+                .setDescription('The item you want to sell')
                 .setRequired(true)
                 .setAutocomplete(true)
         )
@@ -62,7 +62,7 @@ module.exports = {
         // Validate item exists in economy
         const itemConfig = EconomyConfig.items[itemInput];
         if (!itemConfig) {
-            return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
+            return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct name.`));
         }
 
         const totalValue = itemConfig.price * amount;
