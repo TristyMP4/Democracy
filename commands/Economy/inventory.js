@@ -83,11 +83,11 @@ module.exports = {
                 const pageText = `-# Page ${page + 1} of ${totalPages}`;
 
                 const row = new ActionRowBuilder().addComponents(
-                    ComponentUtils.createButton({ customId: `inv_first`, label: `${EconomyConfig.StartArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
-                    ComponentUtils.createButton({ customId: `inv_prev`, label: `${EconomyConfig.BackwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
+                    ComponentUtils.createButton({ customId: `inv_first`, emoji: `${EconomyConfig.StartArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
+                    ComponentUtils.createButton({ customId: `inv_prev`, emoji: `${EconomyConfig.BackwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
                     ComponentUtils.createButton({ customId: `inv_refresh`, emoji: `${EconomyConfig.RefreshIcon}`, style: ButtonStyle.Secondary, disabled: disabled }),
-                    ComponentUtils.createButton({ customId: `inv_next`, label: `${EconomyConfig.ForwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 }),
-                    ComponentUtils.createButton({ customId: `inv_last`, label: `${EconomyConfig.LastArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 })
+                    ComponentUtils.createButton({ customId: `inv_next`, emoji: `${EconomyConfig.ForwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 }),
+                    ComponentUtils.createButton({ customId: `inv_last`, emoji: `${EconomyConfig.LastArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 })
                 );
 
                 return new ContainerBuilder()
