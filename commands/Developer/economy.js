@@ -4,7 +4,7 @@ const EconomySettings = require('../../schemas/EconomySettings.js');
 module.exports = {
     owner: true,
     data: new SlashCommandBuilder()
-        .setName('disable-economy')
+        .setName('economy')
         .setDescription('Globally toggle the economy system on or off.')
         .addBooleanOption(option => 
             option.setName('disabled')
@@ -37,7 +37,6 @@ module.exports = {
 
             settings.economyDisabled = disabled;
             settings.economyDisabledReason = reason;
-
             await settings.save();
 
             const embed = new EmbedBuilder()
