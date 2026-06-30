@@ -46,10 +46,10 @@ module.exports = {
 
             if (isSuccess) {
                 // Base reward
-                let reward = Math.floor(Math.random() * (crimeConfig.maxReward - crimeConfig.minReward + 1)) + crimeConfig.minReward;
+                let baseReward = Math.floor(Math.random() * (crimeConfig.maxReward - crimeConfig.minReward + 1)) + crimeConfig.minReward;
                 
                 // Apply global money multiplier
-                reward = Math.floor(reward * settings.moneyMultiplier);
+                let reward = Math.floor(baseReward * settings.moneyMultiplier);
 
                 userData.wallet += reward;
                 await userData.save();
@@ -57,11 +57,17 @@ module.exports = {
                 const outcomeObj = crimeConfig.successMessages[Math.floor(Math.random() * crimeConfig.successMessages.length)];
                 const message = outcomeObj.message.replace('${amount}', `${EconomyConfig.currencySymbol}${reward.toLocaleString()}`);
 
+                let footerText = outcomeObj.signature;
+                if (settings.moneyMultiplier > 1 && reward > baseReward) {
+                    const bonusAmount = reward - baseReward;
+                    footerText += ` | + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+                }
+
                 const embed = new EmbedBuilder()
                     .setTitle('🦹 Crime Successful')
                     .setDescription(message)
                     .setColor(EconomyConfig.successColor)
-                    .setFooter({ text: outcomeObj.signature });
+                    .setFooter({ text: footerText });
 
                 return interaction.followUp({ embeds: [embed] });
 

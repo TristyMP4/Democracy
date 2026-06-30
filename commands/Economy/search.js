@@ -113,12 +113,13 @@ module.exports = {
                 if (!userData.inventory) userData.inventory = new Map();
 
                 let rewardMoney = 0;
+                let baseReward = 0;
                 let droppedItem = null;
 
                 // Process Money
                 if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
-                    let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                    rewardMoney = Math.floor(reward * settings.moneyMultiplier);
+                    baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
+                    rewardMoney = Math.floor(baseReward * settings.moneyMultiplier);
                     userData.wallet += rewardMoney;
                 }
 
@@ -184,11 +185,17 @@ module.exports = {
                         resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find a ${droppedItem.emoji} **${droppedItem.name}**!`;
                     }
 
+                    let footerText = outcomeObj.signature;
+                    if (settings.moneyMultiplier > 1 && rewardMoney > baseReward) {
+                        const bonusAmount = rewardMoney - baseReward;
+                        footerText += ` | + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+                    }
+
                     const resultEmbed = new EmbedBuilder()
                         .setTitle(`🔍 ${interaction.user.displayName} searched ${chosenLocation.name}`)
                         .setDescription(resultMessage)
                         .setColor(EconomyConfig.successColor)
-                        .setFooter({ text: outcomeObj.signature });
+                        .setFooter({ text: footerText });
 
                     await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
                 }

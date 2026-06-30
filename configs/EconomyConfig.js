@@ -16,8 +16,7 @@ module.exports = {
     StartArrow: "<:StartArrow:1521618283034579075>",
 
     currencySymbol: '£',
-    currencyCode: 'GBP',
-
+    
     // Dictionary of All Items in the Economy System
     items: ItemsConfig,
 

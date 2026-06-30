@@ -8,7 +8,7 @@ module.exports = [
         successMessages: [
             { message: "You searched Jacob's Room and found **${amount}** hidden under a pile of clothes!", signature: "where's willow?" }, 
             { message: "You bravely entered Jacob's Room and snagged **${amount}** from the desk.", signature: "are you sure it's not monopoly money?" },
-            { message: "Jacob was asleep. You crept in and swiped **${amount}**!", signature: "Sneak level 100" }
+            { message: "Jacob was asleep. You crept in and swiped **${amount}**!", signature: "sneaky sneaky" }
         ],
         failMessages: [
             { message: "Jacob caught you and kicked you out. You got nothing.", signature: "you're probably better off" }, 

@@ -79,8 +79,8 @@ module.exports = {
             await userData.save();
 
             const embed = new EmbedBuilder()
-                .setTitle('🛒 Items Sold')
-                .setDescription(`You successfully sold **${amount}x** ${itemConfig.emoji} **${itemConfig.name}** for **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}** ${EconomyConfig.currencyCode}!`)
+                .setTitle(`🛒 ${interaction.user.displayName}'s Sale Receipt`)
+                .setDescription(`${interaction.user} sold **${amount}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`)
                 .setColor(EconomyConfig.successColor);
 
             await interaction.followUp({ embeds: [embed] });
