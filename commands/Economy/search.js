@@ -23,7 +23,7 @@ module.exports = {
             const cooldownTime = 30 * 1000;
             if (userData.lastSearch && (Date.now() - userData.lastSearch.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastSearch.getTime())) / 1000);
-                return interaction.followUp(ComponentUtils.createError(`The cops are still looking around! Try again in **${remaining}s**.`));
+                return interaction.followUp(ComponentUtils.createError(`You're too tired to search again! Try again in **${remaining}s**.`));
             }
 
             userData.lastSearch = new Date();
@@ -167,7 +167,7 @@ module.exports = {
                     const msgTemplate = outcomeObj.message;
                     
                     const resultEmbed = new EmbedBuilder()
-                        .setTitle(`🔍 Searched: ${chosenLocation.name}`)
+                        .setTitle(`${interaction.user.displayName} searched ${chosenLocation.name}`)
                         .setDescription(msgTemplate)
                         .setColor(EconomyConfig.failColor)
                         .setFooter({ text: outcomeObj.signature });
@@ -207,6 +207,11 @@ module.exports = {
                                 .setDisabled(true)
                         );
                     });
+
+                    const lateEmbed = new EmbedBuilder()
+                    .setDescription("Looks like you didn't want to search anywhere.")
+                    .setColor(EconomyConfig.embedColor)
+                    .setFooter({ text: outcomeObj.signature });
 
                     await interaction.editReply({ 
                         content: `❌ You took too long to choose a location!`,

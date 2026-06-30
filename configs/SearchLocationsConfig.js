@@ -27,8 +27,8 @@ module.exports = [
             { message: "You survived the Old Bunker and walked out with **${amount}**.", signature: "make sure theres no mat-49 wallbanger ready to pummel you." }
         ],
         failMessages: [
-            { message: "You tripped a rusty trap in the Old Bunker and had to run for your life.", signature: "Watch your step!" }, 
-            { message: "The Old Bunker was completely looted already.", signature: "Better luck next time." }
+            { message: "You got slapped by a full Boss Kit trio.", signature: "better luck next time" }, 
+            { message: "The Old Bunker was looted already.", signature: "come back when its your turn" }
         ]
     },
     {
