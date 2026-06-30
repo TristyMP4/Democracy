@@ -37,7 +37,7 @@ module.exports = {
             // Find sender
             let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!senderData || senderData.wallet < amount) {
-                return interaction.followUp({ content: `❌ You do not have **$${amount.toLocaleString()}** in your wallet!` });
+                return interaction.followUp({ content: `❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!` });
             }
 
             // Find or create receiver
@@ -55,7 +55,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setTitle('💸 Payment Successful')
-                .setDescription(`You successfully sent **$${amount.toLocaleString()}** to <@${targetUser.id}>!`)
+                .setDescription(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!`)
                 .setColor(EconomyConfig.successColor);
 
             await interaction.followUp({ embeds: [embed] });

@@ -170,7 +170,7 @@ module.exports = {
                     await interaction.editReply({ embeds: [resultEmbed] });
                 } else {
                     const msgTemplate = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
-                    let resultMessage = msgTemplate.replace('${amount}', `$${rewardMoney.toLocaleString()}`);
+                    let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
 
                     if (droppedItem && rewardMoney > 0) {
                         resultMessage += `\n\n🎁 **Bonus Drop!** You also found a ${droppedItem.emoji} **${droppedItem.name}**!`;

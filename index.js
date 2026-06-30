@@ -113,7 +113,11 @@ async function InteractionHandler(interaction, type) {
             }
         */
 
-        await component.execute(interaction, client);
+        if (interaction.isAutocomplete()) {
+            await component.autocomplete(interaction, client);
+        } else {
+            await component.execute(interaction, client);
+        }
     } catch (error) {
         console.error(error);
 		// If there is already a response, say after a deferReply(), we override the response with an error message.
@@ -132,8 +136,9 @@ async function InteractionHandler(interaction, type) {
 // This will run before any command processing, perfect for logs!
 ////////////////////////////////////////////////////////////////
 client.on('interactionCreate', async function(interaction) {
-    if (!interaction.isCommand()) return;
-    await InteractionHandler(interaction, 'commands');
+    if (interaction.isCommand() || interaction.isAutocomplete()) {
+        await InteractionHandler(interaction, 'commands');
+    }
 });
 
 

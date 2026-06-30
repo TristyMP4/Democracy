@@ -35,13 +35,30 @@ module.exports = {
                 await userData.save();
             }
 
+            let netWorth = userData.wallet + userData.bank;
+            if (userData.inventory) {
+                for (const [itemId, quantity] of userData.inventory.entries()) {
+                    if (quantity > 0 && EconomyConfig.items[itemId]) {
+                        netWorth += EconomyConfig.items[itemId].price * quantity;
+                    }
+                }
+            }
+
+            const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+
             const embed = new EmbedBuilder()
-                .setTitle(`💰 ${targetUser.username}'s Balance`)
-                .setDescription(`**Wallet:** $${userData.wallet.toLocaleString()}\n**Bank:** $${userData.bank.toLocaleString()}`)
+                .setTitle(`${targetUser.username}'s Balances`)
+                .setDescription(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**\n\n🪙 **Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n🏦 **Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
                 .setColor(EconomyConfig.embedColor)
                 .setThumbnail(targetUser.displayAvatarURL());
 
-            await interaction.followUp({ embeds: [embed] });
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary)
+            );
+
+            await interaction.followUp({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Balance Error:', error);

@@ -43,7 +43,8 @@ module.exports = {
                 if (quantity > 0) {
                     const itemConfig = EconomyConfig.items[itemId];
                     if (itemConfig) {
-                        inventoryList += `${itemConfig.emoji} **${itemConfig.name}** - \`${quantity}\`\n*${itemConfig.description}*\n\n`;
+                        const totalValue = itemConfig.price * quantity;
+                        inventoryList += `${itemConfig.emoji} **${itemConfig.name}** - \`${quantity}\` (Value: ${EconomyConfig.currencySymbol}${itemConfig.price.toLocaleString()} / Total: ${EconomyConfig.currencySymbol}${totalValue.toLocaleString()})\n*${itemConfig.description}*\n\n`;
                     }
                 }
             }

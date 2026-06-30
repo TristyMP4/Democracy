@@ -54,7 +54,7 @@ module.exports = {
                 await userData.save();
 
                 const messageTemplate = crimeConfig.successMessages[Math.floor(Math.random() * crimeConfig.successMessages.length)];
-                const message = messageTemplate.replace('${amount}', `$${reward.toLocaleString()}`);
+                const message = messageTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${reward.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🦹 Crime Successful')
@@ -77,7 +77,7 @@ module.exports = {
                 await userData.save();
 
                 const messageTemplate = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
-                const message = messageTemplate.replace('${fine}', `$${fine.toLocaleString()}`);
+                const message = messageTemplate.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🚓 Busted')
