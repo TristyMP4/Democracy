@@ -179,7 +179,7 @@ module.exports = {
                     let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
 
                     if (droppedItem && rewardMoney > 0) {
-                        resultMessage += `\n\n🎁 **Bonus Drop!** You also found a ${droppedItem.emoji} **${droppedItem.name}**!`;
+                        resultMessage += `\n>And you lucky ducky, you also found a ${droppedItem.emoji} **${droppedItem.name}**!`;
                     } else if (droppedItem && rewardMoney === 0) {
                         resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find a ${droppedItem.emoji} **${droppedItem.name}**!`;
                     }
