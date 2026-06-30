@@ -89,7 +89,7 @@ module.exports = {
             const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
             const footer = false
             if (settings.moneyMultiplier > 1) {
-                const bonusAmount = rewardMoney - baseReward;
+                const bonusAmount = amount * moneyMultiplier;
                 footer = `-# Money Multiplier + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
             }
 
