@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
+const EconomySettings = require('../../schemas/EconomySettings.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
@@ -44,6 +45,12 @@ module.exports = {
 
     async execute(interaction) {
         await interaction.deferReply();
+        
+        let settings = await EconomySettings.findOne({ id: 'global' });
+        if (!settings) {
+            settings = new EconomySettings();
+            await settings.save();
+        }
 
         const itemInput = interaction.options.getString('item').toLowerCase();
         let amount = interaction.options.getInteger('amount') || 1;
@@ -79,13 +86,22 @@ module.exports = {
             await userData.save();
 
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
-            const descDisplay = ComponentUtils.createText(`-# You sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
+            const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
+            const footer = false
+            if (settings.moneyMultiplier > 1 && rewardMoney > baseReward) {
+                const bonusAmount = rewardMoney - baseReward;
+                footer = `-# Money Multiplier + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+            }
 
             const container = new ContainerBuilder()
                 .addTextDisplayComponents(titleDisplay)
                 .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addTextDisplayComponents(descDisplay);
-
+            
+            if (footer) {
+                container.addSeparatorComponents(ComponentUtils.createSeparator())
+                container.addTextDisplayComponents(footer)
+            }
             await interaction.followUp(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
