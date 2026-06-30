@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
@@ -48,19 +48,31 @@ module.exports = {
         let amount = interaction.options.getInteger('amount') || 1;
 
         if (amount < 1) {
-            return interaction.followUp({ content: '❌ You must sell at least 1 item.' });
+            return interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You must sell at least 1 item.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         // Validate item exists in game
         const itemConfig = EconomyConfig.items[itemInput];
         if (!itemConfig) {
-            return interaction.followUp({ content: `❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.` });
+            return interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < amount) {
-                return interaction.followUp({ content: `❌ You do not have enough **${itemConfig.name}** to sell!` });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have enough **${itemConfig.name}** to sell!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             // Deduct from inventory
@@ -86,7 +98,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Sell Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while selling the item.' });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while selling the item.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };

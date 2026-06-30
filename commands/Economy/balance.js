@@ -71,7 +71,10 @@ module.exports = {
 
         } catch (error) {
             console.error('Balance Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while checking the balance.' });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You don't have a balance yet. Run this command again!`))],
+                ephemeral: true 
+            });
         }
     }
 };

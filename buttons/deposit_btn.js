@@ -1,11 +1,15 @@
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
     customID: 'deposit_btn',
     async execute(interaction) {
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {
-            return interaction.reply({ content: '❌ You cannot use these buttons on someone else\'s balance!', ephemeral: true });
+            return interaction.reply({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot use these buttons on someone else's balance!`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         const modal = new ModalBuilder()

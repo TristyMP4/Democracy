@@ -16,7 +16,11 @@ module.exports = {
         
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {
-            return interaction.reply({ content: '❌ You cannot use these buttons on someone else\'s balance!', ephemeral: true });
+            return interaction.reply({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot use these buttons on someone else's balance!`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         await interaction.deferUpdate();
@@ -38,9 +42,9 @@ module.exports = {
                 }
             }
 
-            let targetUser = client.users.cache.get(targetId);
+            let targetUser = interaction.client.users.cache.get(targetId);
             if (!targetUser) {
-                targetUser = await client.users.fetch(targetId).catch(() => null);
+                targetUser = await interaction.client.users.fetch(targetId).catch(() => null);
             }
             const username = targetUser ? targetUser.username : 'Unknown';
 

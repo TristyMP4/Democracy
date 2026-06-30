@@ -13,17 +13,29 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || userData.wallet <= 0) {
-                return interaction.followUp({ content: '❌ You do not have any money in your wallet to deposit!', ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have any money in your wallet to deposit!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             const amountToDeposit = parseAmount(amountInput, userData.wallet);
 
             if (amountToDeposit <= 0) {
-                return interaction.followUp({ content: '❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).', ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             if (amountToDeposit > userData.wallet) {
-                return interaction.followUp({ content: `❌ You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`, ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             userData.wallet -= amountToDeposit;
@@ -74,7 +86,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Deposit Modal Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while depositing.', ephemeral: true });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while depositing.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };

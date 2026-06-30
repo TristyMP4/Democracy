@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
@@ -89,7 +89,10 @@ module.exports = {
 
         } catch (error) {
             console.error('Crime Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while trying to commit a crime.' });
+            await interaction.followUp({
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ The user could not be found!`))],
+                ephemeral: true
+            });
         }
     }
 };

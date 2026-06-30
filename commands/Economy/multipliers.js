@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
@@ -51,7 +51,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Multipliers Error:', error);
-            await interaction.followUp({ content: '❌ Failed to update global settings.' });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Failed to update global settings.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };

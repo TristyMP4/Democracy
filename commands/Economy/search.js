@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
@@ -22,7 +22,11 @@ module.exports = {
             const cooldownTime = 30 * 1000;
             if (userData.lastSearch && (Date.now() - userData.lastSearch.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastSearch.getTime())) / 1000);
-                return interaction.followUp({ content: `⏱️ You're still tired from your last search. Try again in **${remaining}s**.` });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You're still tired from your last search. Try again in **${remaining}s**.`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             userData.lastSearch = new Date();
@@ -202,16 +206,23 @@ module.exports = {
                     });
 
                     await interaction.editReply({ 
-                        content: '⏱️ You took too long to choose a location!', 
-                        embeds: [], 
-                        components: [disabledRow] 
+                        components: [new ContainerBuilder()
+                            .addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You took too long to choose a location!`))
+                            .addActionRowComponents(disabledRow)
+                        ],
+                        flags: MessageFlags.HasComponentsV2,
+                        embeds: []
                     }).catch(() => {});
                 }
             });
 
         } catch (error) {
             console.error('Search Error:', error);
-            await interaction.editReply({ content: '❌ An error occurred while searching.' }).catch(() => {});
+            await interaction.editReply({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while searching.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            }).catch(() => {});
         }
     }
 };

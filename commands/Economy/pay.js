@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
@@ -26,18 +26,30 @@ module.exports = {
         const amount = interaction.options.getInteger('amount');
 
         if (targetUser.bot) {
-            return interaction.followUp({ content: '❌ You cannot pay a bot!' });
+            return interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot pay a bot!`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         if (targetUser.id === interaction.user.id) {
-            return interaction.followUp({ content: '❌ You cannot pay yourself!' });
+            return interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot pay yourself!`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
 
         try {
             // Find sender
             let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!senderData || senderData.wallet < amount) {
-                return interaction.followUp({ content: `❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!` });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             // Find or create receiver
@@ -62,7 +74,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Pay Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred during the transaction.' });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred during the transaction.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };

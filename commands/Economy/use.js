@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
@@ -30,7 +30,11 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || !userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
-                return interaction.followUp({ content: `❌ You do not have a **${itemConfig.name}** in your inventory!` });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have a **${itemConfig.name}** in your inventory!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             // Consume item
@@ -88,7 +92,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Use Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while using the item.' });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while using the item.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };

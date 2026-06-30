@@ -14,17 +14,29 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || userData.bank <= 0) {
-                return interaction.followUp({ content: '❌ You do not have any money in your bank to withdraw!', ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have any money in your bank to withdraw!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             const amountToWithdraw = parseAmount(amountInput, userData.bank);
 
             if (amountToWithdraw <= 0) {
-                return interaction.followUp({ content: '❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).', ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             if (amountToWithdraw > userData.bank) {
-                return interaction.followUp({ content: `❌ You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`, ephemeral: true });
+                return interaction.followUp({ 
+                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`))],
+                    flags: MessageFlags.HasComponentsV2,
+                    ephemeral: true 
+                });
             }
 
             userData.bank -= amountToWithdraw;
@@ -75,7 +87,11 @@ module.exports = {
 
         } catch (error) {
             console.error('Withdraw Modal Error:', error);
-            await interaction.followUp({ content: '❌ An error occurred while withdrawing.', ephemeral: true });
+            await interaction.followUp({ 
+                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while withdrawing.`))],
+                flags: MessageFlags.HasComponentsV2,
+                ephemeral: true 
+            });
         }
     }
 };
