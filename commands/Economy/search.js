@@ -188,7 +188,7 @@ module.exports = {
                     let footerText = outcomeObj.signature;
                     if (settings.moneyMultiplier > 1 && rewardMoney > baseReward) {
                         const bonusAmount = rewardMoney - baseReward;
-                        footerText += ` | Money Multiplier: + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+                        footerText += ` | Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
                     }
 
                     const resultEmbed = new EmbedBuilder()
