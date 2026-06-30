@@ -3,7 +3,6 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
     customID: 'changelogModal',
     async execute(interaction, client) {
-        // Retrieve the target channel from the cache
         const targetChannelId = client.cache.get(`changelogChannel_${interaction.user.id}`);
         
         if (!targetChannelId) {
@@ -27,13 +26,12 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle(`📢 Bot Update: ${title}`)
             .setDescription(message)
-            .setColor(0x2b2d31) // Sleek dark theme
+            .setColor(0x2b2d31)
             .setFooter({ text: `Update deployed by ${interaction.user.username}`, iconURL: interaction.user.displayAvatarURL() })
             .setTimestamp();
 
         try {
             await targetChannel.send({ content: '@everyone', embeds: [embed] });
-            
             // Clean up cache
             client.cache.delete(`changelogChannel_${interaction.user.id}`);
 
