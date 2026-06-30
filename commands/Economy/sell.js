@@ -87,7 +87,7 @@ module.exports = {
             await userData.save();
 
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
-            const descDisplay = ComponentUtils.createText(`-# You sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${finalValue.toLocaleString()}**!`);
+            const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${finalValue.toLocaleString()}**!`);
             
             let footerDisplay = null;
             if (settings.moneyMultiplier > 1) {
