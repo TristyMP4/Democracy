@@ -33,7 +33,7 @@ module.exports = {
             }
 
             if (amountToWithdraw > userData.bank) {
-                return interaction.followUp(ComponentUtils.createError(`❌ You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`));
+                return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`));
             }
 
             userData.bank -= amountToWithdraw;

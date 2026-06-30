@@ -31,10 +31,10 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!itemConfig) {
-                return interaction.followUp(ComponentUtils.createError(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
+                return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
             }
             if (!userData || !userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
-                return interaction.followUp(ComponentUtils.createError(`❌ You do not have a **${itemConfig.name}** in your inventory!`));
+                return interaction.followUp(ComponentUtils.createError(`You do not have a **${itemConfig.name}** in your inventory!`));
             }
 
             // Consume item

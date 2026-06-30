@@ -33,7 +33,7 @@ module.exports = {
             }
 
             if (amountToDeposit > userData.wallet) {
-                return interaction.followUp(ComponentUtils.createError(`❌ You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
+                return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
             }
 
             userData.wallet -= amountToDeposit;

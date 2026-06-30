@@ -23,7 +23,7 @@ module.exports = {
             const cooldownTime = 60 * 1000;
             if (userData.lastCrime && (Date.now() - userData.lastCrime.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastCrime.getTime())) / 1000);
-                return interaction.followUp(ComponentUtils.createError(`❌ You're too hot right now! Lie low for **${remaining}s**.`));
+                return interaction.followUp(ComponentUtils.createError(`You're too hot right now! Lie low for **${remaining}s**.`));
             }
 
             // Update cooldown

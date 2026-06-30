@@ -111,7 +111,7 @@ module.exports = {
 
             collector.on('collect', async i => {
                 if (i.user.id !== interaction.user.id) {
-                    return i.reply(ComponentUtils.createError('❌ You cannot use these buttons!'));
+                    return i.reply(ComponentUtils.createError('You cannot use these buttons!'));
                 }
 
                 if (i.customId === 'inv_first') {

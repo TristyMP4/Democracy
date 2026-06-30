@@ -17,7 +17,7 @@ module.exports = {
         
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {
-            return interaction.reply(ComponentUtils.createError(`❌ You cannot use these buttons on someone else's balance!`));
+            return interaction.reply(ComponentUtils.createError(`You cannot use these buttons on someone else's balance!`));
         }
 
         await interaction.deferUpdate();
@@ -52,7 +52,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),
                 new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary).setDisabled(false),
-                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(false)
+                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji(`${EconomyConfig.RefreshIcon}`).setStyle(ButtonStyle.Secondary).setDisabled(false)
             );
 
             const container = new ContainerBuilder()

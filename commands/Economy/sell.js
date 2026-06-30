@@ -55,13 +55,13 @@ module.exports = {
         // Validate item exists in game
         const itemConfig = EconomyConfig.items[itemInput];
         if (!itemConfig) {
-            return interaction.followUp(ComponentUtils.createError(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
+            return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
         }
 
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < amount) {
-                return interaction.followUp(ComponentUtils.createError(`❌ You do not have enough **${itemConfig.name}** to sell!`));
+                return interaction.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell!`));
             }
 
             // Deduct from inventory

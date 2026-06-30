@@ -38,7 +38,7 @@ module.exports = {
             // Find sender
             let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!senderData || senderData.wallet < amount) {
-                return interaction.followUp(ComponentUtils.createError(`❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`));
+                return interaction.followUp(ComponentUtils.createError(`You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`));
             }
 
             // Find or create receiver

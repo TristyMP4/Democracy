@@ -67,7 +67,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Balance Error:', error);
-            await interaction.followUp(ComponentUtils.createError(`❌ You don't have a balance yet. Run this command again!`));
+            await interaction.followUp(ComponentUtils.createError(`You don't have a balance yet. Run this command again!`));
         }
     }
 };
