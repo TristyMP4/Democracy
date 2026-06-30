@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
@@ -49,7 +49,7 @@ module.exports = {
         let amount = interaction.options.getInteger('amount') || 1;
 
         if (amount <= 0) {
-            return interaction.followUp(ComponentUtils.createError('❌ You must sell at least 1.'));
+            return interaction.followUp(ComponentUtils.createError('You must sell at least 1.'));
         }
 
         // Validate item exists in game
@@ -78,12 +78,15 @@ module.exports = {
 
             await userData.save();
 
-            const embed = new EmbedBuilder()
-                .setTitle(`🛒 ${interaction.user.displayName}'s Sale Receipt`)
-                .setDescription(`${interaction.user} sold **${amount}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`)
-                .setColor(EconomyConfig.successColor);
+            const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
+            const descDisplay = ComponentUtils.createText(`-# You sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
 
-            await interaction.followUp({ embeds: [embed] });
+            const container = new ContainerBuilder()
+                .addTextDisplayComponents(titleDisplay)
+                .addSeparatorComponents(ComponentUtils.createSeparator())
+                .addTextDisplayComponents(descDisplay);
+
+            await interaction.followUp(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
             console.error('Sell Error:', error);
