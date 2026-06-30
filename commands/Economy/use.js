@@ -1,6 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -29,12 +30,11 @@ module.exports = {
 
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
+            if (!itemConfig) {
+                return interaction.followUp(ComponentUtils.createError(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
+            }
             if (!userData || !userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have a **${itemConfig.name}** in your inventory!`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ You do not have a **${itemConfig.name}** in your inventory!`));
             }
 
             // Consume item
@@ -92,11 +92,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Use Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while using the item.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while using the item.'));
         }
     }
 };

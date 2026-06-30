@@ -1,6 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -47,32 +48,20 @@ module.exports = {
         const itemInput = interaction.options.getString('item').toLowerCase();
         let amount = interaction.options.getInteger('amount') || 1;
 
-        if (amount < 1) {
-            return interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You must sell at least 1 item.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+        if (amount <= 0) {
+            return interaction.followUp(ComponentUtils.createError('❌ You must sell at least 1.'));
         }
 
         // Validate item exists in game
         const itemConfig = EconomyConfig.items[itemInput];
         if (!itemConfig) {
-            return interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            return interaction.followUp(ComponentUtils.createError(`❌ That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
         }
 
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < amount) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have enough **${itemConfig.name}** to sell!`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ You do not have enough **${itemConfig.name}** to sell!`));
             }
 
             // Deduct from inventory
@@ -98,11 +87,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Sell Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while selling the item.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while selling the item.'));
         }
     }
 };

@@ -1,4 +1,5 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SectionBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } = require('discord.js');
+const ComponentUtils = require('../utils/ComponentUtils.js');
 const EconomyUser = require('../schemas/EconomyUser.js');
 const EconomyConfig = require('../utils/EconomyConfig.js');
 
@@ -16,11 +17,7 @@ module.exports = {
         
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {
-            return interaction.reply({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot use these buttons on someone else's balance!`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            return interaction.reply(ComponentUtils.createError(`❌ You cannot use these buttons on someone else's balance!`));
         }
 
         await interaction.deferUpdate();
@@ -48,9 +45,9 @@ module.exports = {
             }
             const username = targetUser ? targetUser.username : 'Unknown';
 
-            const titleDisplay = new TextDisplayBuilder().setContent(`### **${username}'s Balances**`);
-            const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const titleDisplay = ComponentUtils.createText(`### **${username}'s Balances**`);
+            const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const balancesDisplay = ComponentUtils.createText(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),
@@ -58,19 +55,14 @@ module.exports = {
                 new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(false)
             );
 
-            const { SeparatorBuilder, SeparatorSpacingSize } = require('discord.js');
-
             const container = new ContainerBuilder()
                 .addTextDisplayComponents(titleDisplay, rankDisplay)
-                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+                .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addTextDisplayComponents(balancesDisplay)
-                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+                .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addActionRowComponents(row);
 
-            await interaction.editReply({ 
-                flags: MessageFlags.IsComponentsV2,
-                components: [container] 
-            });
+            await interaction.editReply(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
             console.error('Refresh Bal Error:', error);

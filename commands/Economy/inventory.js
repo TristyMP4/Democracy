@@ -1,6 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -19,11 +20,7 @@ module.exports = {
         const targetUser = interaction.options.getUser('user') || interaction.user;
 
         if (targetUser.bot) {
-            return interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Bots do not have inventories!`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            return interaction.followUp(ComponentUtils.createError('❌ Bots do not have inventories!'));
         }
 
         try {
@@ -67,11 +64,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Inventory Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while checking the inventory.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while checking the inventory.'));
         }
     }
 };

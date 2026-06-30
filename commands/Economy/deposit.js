@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 const parseAmount = require('../../utils/AmountParser.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -22,26 +23,17 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || userData.wallet <= 0) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have any money in your wallet to deposit!`))],
-                    flags: MessageFlags.HasComponentsV2
-                });
+                return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your wallet to deposit!'));
             }
 
             const amountToDeposit = parseAmount(amountInput, userData.wallet);
 
             if (amountToDeposit <= 0) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).`))],
-                    flags: MessageFlags.HasComponentsV2
-                });
+                return interaction.followUp(ComponentUtils.createError('❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).'));
             }
 
             if (amountToDeposit > userData.wallet) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`))],
-                    flags: MessageFlags.HasComponentsV2
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
             }
 
             userData.wallet -= amountToDeposit;
@@ -58,10 +50,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Deposit Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while depositing.`))],
-                flags: MessageFlags.HasComponentsV2
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while depositing.'));
         }
     }
 };

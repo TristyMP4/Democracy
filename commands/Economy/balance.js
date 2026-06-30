@@ -1,6 +1,7 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SectionBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -19,7 +20,7 @@ module.exports = {
         const targetUser = interaction.options.getUser('user') || interaction.user;
 
         if (targetUser.bot) {
-            return interaction.followUp({ content: 'Bots do not have economy profiles!' });
+            return interaction.followUp(ComponentUtils.createError('❌ Bots do not have economy profiles!'));
         }
 
         try {
@@ -28,7 +29,7 @@ module.exports = {
             if (!userData) {
                 // If checking someone else who has no data
                 if (targetUser.id !== interaction.user.id) {
-                    return interaction.followUp({ content: 'That user does not have an economy profile yet.' });
+                    return interaction.followUp(ComponentUtils.createError('❌ That user does not have an economy profile yet.'));
                 }
                 // If checking self, create profile
                 userData = new EconomyUser({ userId: interaction.user.id });
@@ -44,37 +45,29 @@ module.exports = {
                 }
             }
 
-            const titleDisplay = new TextDisplayBuilder().setContent(`### **${targetUser.username}'s Balances**`);
-            const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const titleDisplay = ComponentUtils.createText(`### **${targetUser.username}'s Balances**`);
+            const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const balancesDisplay = ComponentUtils.createText(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const isOtherUser = targetUser.id !== interaction.user.id;
             const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser),
-                new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser),
-                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser)
+                ComponentUtils.createButton({ customId: 'withdraw_btn', label: 'Withdraw', style: ButtonStyle.Secondary, disabled: isOtherUser }),
+                ComponentUtils.createButton({ customId: 'deposit_btn', label: 'Deposit', style: ButtonStyle.Secondary, disabled: isOtherUser }),
+                ComponentUtils.createButton({ customId: 'refresh_bal_btn', emoji: '🔄', style: ButtonStyle.Secondary, disabled: isOtherUser })
             );
-
-            const { SeparatorBuilder, SeparatorSpacingSize } = require('discord.js');
 
             const container = new ContainerBuilder()
                 .addTextDisplayComponents(titleDisplay, rankDisplay)
-                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+                .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addTextDisplayComponents(balancesDisplay)
-                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+                .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addActionRowComponents(row);
 
-            await interaction.followUp({ 
-                flags: MessageFlags.IsComponentsV2,
-                components: [container]
-            });
+            await interaction.followUp(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
             console.error('Balance Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You don't have a balance yet. Run this command again!`))],
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError(`❌ You don't have a balance yet. Run this command again!`));
         }
     }
 };

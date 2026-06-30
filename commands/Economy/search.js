@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -22,11 +23,7 @@ module.exports = {
             const cooldownTime = 30 * 1000;
             if (userData.lastSearch && (Date.now() - userData.lastSearch.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastSearch.getTime())) / 1000);
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You're still tired from your last search. Try again in **${remaining}s**.`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ The cops are still looking around! Try again in **${remaining}s**.`));
             }
 
             userData.lastSearch = new Date();
@@ -171,7 +168,7 @@ module.exports = {
                         .setDescription(msgTemplate)
                         .setColor(EconomyConfig.failColor);
 
-                    await interaction.editReply({ embeds: [resultEmbed] });
+                    await interaction.editReply({ embeds: [resultEmbed], components: [] });
                 } else {
                     const msgTemplate = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
                     let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
@@ -187,7 +184,7 @@ module.exports = {
                         .setDescription(resultMessage)
                         .setColor(EconomyConfig.successColor);
 
-                    await interaction.editReply({ embeds: [resultEmbed] });
+                    await interaction.editReply({ embeds: [resultEmbed], components: [] });
                 }
             });
 
@@ -206,11 +203,8 @@ module.exports = {
                     });
 
                     await interaction.editReply({ 
-                        components: [new ContainerBuilder()
-                            .addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You took too long to choose a location!`))
-                            .addActionRowComponents(disabledRow)
-                        ],
-                        flags: MessageFlags.HasComponentsV2,
+                        content: `❌ You took too long to choose a location!`,
+                        components: [disabledRow],
                         embeds: []
                     }).catch(() => {});
                 }
@@ -218,11 +212,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Search Error:', error);
-            await interaction.editReply({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while searching.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            }).catch(() => {});
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while searching.'));
         }
     }
 };

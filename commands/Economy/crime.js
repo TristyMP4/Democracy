@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -22,7 +23,7 @@ module.exports = {
             const cooldownTime = 60 * 1000;
             if (userData.lastCrime && (Date.now() - userData.lastCrime.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastCrime.getTime())) / 1000);
-                return interaction.followUp({ content: `🚓 Lay low! You can commit another crime in **${remaining}s**.` });
+                return interaction.followUp(ComponentUtils.createError(`❌ You're too hot right now! Lie low for **${remaining}s**.`));
             }
 
             // Update cooldown
@@ -89,10 +90,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Crime Error:', error);
-            await interaction.followUp({
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ The user could not be found!`))],
-                ephemeral: true
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while committing a crime.'));
         }
     }
 };

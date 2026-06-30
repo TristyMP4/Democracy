@@ -1,6 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -26,30 +27,18 @@ module.exports = {
         const amount = interaction.options.getInteger('amount');
 
         if (targetUser.bot) {
-            return interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot pay a bot!`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            return interaction.followUp(ComponentUtils.createError('❌ You cannot pay a bot!'));
         }
 
         if (targetUser.id === interaction.user.id) {
-            return interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You cannot pay yourself!`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            return interaction.followUp(ComponentUtils.createError('❌ You cannot pay yourself!'));
         }
 
         try {
             // Find sender
             let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!senderData || senderData.wallet < amount) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`));
             }
 
             // Find or create receiver
@@ -74,11 +63,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Pay Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred during the transaction.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred during the transaction.'));
         }
     }
 };

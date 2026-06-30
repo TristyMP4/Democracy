@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 const parseAmount = require('../../utils/AmountParser.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     economy: true,
@@ -22,29 +23,17 @@ module.exports = {
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!userData || userData.bank <= 0) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You do not have any money in your bank to withdraw!`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your bank to withdraw!'));
             }
 
             const amountToWithdraw = parseAmount(amountInput, userData.bank);
 
             if (amountToWithdraw <= 0) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError('❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).'));
             }
 
             if (amountToWithdraw > userData.bank) {
-                return interaction.followUp({ 
-                    components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`))],
-                    flags: MessageFlags.HasComponentsV2,
-                    ephemeral: true 
-                });
+                return interaction.followUp(ComponentUtils.createError(`❌ You only have **${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}** in your bank!`));
             }
 
             userData.bank -= amountToWithdraw;
@@ -61,11 +50,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Withdraw Error:', error);
-            await interaction.followUp({ 
-                components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ An error occurred while withdrawing.`))],
-                flags: MessageFlags.HasComponentsV2,
-                ephemeral: true 
-            });
+            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while withdrawing.'));
         }
     }
 };
