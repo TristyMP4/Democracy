@@ -44,7 +44,7 @@ module.exports = {
                 }
             }
 
-            const titleDisplay = new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`);
+            const titleDisplay = new TextDisplayBuilder().setContent(`### **${targetUser.username}'s Balances**`);
             const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
             const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
@@ -55,9 +55,13 @@ module.exports = {
                 new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser)
             );
 
+            const { SeparatorBuilder, SeparatorSpacingSize } = require('discord.js');
+
             const container = new ContainerBuilder()
-                .setAccentColor(EconomyConfig.embedColor)
-                .addTextDisplayComponents(titleDisplay, rankDisplay, balancesDisplay)
+                .addTextDisplayComponents(titleDisplay, rankDisplay)
+                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+                .addTextDisplayComponents(balancesDisplay)
+                .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
                 .addActionRowComponents(row);
 
             await interaction.followUp({ 
