@@ -71,20 +71,6 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell!`));
             }
 
-            // Deduct from inventory
-            const currentAmount = userData.inventory.get(itemInput);
-            if (currentAmount === amount) {
-                userData.inventory.delete(itemInput);
-            } else {
-                userData.inventory.set(itemInput, currentAmount - amount);
-            }
-
-            // Add money
-            const totalValue = itemConfig.price * amount;
-            userData.wallet += totalValue;
-
-            await userData.save();
-
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
             const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
             const footer = false
@@ -108,5 +94,17 @@ module.exports = {
             console.error('Sell Error:', error);
             await interaction.followUp(ComponentUtils.createError('❌ An error occurred while selling the item.'));
         }
+        // Deduct from inventory
+        const currentAmount = userData.inventory.get(itemInput);
+        if (currentAmount === amount) {
+            userData.inventory.delete(itemInput);
+        } else {
+            userData.inventory.set(itemInput, currentAmount - amount);
+        }
+
+        // Add money
+        const totalValue = itemConfig.price * amount;
+        userData.wallet += totalValue;
+        await userData.save();
     }
 };
