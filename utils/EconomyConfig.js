@@ -1,5 +1,4 @@
 module.exports = {
-    // Standard embed color for economy commands to keep branding consistent
     embedColor: 0x2b2d31,
     successColor: 0x2ecc71,
     failColor: 0xe74c3c,
@@ -10,14 +9,14 @@ module.exports = {
             name: 'AK-Alpha',
             description: 'A reliable assault rifle for heavy engagements.',
             emoji: '🔫', // Replace with custom emoji like '<:AK_Alpha:123456789>'
-            price: 5000,
+            price: 8500,
             dropWeight: 10 // Very Rare
         },
         'xm-250': {
             name: 'XM-250',
-            description: 'Devastating light machine gun, dropped by the Collector.',
+            description: 'Devastating light machine gun, tears through anything you throw its way. - Dropped by the Collector.',
             emoji: '🔥', 
-            price: 25000,
+            price: 30000,
             dropWeight: 3 // Legendary
         },
         'collector-armour-rig': {
@@ -31,21 +30,21 @@ module.exports = {
             name: 'Thompson',
             description: 'A mid tier SMG that is a reliable choice in a gunfight.',
             emoji: '🪵', 
-            price: 3000,
+            price: 5500,
             dropWeight: 30 // Rare
         },
         'semi-automatic-pistol': {
             name: 'Semi Automatic Pistol',
             description: 'Your basic sidearm. Better than nothing.',
             emoji: '🤏', 
-            price: 500,
+            price: 2500,
             dropWeight: 100 // Common
         },
         'semi-automatic-rifle': {
             name: 'Semi Automatic Rifle',
             description: 'High damaging semi rifle chambered in 5.56',
             emoji: '🎯', 
-            price: 2000,
+            price: 5000,
             dropWeight: 30 // Rare
         },
         'supply-signal': {
@@ -55,6 +54,14 @@ module.exports = {
             price: 50000,
             dropWeight: 5, // Very Rare, slightly lower than AK
             usable: true
+        },
+        'wet-willow': {
+            name: "Wet Willow",
+            description: "Wet Willow's dead corpse - Found in the depths of Jacob's Room",
+            emoji: '👼', 
+            price: 1000000,
+            dropWeight: 2, // Exotic
+            usable: false
         }
     },
 
@@ -75,7 +82,7 @@ module.exports = {
             emoji: "🚪",
             minReward: 100,
             maxReward: 1000,
-            possibleItems: ['semi-automatic-pistol'],
+            possibleItems: ['semi-automatic-pistol', 'wet-willow'],
             successMessages: [
                 "You searched Jacob's Room and found **${amount}** hidden under a pile of clothes!", 
                 "You bravely entered Jacob's Room and snagged **${amount}** from the desk.",
@@ -121,8 +128,8 @@ module.exports = {
             name: "Oil Rig",
             emoji: "🛢️",
             minReward: 1000,
-            maxReward: 5000, // High risk, high reward
-            possibleItems: ['ak-alpha', 'collector-armour-rig', 'supply-signal'],
+            maxReward: 5000,
+            possibleItems: ['ak-alpha', 'supply-signal'],
             successMessages: [
                 "You fought the heavies at the Oil Rig and claimed **${amount}** from the locked crate!", 
                 "You sniped the scientists and secured **${amount}** at the Oil Rig."
@@ -136,8 +143,8 @@ module.exports = {
             name: "Cargo",
             emoji: "🚢",
             minReward: 800,
-            maxReward: 4000,
-            possibleItems: ['xm-250', 'ak-alpha', 'supply-signal'],
+            maxReward: 4500,
+            possibleItems: ['xm-250', 'collector-armour-rig', 'ak-alpha', 'supply-signal'],
             successMessages: [
                 "You boarded the Cargo ship and looted **${amount}** from the holds!", 
                 "You took out the captain and secured **${amount}** on Cargo."
