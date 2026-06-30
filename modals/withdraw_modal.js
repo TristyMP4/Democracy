@@ -50,20 +50,26 @@ module.exports = {
             }
 
             const section = new SectionBuilder()
-                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${interaction.user.username}'s Balances**`))
-                .setButtonAccessory(new ButtonBuilder().setCustomId('net_worth_dummy').setLabel('Net Worth').setStyle(ButtonStyle.Secondary).setDisabled(true));
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${interaction.user.username}'s Balances**`));
 
-            const rankDisplay = new TextDisplayBuilder().setContent(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
             const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),
+                new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary).setDisabled(false),
+                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(false)
+            );
 
             const container = new ContainerBuilder()
                 .setAccentColor(EconomyConfig.embedColor)
                 .addSectionComponents(section)
-                .addTextDisplayComponents(rankDisplay, balancesDisplay);
+                .addTextDisplayComponents(rankDisplay, balancesDisplay)
+                .addActionRowComponents(row);
 
             await interaction.editReply({ 
                 flags: MessageFlags.IsComponentsV2,
-                components: [container, interaction.message.components[1]] 
+                components: [container] 
             });
 
         } catch (error) {

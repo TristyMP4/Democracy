@@ -45,10 +45,9 @@ module.exports = {
             }
 
             const section = new SectionBuilder()
-                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`))
-                .setButtonAccessory(new ButtonBuilder().setCustomId('net_worth_dummy').setLabel('Net Worth').setStyle(ButtonStyle.Secondary).setDisabled(true));
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`));
 
-            const rankDisplay = new TextDisplayBuilder().setContent(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
             const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const isOtherUser = targetUser.id !== interaction.user.id;
@@ -61,11 +60,12 @@ module.exports = {
             const container = new ContainerBuilder()
                 .setAccentColor(EconomyConfig.embedColor)
                 .addSectionComponents(section)
-                .addTextDisplayComponents(rankDisplay, balancesDisplay);
+                .addTextDisplayComponents(rankDisplay, balancesDisplay)
+                .addActionRowComponents(row);
 
             await interaction.followUp({ 
                 flags: MessageFlags.IsComponentsV2,
-                components: [container, row]
+                components: [container]
             });
 
         } catch (error) {
