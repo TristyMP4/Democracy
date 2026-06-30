@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
-const EconomyConfig = require('../../utils/EconomyConfig.js');
+const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
@@ -54,13 +54,14 @@ module.exports = {
                 userData.wallet += reward;
                 await userData.save();
 
-                const messageTemplate = crimeConfig.successMessages[Math.floor(Math.random() * crimeConfig.successMessages.length)];
-                const message = messageTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${reward.toLocaleString()}`);
+                const outcomeObj = crimeConfig.successMessages[Math.floor(Math.random() * crimeConfig.successMessages.length)];
+                const message = outcomeObj.message.replace('${amount}', `${EconomyConfig.currencySymbol}${reward.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🦹 Crime Successful')
                     .setDescription(message)
-                    .setColor(EconomyConfig.successColor);
+                    .setColor(EconomyConfig.successColor)
+                    .setFooter({ text: outcomeObj.signature });
 
                 return interaction.followUp({ embeds: [embed] });
 
@@ -77,13 +78,14 @@ module.exports = {
                 userData.wallet -= fine;
                 await userData.save();
 
-                const messageTemplate = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
-                const message = messageTemplate.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
+                const outcomeObj = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
+                const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🚓 Busted')
                     .setDescription(message)
-                    .setColor(EconomyConfig.failColor);
+                    .setColor(EconomyConfig.failColor)
+                    .setFooter({ text: outcomeObj.signature });
 
                 return interaction.followUp({ embeds: [embed] });
             }

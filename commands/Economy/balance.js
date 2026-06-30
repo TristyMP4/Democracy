@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
-const EconomyConfig = require('../../utils/EconomyConfig.js');
+const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
@@ -45,7 +45,7 @@ module.exports = {
                 }
             }
 
-            const titleDisplay = ComponentUtils.createText(`### **${targetUser.username}'s Balances**`);
+            const titleDisplay = ComponentUtils.createText(`### **${targetUser.displayName}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
             const balancesDisplay = ComponentUtils.createText(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
-const EconomyConfig = require('../../utils/EconomyConfig.js');
+const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
@@ -45,8 +45,8 @@ module.exports = {
             });
 
             const embed = new EmbedBuilder()
-                .setTitle('🔍 Search for Loot')
-                .setDescription('Where do you want to search? Click a button below!')
+                .setTitle('🔍 Where do you want to search?')
+                .setDescription('*Pick an option below to start searching that location!*')
                 .setColor(EconomyConfig.embedColor);
 
             const message = await interaction.followUp({ embeds: [embed], components: [row] });
@@ -59,24 +59,26 @@ module.exports = {
             });
 
             collector.on('collect', async i => {
-                // Disable buttons
+                const choiceIndex = parseInt(i.customId.split('_')[1]);
+                const chosenLocation = options[choiceIndex];
+
+                // Disable buttons and turn the chosen one green
                 const disabledRow = new ActionRowBuilder();
                 options.forEach((loc, index) => {
+                    const isChosen = index === choiceIndex;
                     disabledRow.addComponents(
-                        new ButtonBuilder()
-                            .setCustomId(`search_${index}`)
-                            .setLabel(loc.name)
-                            .setEmoji(loc.emoji)
-                            .setStyle(ButtonStyle.Secondary)
-                            .setDisabled(true)
+                        ComponentUtils.createButton({
+                            customId: `search_${index}`,
+                            label: loc.name,
+                            emoji: loc.emoji,
+                            style: isChosen ? ButtonStyle.Success : ButtonStyle.Secondary,
+                            disabled: true
+                        })
                     );
                 });
 
                 await i.update({ components: [disabledRow] });
                 collector.stop('clicked');
-
-                const choiceIndex = parseInt(i.customId.split('_')[1]);
-                const chosenLocation = options[choiceIndex];
 
                 // Fetch Global Multipliers
                 let settings = await EconomySettings.findOne({ id: 'global' });
@@ -161,16 +163,19 @@ module.exports = {
 
                 // Format the Result Embed
                 if (selectedOutcome === 'nothing') {
-                    const msgTemplate = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
+                    const outcomeObj = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
+                    const msgTemplate = outcomeObj.message;
                     
                     const resultEmbed = new EmbedBuilder()
                         .setTitle(`🔍 Searched: ${chosenLocation.name}`)
                         .setDescription(msgTemplate)
-                        .setColor(EconomyConfig.failColor);
+                        .setColor(EconomyConfig.failColor)
+                        .setFooter({ text: outcomeObj.signature });
 
-                    await interaction.editReply({ embeds: [resultEmbed], components: [] });
+                    await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
                 } else {
-                    const msgTemplate = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
+                    const outcomeObj = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
+                    const msgTemplate = outcomeObj.message;
                     let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
 
                     if (droppedItem && rewardMoney > 0) {
@@ -180,11 +185,12 @@ module.exports = {
                     }
 
                     const resultEmbed = new EmbedBuilder()
-                        .setTitle(`🔍 Searched: ${chosenLocation.name}`)
+                        .setTitle(`🔍 ${interaction.user.displayName} searched ${chosenLocation.name}`)
                         .setDescription(resultMessage)
-                        .setColor(EconomyConfig.successColor);
+                        .setColor(EconomyConfig.successColor)
+                        .setFooter({ text: outcomeObj.signature });
 
-                    await interaction.editReply({ embeds: [resultEmbed], components: [] });
+                    await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
                 }
             });
 
