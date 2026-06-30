@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } = require('discord.js');
 const ComponentUtils = require('../utils/ComponentUtils.js');
 const EconomyUser = require('../schemas/EconomyUser.js');
-const EconomyConfig = require('../utils/EconomyConfig.js');
+const EconomyConfig = require('../configs/EconomyConfig.js');
 
 module.exports = {
     customID: 'refresh_bal_btn',
