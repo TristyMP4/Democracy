@@ -1,9 +1,7 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
 
 module.exports = {
-    data: {
-        name: 'deposit_btn'
-    },
+    customID: 'deposit_btn',
     async execute(interaction) {
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {

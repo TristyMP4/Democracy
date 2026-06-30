@@ -1,12 +1,10 @@
-const { EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SectionBuilder, TextDisplayBuilder, MessageFlags, EmbedBuilder } = require('discord.js');
 const EconomyUser = require('../schemas/EconomyUser.js');
 const EconomyConfig = require('../utils/EconomyConfig.js');
 const parseAmount = require('../utils/AmountParser.js');
 
 module.exports = {
-    data: {
-        name: 'withdraw_modal'
-    },
+    customID: 'withdraw_modal',
     async execute(interaction) {
         await interaction.deferUpdate(); // Update the original balance message if possible, or we could deferReply to send a new message.
         // Actually, Modal submits can edit the message directly if we use deferUpdate, then followUp for the alert.
@@ -51,14 +49,22 @@ module.exports = {
                 }
             }
 
-            const originalEmbed = interaction.message.embeds[0];
-            const updatedEmbed = new EmbedBuilder()
-                .setTitle(originalEmbed.title)
-                .setDescription(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**\n\n🪙 **Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n🏦 **Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
-                .setColor(EconomyConfig.embedColor)
-                .setThumbnail(originalEmbed.thumbnail.url);
+            const section = new SectionBuilder()
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${interaction.user.username}'s Balances**`))
+                .setButtonAccessory(new ButtonBuilder().setCustomId('net_worth_dummy').setLabel('Net Worth').setStyle(ButtonStyle.Secondary).setDisabled(true));
 
-            await interaction.editReply({ embeds: [updatedEmbed] });
+            const rankDisplay = new TextDisplayBuilder().setContent(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+
+            const container = new ContainerBuilder()
+                .setAccentColor(parseInt(EconomyConfig.embedColor.replace('#', ''), 16))
+                .addSectionComponents(section)
+                .addTextDisplayComponents(rankDisplay, balancesDisplay);
+
+            await interaction.editReply({ 
+                flags: MessageFlags.IsComponentsV2,
+                components: [container, interaction.message.components[1]] 
+            });
 
         } catch (error) {
             console.error('Withdraw Modal Error:', error);

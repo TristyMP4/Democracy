@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SectionBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../utils/EconomyConfig.js');
 
@@ -44,21 +44,29 @@ module.exports = {
                 }
             }
 
-            const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+            const section = new SectionBuilder()
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`))
+                .setButtonAccessory(new ButtonBuilder().setCustomId('net_worth_dummy').setLabel('Net Worth').setStyle(ButtonStyle.Secondary).setDisabled(true));
 
-            const embed = new EmbedBuilder()
-                .setTitle(`${targetUser.username}'s Balances`)
-                .setDescription(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**\n\n🪙 **Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n🏦 **Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
-                .setColor(EconomyConfig.embedColor)
-                .setThumbnail(targetUser.displayAvatarURL());
+            const rankDisplay = new TextDisplayBuilder().setContent(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
+            const isOtherUser = targetUser.id !== interaction.user.id;
             const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary),
-                new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary),
-                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary)
+                new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser),
+                new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser),
+                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(isOtherUser)
             );
 
-            await interaction.followUp({ embeds: [embed], components: [row] });
+            const container = new ContainerBuilder()
+                .setAccentColor(parseInt(EconomyConfig.embedColor.replace('#', ''), 16))
+                .addSectionComponents(section)
+                .addTextDisplayComponents(rankDisplay, balancesDisplay);
+
+            await interaction.followUp({ 
+                flags: MessageFlags.IsComponentsV2,
+                components: [container, row]
+            });
 
         } catch (error) {
             console.error('Balance Error:', error);

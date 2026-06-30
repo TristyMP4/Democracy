@@ -1,9 +1,7 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
 
 module.exports = {
-    data: {
-        name: 'withdraw_btn'
-    },
+    customID: 'withdraw_btn',
     async execute(interaction) {
         // Ensure only the person who ran /balance can use this
         if (interaction.message.interaction && interaction.user.id !== interaction.message.interaction.user.id) {

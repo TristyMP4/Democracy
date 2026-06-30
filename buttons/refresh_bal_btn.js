@@ -1,11 +1,9 @@
-const { EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SectionBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUser = require('../schemas/EconomyUser.js');
 const EconomyConfig = require('../utils/EconomyConfig.js');
 
 module.exports = {
-    data: {
-        name: 'refresh_bal_btn'
-    },
+    customID: 'refresh_bal_btn',
     async execute(interaction) {
         // The title is "Username's Balances". Wait, we can't reliably get the target ID from the title easily if there are special characters.
         // If it's the author's balance, interaction.message.interaction.user.id is the author.
@@ -57,13 +55,22 @@ module.exports = {
                 }
             }
 
-            const embed = new EmbedBuilder()
-                .setTitle(title)
-                .setDescription(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**\n\n🪙 **Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n🏦 **Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
-                .setColor(EconomyConfig.embedColor)
-                .setThumbnail(thumbnail);
+            const section = new SectionBuilder()
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${title.replace("'s Balances", "")}'s Balances**`))
+                .setButtonAccessory(new ButtonBuilder().setCustomId('net_worth_dummy').setLabel('Net Worth').setStyle(ButtonStyle.Secondary).setDisabled(true));
 
-            await interaction.editReply({ embeds: [embed] });
+            const rankDisplay = new TextDisplayBuilder().setContent(`Market Value: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
+            const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+
+            const container = new ContainerBuilder()
+                .setAccentColor(parseInt(EconomyConfig.embedColor.replace('#', ''), 16))
+                .addSectionComponents(section)
+                .addTextDisplayComponents(rankDisplay, balancesDisplay);
+
+            await interaction.editReply({ 
+                flags: MessageFlags.IsComponentsV2,
+                components: [container, interaction.message.components[1]] 
+            });
 
         } catch (error) {
             console.error('Refresh Bal Error:', error);
