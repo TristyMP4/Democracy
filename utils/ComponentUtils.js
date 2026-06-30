@@ -10,7 +10,7 @@ module.exports = {
         const cleanMessage = message.startsWith('❌') ? message.replace(/^❌\s*/, '') : message;
         return {
             components: [new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ ${cleanMessage}`))],
-            flags: MessageFlags.HasComponentsV2 | MessageFlags.Ephemeral
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
         };
     },
 
@@ -51,7 +51,7 @@ module.exports = {
      */
     createContainerResponse: (container) => {
         return {
-            flags: MessageFlags.HasComponentsV2,
+            flags: MessageFlags.IsComponentsV2,
             components: [container]
         };
     }
