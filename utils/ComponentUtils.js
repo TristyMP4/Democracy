@@ -1,5 +1,4 @@
 const { ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SeparatorSpacingSize, MessageFlags, ButtonBuilder, ButtonStyle } = require('discord.js');
-const EconomyConfig = require('./EconomyConfig.js');
 
 module.exports = {
     /**
@@ -10,7 +9,7 @@ module.exports = {
     createError: (message) => {
         const cleanMessage = message.startsWith('❌') ? message.replace(/^❌\s*/, '') : message;
         return {
-            components: [new ContainerBuilder().setAccentColor(EconomyConfig.failColor).addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ ${cleanMessage}`))],
+            components: [new ContainerBuilder().setAccentColor(0xe74c3c).addTextDisplayComponents(new TextDisplayBuilder().setContent(`❌ ${cleanMessage}`))],
             flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
         };
     },

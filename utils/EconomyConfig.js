@@ -1,8 +1,4 @@
 module.exports = {
-    embedColor: 0x2b2d31,
-    successColor: 0x2ecc71,
-    failColor: 0xe74c3c,
-
     currencySymbol: '£',
     currencyCode: 'GBP',
 
