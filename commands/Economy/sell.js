@@ -73,12 +73,26 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell!`));
             }
 
+            // Deduct from inventory
+            const currentAmount = userData.inventory.get(itemInput);
+            if (currentAmount === amount) {
+                userData.inventory.delete(itemInput);
+            } else {
+                userData.inventory.set(itemInput, currentAmount - amount);
+            }
+
+            // Add money
+            const finalValue = totalValue * settings.moneyMultiplier;
+            userData.wallet += finalValue;
+            await userData.save();
+
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
-            const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
-            const footer = false
+            const descDisplay = ComponentUtils.createText(`-# You sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${finalValue.toLocaleString()}**!`);
+            
+            let footerDisplay = null;
             if (settings.moneyMultiplier > 1) {
-                const bonusAmount = totalValue * moneyMultiplier;
-                footer = `-# Money Multiplier + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+                const bonusAmount = finalValue - totalValue;
+                footerDisplay = ComponentUtils.createText(`-# Money Multiplier | + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`);
             }
 
             const container = new ContainerBuilder()
@@ -86,9 +100,9 @@ module.exports = {
                 .addSeparatorComponents(ComponentUtils.createSeparator())
                 .addTextDisplayComponents(descDisplay);
             
-            if (footer) {
-                container.addSeparatorComponents(ComponentUtils.createSeparator())
-                container.addTextDisplayComponents(footer)
+            if (footerDisplay) {
+                container.addSeparatorComponents(ComponentUtils.createSeparator());
+                container.addTextDisplayComponents(footerDisplay);
             }
             await interaction.followUp(ComponentUtils.createContainerResponse(container));
 
@@ -96,16 +110,5 @@ module.exports = {
             console.error('Sell Error:', error);
             await interaction.followUp(ComponentUtils.createError('❌ An error occurred while selling the item.'));
         }
-        // Deduct from inventory
-        const currentAmount = userData.inventory.get(itemInput);
-        if (currentAmount === amount) {
-            userData.inventory.delete(itemInput);
-        } else {
-            userData.inventory.set(itemInput, currentAmount - amount);
-        }
-
-        // Add money
-        userData.wallet += totalValue;
-        await userData.save();
     }
 };
