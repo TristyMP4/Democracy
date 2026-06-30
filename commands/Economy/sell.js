@@ -58,6 +58,8 @@ module.exports = {
         if (amount <= 0) {
             return interaction.followUp(ComponentUtils.createError('You must sell at least 1.'));
         }
+        
+        const totalValue = itemConfig.price * amount;
 
         // Validate item exists in game
         const itemConfig = EconomyConfig.items[itemInput];
@@ -75,7 +77,7 @@ module.exports = {
             const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${totalValue.toLocaleString()}**!`);
             const footer = false
             if (settings.moneyMultiplier > 1) {
-                const bonusAmount = amount * moneyMultiplier;
+                const bonusAmount = totalValue * moneyMultiplier;
                 footer = `-# Money Multiplier + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
             }
 
@@ -103,7 +105,6 @@ module.exports = {
         }
 
         // Add money
-        const totalValue = itemConfig.price * amount;
         userData.wallet += totalValue;
         await userData.save();
     }
