@@ -58,14 +58,14 @@ module.exports = {
         if (amount <= 0) {
             return interaction.followUp(ComponentUtils.createError('You must sell at least 1.'));
         }
-        
-        const totalValue = itemConfig.price * amount;
 
-        // Validate item exists in game
+        // Validate item exists in economy
         const itemConfig = EconomyConfig.items[itemInput];
         if (!itemConfig) {
             return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
         }
+
+        const totalValue = itemConfig.price * amount;
 
         try {
             let userData = await EconomyUser.findOne({ userId: interaction.user.id });
