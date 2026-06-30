@@ -63,7 +63,7 @@ module.exports = {
             const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const container = new ContainerBuilder()
-                .setAccentColor(parseInt(EconomyConfig.embedColor.replace('#', ''), 16))
+                .setAccentColor(EconomyConfig.embedColor)
                 .addSectionComponents(section)
                 .addTextDisplayComponents(rankDisplay, balancesDisplay);
 
