@@ -92,7 +92,7 @@ module.exports = {
             let footerDisplay = null;
             if (settings.moneyMultiplier > 1) {
                 const bonusAmount = finalValue - totalValue;
-                footerDisplay = ComponentUtils.createText(`-# Money Multiplier | + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`);
+                footerDisplay = ComponentUtils.createText(`-# Money Multiplier: + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`);
             }
 
             const container = new ContainerBuilder()

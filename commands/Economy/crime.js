@@ -60,7 +60,7 @@ module.exports = {
                 let footerText = outcomeObj.signature;
                 if (settings.moneyMultiplier > 1 && reward > baseReward) {
                     const bonusAmount = reward - baseReward;
-                    footerText += ` | Money Multiplier + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
+                    footerText += ` | Money Multiplier: + ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()}`;
                 }
 
                 const embed = new EmbedBuilder()
