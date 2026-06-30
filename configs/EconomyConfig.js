@@ -7,6 +7,14 @@ module.exports = {
     successColor: 0x2ecc71,
     failColor: 0xe74c3c,
 
+    // Icons & Emojis
+    ReplyIcon: "<:Reply:1521616973518340097>",
+    RefreshIcon: "<:Refresh:1521618279096127488>",
+    ForwardArrow: "<:ForwardArrow:1521618281780478012>",
+    BackwardArrow: "<:BackArrow:1521618280194900108>",
+    LastArrow: "<:LastArrow:1521618284133486792>",
+    StartArrow: "<:StartArrow:1521618283034579075>",
+
     currencySymbol: '£',
     currencyCode: 'GBP',
 

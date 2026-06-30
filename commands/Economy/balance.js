@@ -53,7 +53,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 ComponentUtils.createButton({ customId: 'withdraw_btn', label: 'Withdraw', style: ButtonStyle.Secondary, disabled: isOtherUser }),
                 ComponentUtils.createButton({ customId: 'deposit_btn', label: 'Deposit', style: ButtonStyle.Secondary, disabled: isOtherUser }),
-                ComponentUtils.createButton({ customId: 'refresh_bal_btn', emoji: '🔄', style: ButtonStyle.Secondary, disabled: isOtherUser })
+                ComponentUtils.createButton({ customId: 'refresh_bal_btn', emoji: `${EconomyConfig.RefreshIcon}`, style: ButtonStyle.Secondary, disabled: isOtherUser })
             );
 
             const container = new ContainerBuilder()

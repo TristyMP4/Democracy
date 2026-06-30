@@ -76,18 +76,18 @@ module.exports = {
 
                 for (const item of pageItems) {
                     pageMarketValue += item.totalValue;
-                    itemsText += `${item.emoji} **${item.name}** — ${item.quantity.toLocaleString()}\n╰ -# ${EconomyConfig.currencySymbol}${item.totalValue.toLocaleString()}\n\n`;
+                    itemsText += `${item.emoji} **${item.name}** — ${item.quantity.toLocaleString()}\n${EconomyConfig.ReplyIcon} *Value: ${EconomyConfig.currencySymbol}${item.totalValue.toLocaleString()}*\n\n`;
                 }
 
                 const titleText = `### **${targetUser.displayName}'s Inventory**\n-# Total Market Value: ${EconomyConfig.currencySymbol}${totalMarketValue.toLocaleString()}\n-# Page Market Value: ${EconomyConfig.currencySymbol}${pageMarketValue.toLocaleString()}`;
                 const pageText = `-# Page ${page + 1} of ${totalPages}`;
 
                 const row = new ActionRowBuilder().addComponents(
-                    ComponentUtils.createButton({ customId: `inv_first`, label: '«', style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
-                    ComponentUtils.createButton({ customId: `inv_prev`, label: '<', style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
-                    ComponentUtils.createButton({ customId: `inv_refresh`, emoji: '🔄', style: ButtonStyle.Secondary, disabled: disabled }),
-                    ComponentUtils.createButton({ customId: `inv_next`, label: '>', style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 }),
-                    ComponentUtils.createButton({ customId: `inv_last`, label: '»', style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 })
+                    ComponentUtils.createButton({ customId: `inv_first`, label: `${EconomyConfig.StartArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
+                    ComponentUtils.createButton({ customId: `inv_prev`, label: `${EconomyConfig.BackwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === 0 }),
+                    ComponentUtils.createButton({ customId: `inv_refresh`, emoji: `${EconomyConfig.RefreshIcon}`, style: ButtonStyle.Secondary, disabled: disabled }),
+                    ComponentUtils.createButton({ customId: `inv_next`, label: `${EconomyConfig.ForwardArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 }),
+                    ComponentUtils.createButton({ customId: `inv_last`, label: `${EconomyConfig.LastArrow}`, style: ButtonStyle.Secondary, disabled: disabled || page === totalPages - 1 })
                 );
 
                 return new ContainerBuilder()
