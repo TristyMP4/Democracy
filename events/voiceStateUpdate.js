@@ -5,7 +5,6 @@ module.exports = {
     name: 'voiceStateUpdate',
     once: false,
     async execute(client, oldState, newState) {
-        // Prevent bots from triggering it
         if (newState.member.user.bot) return;
 
         try {
@@ -13,8 +12,6 @@ module.exports = {
             if (!j2cData) return;
 
             const { setupChannelId, categoryId } = j2cData;
-
-            // User joins the setup channel
             if (newState.channelId === setupChannelId) {
                 // Ensure category exists
                 const category = newState.guild.channels.cache.get(categoryId);
@@ -42,20 +39,12 @@ module.exports = {
                         }
                     ]
                 });
-
-                // Move the user to their new channel
                 await newState.member.voice.setChannel(newChannel);
-
-                // Save to database tracking
                 j2cData.createdChannels.push(newChannel.id);
                 await j2cData.save();
             }
-
-            // User leaves a channel (or moves to another)
             if (oldState.channelId && oldState.channelId !== newState.channelId) {
                 const oldChannel = oldState.channel;
-                
-                // If the channel they left was a J2C channel
                 if (oldChannel && j2cData.createdChannels.includes(oldChannel.id)) {
                     // Check if empty
                     if (oldChannel.members.size === 0) {
