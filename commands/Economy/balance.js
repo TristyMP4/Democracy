@@ -44,9 +44,7 @@ module.exports = {
                 }
             }
 
-            const section = new SectionBuilder()
-                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`));
-
+            const titleDisplay = new TextDisplayBuilder().setContent(`**${targetUser.username}'s Balances**`);
             const rankDisplay = new TextDisplayBuilder().setContent(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
             const balancesDisplay = new TextDisplayBuilder().setContent(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
@@ -59,8 +57,7 @@ module.exports = {
 
             const container = new ContainerBuilder()
                 .setAccentColor(EconomyConfig.embedColor)
-                .addSectionComponents(section)
-                .addTextDisplayComponents(rankDisplay, balancesDisplay)
+                .addTextDisplayComponents(titleDisplay, rankDisplay, balancesDisplay)
                 .addActionRowComponents(row);
 
             await interaction.followUp({ 
