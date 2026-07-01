@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomySettings = require('../../schemas/EconomySettings.js');
-const EconomyConfig = require('../../Configs/EconomyConfig.js');
+const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {

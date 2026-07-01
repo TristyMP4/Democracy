@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
-const ItemsConfig = require('../../Configs/ItemsConfig.js');
+const ItemsConfig = require('../../configs/ItemsConfig.js');
 
 function getRarity(weight) {
     if (weight >= 60) return 'Common';
