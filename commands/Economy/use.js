@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
@@ -78,21 +78,33 @@ module.exports = {
 
                 await userData.save();
 
-                const embed = new EmbedBuilder()
-                    .setTitle('🚁 Supply Drop Arrived!')
-                    .setDescription(`You threw the Supply Signal and a chopper dropped off a crate!\n\n**You received:**\n${receivedText}`)
-                    .setColor(EconomyConfig.successColor);
+                const titleDisplay = ComponentUtils.createText(`### 🚁 **Supply Drop Arrived!**`);
+                const descDisplay = ComponentUtils.createText(`-# You threw the Supply Signal and a chopper dropped off a crate!\n\n**You received:**\n${receivedText}`);
 
-                return interaction.followUp({ embeds: [embed] });
+                const container = new ContainerBuilder()
+                    .setAccentColor(EconomyConfig.successColor)
+                    .addTextDisplayComponents(titleDisplay)
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(descDisplay);
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
             }
 
             // Fallback for generic items
             await userData.save();
-            await interaction.followUp({ content: `✅ You used **${itemConfig.name}**.` });
+            const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
+            const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);
+            const fallbackContainer = new ContainerBuilder()
+                .setAccentColor(EconomyConfig.successColor)
+                .addTextDisplayComponents(fallbackTitle)
+                .addSeparatorComponents(ComponentUtils.createSeparator())
+                .addTextDisplayComponents(fallbackDesc);
+
+            await interaction.followUp(ComponentUtils.createContainerResponse(fallbackContainer));
 
         } catch (error) {
             console.error('Use Error:', error);
-            await interaction.followUp(ComponentUtils.createError('❌ An error occurred while using the item.'));
+            await interaction.followUp(ComponentUtils.createError('An error occurred while using the item.'));
         }
     }
 };
