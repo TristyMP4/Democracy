@@ -7,6 +7,13 @@ module.exports = {
     async execute(client, oldState, newState) {
         if (newState.member.user.bot) return;
 
+        // Automatically un-server-mute and un-server-deafen when joining a VC
+        if (newState.channelId && oldState.channelId !== newState.channelId) {
+            if (newState.serverMute || newState.serverDeaf) {
+                newState.member.edit({ mute: false, deaf: false }).catch(console.error);
+            }
+        }
+
         try {
             const j2cData = await JoinToCreate.findOne({ guildId: newState.guild.id });
             if (!j2cData) return;
