@@ -80,7 +80,7 @@ module.exports = {
             }
             descLines.push(`**Voting ends** ${voteDurationString}`);
 
-            const descDisplay = ComponentUtils.createText(descLines.join('\n'));
+            const descDisplay = ComponentUtils.createText(descLines.join(''));
             const yesDisplay = ComponentUtils.createText(`**${yesLabel}**\n${yesSet.size}`);
             const noDisplay = ComponentUtils.createText(`**${noLabel}**\n${noSet.size}`);
 

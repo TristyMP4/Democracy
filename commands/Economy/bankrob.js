@@ -69,7 +69,7 @@ module.exports = {
 
         const voteResult = await VoteManager.startVote(interaction, {
             title: '🏦 **Bank Heist**',
-            description: `A heist is being organized against ${target}'s bank account!\n\n> You need ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.\n> If the heist fails, you will lose **${config.finePercentage * 100}%** of your money!`,
+            description: `A heist is being organized against ${target}'s bank account!\n> You need ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.\n> If the heist fails, you will lose **${config.finePercentage * 100}%** of your money!`,
             fixedRequiredVotes: 1,
             duration: 150_000,
             requireOnline: true,
