@@ -43,7 +43,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setTitle('🏦 Withdrawal Successful')
-                .setDescription(`You withdrew **${EconomyConfig.currencySymbol}${amountToWithdraw.toLocaleString()}** from your bank.\n\n**New Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n**New Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
+                .setDescription(`You withdrew **${EconomyConfig.currencySymbol}${amountToWithdraw.toLocaleString()}** from your bank.\n> **New Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n> **New Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
                 .setColor(EconomyConfig.successColor);
 
             await interaction.followUp({ embeds: [embed] });

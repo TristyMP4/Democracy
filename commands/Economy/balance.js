@@ -47,7 +47,7 @@ module.exports = {
 
             const titleDisplay = ComponentUtils.createText(`### **${targetUser.displayName}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\` Scrap**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\` Scrap**\n🏦 **\`${userData.bank.toLocaleString()}\` Scrap**`);
 
             const isOtherUser = targetUser.id !== interaction.user.id;
             const row = new ActionRowBuilder().addComponents(

@@ -1,11 +1,7 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
-} = require('discord.js');
-const Cooldown = require('../../schemas/cooldown');
+const { SlashCommandBuilder } = require('discord.js');
+const Cooldown = require('../../schemas/cooldown.js');
+const ComponentUtils = require('../../utils/ComponentUtils.js');
+const VoteManager = require('../../utils/VoteManager.js');
 const cooldownMinutes = 10;
 
 module.exports = {
@@ -30,47 +26,12 @@ module.exports = {
         });
 
         if (existingCooldown && existingCooldown.expiresAt > new Date()) {
-            const secondsLeft = Math.ceil(
-                (existingCooldown.expiresAt.getTime() - Date.now()) / 1000
-            );
-
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription(
-                            `❌ You must wait **${secondsLeft} seconds** before voting to change server name again.`
-                        )
-                ],
-                ephemeral: true
-            });
-        }
-
-        await interaction.guild.members.fetch();
-        const onlineMembers = interaction.guild.members.cache.filter(member => {
-            if (member.user.bot) return false;
-
-            const status = member.presence?.status ?? 'offline';
-            return status !== 'offline';
-        });
-
-        const onlineCount = onlineMembers.size;
-        if (onlineCount < 2) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ Not enough online users to start a vote.')
-                ],
-                ephemeral: true
-            });
+            const secondsLeft = Math.ceil((existingCooldown.expiresAt.getTime() - Date.now()) / 1000);
+            return interaction.reply(ComponentUtils.createError(`You must wait **${secondsLeft} seconds** before voting to change server name again.`));
         }
 
         await Cooldown.findOneAndUpdate(
-            {
-                userId: interaction.user.id,
-                commandName
-            },
+            { userId: interaction.user.id, commandName },
             {
                 userId: interaction.user.id,
                 commandName,
@@ -79,160 +40,50 @@ module.exports = {
             { upsert: true }
         );
 
-        const yesVotes = new Set();
-        const noVotes = new Set();
+        const descriptionLines = [
+            `Started by: ${interaction.user}`,
+            '> A rename server vote has been started.',
+            `> If **60%** of online members vote **Yes**, the server will be renamed.`,
+            `**New Server Name:** \`${newName}\``
+        ];
 
-        const voteDuration = 60_000; // 60 seconds
-        const requiredVotes = Math.ceil(onlineCount * 0.6);
-        // const requiredVotes = 1
-
-        const embed = new EmbedBuilder()
-            .setTitle('🗳️ Vote Server Rename')
-            .setColor(0xf1c40f)
-            .setDescription(
-                [
-                    `Started by: ${interaction.user}`,
-                    '> A rename server vote has been started.',
-                    `> If **60%** of online members vote **Yes**, the server will be renamed.`,
-                    `**New Server Name:** \`${newName}\``,
-                    '',
-                    `*Required Votes to win:* ***${requiredVotes}***`,
-                    `*Online Members:* **${onlineCount}**`,
-                    `**Voting ends** <t:${Math.floor((Date.now() + voteDuration) / 1000)}:R>`
-                ].join('\n')
-            )
-            .addFields(
-                {
-                    name: 'Yes',
-                    value: '0',
-                    inline: true
-                },
-                {
-                    name: 'No',
-                    value: '0',
-                    inline: true
-                }
-            );
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId('vote_yes')
-                .setLabel('Yes')
-                .setStyle(ButtonStyle.Success),
-
-            new ButtonBuilder()
-                .setCustomId('vote_no')
-                .setLabel('No')
-                .setStyle(ButtonStyle.Danger)
-        );
-
-        await interaction.reply({
-            content: '@here',
-            embeds: [embed],
-            components: [row],
-            allowedMentions: {
-                parse: ['everyone']
-            }
+        const voteResult = await VoteManager.startVote(interaction, {
+            title: '🗳️ **Vote Server Rename**',
+            description: descriptionLines.join('\n'),
+            requiredPercentage: 0.60,
+            duration: 60_000,
+            requireOnline: true
         });
 
-        const message = await interaction.fetchReply();
+        if (!voteResult) return; // Early exit (e.g. not enough users)
 
-        const collector = message.createMessageComponentCollector({
-            time: voteDuration
-        });
+        const { passed, yesVotes, noVotes, requiredVotes, message } = voteResult;
 
-        collector.on('collect', async buttonInteraction => {
-            if (
-                buttonInteraction.customId !== 'vote_yes' &&
-                buttonInteraction.customId !== 'vote_no'
-            ) {
-                return;
-            }
-
-            const userId = buttonInteraction.user.id;
-
-            yesVotes.delete(userId);
-            noVotes.delete(userId);
-
-            if (buttonInteraction.customId === 'vote_yes') {
-                yesVotes.add(userId);
-            } else {
-                noVotes.add(userId);
-            }
-
-            const updatedEmbed = EmbedBuilder.from(embed).setFields(
-                {
-                    name: 'Yes',
-                    value: `${yesVotes.size}`,
-                    inline: true
-                },
-                {
-                    name: 'No',
-                    value: `${noVotes.size}`,
-                    inline: true
-                }
-            );
-
-            await buttonInteraction.update({
-                embeds: [updatedEmbed],
-                components: [row]
-            });
-        });
-
-        collector.on('end', async () => {
-            const passed = yesVotes.size >= requiredVotes;
-
-            const disabledRow = new ActionRowBuilder().addComponents(
-                ButtonBuilder.from(row.components[0]).setDisabled(true),
-                ButtonBuilder.from(row.components[1]).setDisabled(true)
-            );
-
-            if (passed) {
-                try {
-                    await interaction.guild.setName(newName);
-                    const resultEmbed = new EmbedBuilder()
-                        .setTitle('✅ Vote Passed')
-                        .setColor(0x2ecc71)
-                        .setDescription(
-                            `The server has been renamed to \`${newName}\`\n` +
-                            `> Yes: **${yesVotes.size}**\n` +
-                            `> No: **${noVotes.size}**\n` +
-                            `> Required Votes to win: **${requiredVotes}**`
-                        );
-
-                    await message.edit({
-                        embeds: [resultEmbed],
-                        components: [disabledRow]
-                    });
-                } catch (err) {
-                    const errorEmbed = new EmbedBuilder()
-                        .setTitle('❌ Server Rename Failed')
-                        .setColor(0xe74c3c)
-                        .setDescription(
-                            `The vote passed, but I couldn't rename the server.\n\`\`\`${err.message}\`\`\``
-                        );
-
-                    await message.edit({
-                        embeds: [errorEmbed],
-                        components: [disabledRow]
-                    });
-                }
-            } else {
-                const failEmbed = new EmbedBuilder()
-                    .setTitle('❌ Vote Failed')
-                    .setColor(0xe74c3c)
-                    .setDescription(
-                        `The server will not be renamed.\n` +
-                        `> Yes: **${yesVotes.size}**\n` +
-                        `> No: **${noVotes.size}**\n` +
-                        `> Required Votes to win: **${requiredVotes}**`
-                    );
-
-                await message.edit({
-                    embeds: [failEmbed],
-                    components: [disabledRow]
+        if (passed) {
+            try {
+                await interaction.guild.setName(newName);
+                
+                await VoteManager.displayResult(message, {
+                    passed: true,
+                    title: 'Vote Passed',
+                    description: `The server has been renamed to \`${newName}\``,
+                    yesVotes, noVotes, requiredVotes
+                });
+            } catch (err) {
+                await VoteManager.displayResult(message, {
+                    passed: false,
+                    title: 'Server Rename Failed',
+                    description: `The vote passed, but I couldn't rename the server.\n\`\`\`${err.message}\`\`\``,
+                    yesVotes, noVotes, requiredVotes
                 });
             }
-        });
+        } else {
+            await VoteManager.displayResult(message, {
+                passed: false,
+                title: 'Vote Failed',
+                description: `The server will not be renamed.`,
+                yesVotes, noVotes, requiredVotes
+            });
+        }
     }
 };

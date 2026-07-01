@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord
 const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
+const parseAmount = require('../../utils/AmountParser.js');
 
 module.exports = {
     economy: true,
@@ -13,10 +14,9 @@ module.exports = {
                 .setDescription('The user you want to pay')
                 .setRequired(true)
         )
-        .addIntegerOption(option =>
+        .addStringOption(option =>
             option.setName('amount')
-                .setDescription('The amount of money to send')
-                .setMinValue(1)
+                .setDescription('The amount of money to send (e.g. 1234, 2k, 50%, all)')
                 .setRequired(true)
         ),
 
@@ -24,21 +24,31 @@ module.exports = {
         await interaction.deferReply();
 
         const targetUser = interaction.options.getUser('user');
-        const amount = interaction.options.getInteger('amount');
+        const amountInput = interaction.options.getString('amount');
 
         if (targetUser.bot) {
-            return interaction.followUp(ComponentUtils.createError('❌ You cannot pay a bot!'));
+            return interaction.followUp(ComponentUtils.createError('You cannot pay a bot!'));
         }
 
         if (targetUser.id === interaction.user.id) {
-            return interaction.followUp(ComponentUtils.createError('❌ You cannot pay yourself!'));
+            return interaction.followUp(ComponentUtils.createError('You cannot pay yourself!'));
         }
 
         try {
             // Find sender
             let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!senderData || senderData.wallet < amount) {
-                return interaction.followUp(ComponentUtils.createError(`You do not have **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** in your wallet!`));
+            if (!senderData || senderData.wallet <= 0) {
+                return interaction.followUp(ComponentUtils.createError('You do not have any money in your wallet!'));
+            }
+
+            const amount = parseAmount(amountInput, senderData.wallet);
+
+            if (amount <= 0) {
+                return interaction.followUp(ComponentUtils.createError('Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).'));
+            }
+
+            if (senderData.wallet < amount) {
+                return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${senderData.wallet.toLocaleString()}** in your wallet!`));
             }
 
             // Find or create receiver
@@ -54,12 +64,16 @@ module.exports = {
             await senderData.save();
             await receiverData.save();
 
-            const embed = new EmbedBuilder()
-                .setTitle('💸 Payment Successful')
-                .setDescription(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!`)
-                .setColor(EconomyConfig.successColor);
+            const titleDisplay = ComponentUtils.createText(`### 💸 **Payment Successful**`);
+            const descDisplay = ComponentUtils.createText(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!`);
+            
+            const container = new ContainerBuilder()
+                .setAccentColor(EconomyConfig.successColor)
+                .addTextDisplayComponents(titleDisplay)
+                .addSeparatorComponents(ComponentUtils.createSeparator())
+                .addTextDisplayComponents(descDisplay);
 
-            await interaction.followUp({ embeds: [embed] });
+            await interaction.followUp(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
             console.error('Pay Error:', error);

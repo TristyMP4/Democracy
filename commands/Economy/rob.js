@@ -72,7 +72,7 @@ module.exports = {
                 const stealMin = targetData.wallet * robConfig.minStealPercentage;
                 const stealMax = targetData.wallet * robConfig.maxStealPercentage;
                 
-                let stealAmount = Math.floor(Math.random() * (stealMax - stealMin + 1)) + stealMin;
+                let stealAmount = Math.round(Math.random() * (stealMax - stealMin) + stealMin);
                 if (stealAmount < 1) stealAmount = 1; // Always steal at least 1 if successful and they have money
                 if (stealAmount > targetData.wallet) stealAmount = targetData.wallet;
 

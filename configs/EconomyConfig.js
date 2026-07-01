@@ -49,5 +49,16 @@ module.exports = {
         finePercentage: 0.1, // Lose 10% of your own wallet on fail
         minimumAmountToRob: 5000,
         cooldown: 300 * 1000 // 5 minutes (300 seconds) to milliseconds * 1000
+    },
+
+    // BankRob configurations
+    bankrob: {
+        successChance: 0.4, // Base 40% chance of success
+        minStealPercentage: 0.05, // Steal at least 5% of target bank
+        maxStealPercentage: 0.10, // Steal up to 10% of target bank
+        finePercentage: 0.05, // Lose 5% of your own bank/wallet on fail
+        minTargetBank: 10000, // Target must have at least 10,000 in bank
+        minBalanceToJoin: 5000, // Participants must have at least 5,000 in bank or wallet
+        cooldown: 7200 * 1000 // 2 hours (7200 seconds)
     }
 };
