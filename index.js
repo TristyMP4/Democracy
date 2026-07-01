@@ -67,8 +67,8 @@ async function InteractionHandler(interaction, type) {
         }
 
         if (component.economy) {
-            const EconomySettings = require('./schemas/EconomySettings.js');
-            const settings = await EconomySettings.findOne({ id: 'global' });
+            const GlobalSettings = require('./schemas/GlobalSettings.js');
+            const settings = await GlobalSettings.findOne({ id: 'global' });
             if (settings && settings.economyDisabled) {
                 // Let owners bypass the lock
                 if (!owners.includes(interaction.user.id)) {
@@ -78,6 +78,35 @@ async function InteractionHandler(interaction, type) {
                     const titleDisplay = ComponentUtils.createText(`### 🔒 **Economy Locked**`);
                     const descDisplay = ComponentUtils.createText(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\``);
                     const footer = ComponentUtils.createText(`-# Economy features are currently disabled.`);
+                    
+                    const container = new ContainerBuilder()
+                        .setAccentColor(0xe74c3c)
+                        .addTextDisplayComponents(titleDisplay)
+                        .addSeparatorComponents(ComponentUtils.createSeparator())
+                        .addTextDisplayComponents(descDisplay)
+                        .addSeparatorComponents(ComponentUtils.createSeparator())
+                        .addTextDisplayComponents(footer);
+                    
+                    const payload = ComponentUtils.createContainerResponse(container);
+                    payload.ephemeral = true;
+                    
+                    return await interaction.reply(payload);
+                }
+            }
+        }
+
+        if (component.democracy) {
+            const GlobalSettings = require('./schemas/GlobalSettings.js');
+            const settings = await GlobalSettings.findOne({ id: 'global' });
+            if (settings && settings.democracyDisabled) {
+                // Let owners bypass the lock
+                if (!owners.includes(interaction.user.id)) {
+                    const { ContainerBuilder } = require('discord.js');
+                    const ComponentUtils = require('./utils/ComponentUtils.js');
+                    
+                    const titleDisplay = ComponentUtils.createText(`### 🔒 **Democracy Locked**`);
+                    const descDisplay = ComponentUtils.createText(`**This command cannot be executed right now!**\n*Reason:* \`${settings.democracyDisabledReason || 'Maintenance.'}\``);
+                    const footer = ComponentUtils.createText(`-# Democracy features are currently disabled.`);
                     
                     const container = new ContainerBuilder()
                         .setAccentColor(0xe74c3c)

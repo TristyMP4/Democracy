@@ -11,6 +11,7 @@ const cooldownMinutes = 10;
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
+    democracy: true,
     data: new SlashCommandBuilder()
         .setName('votekick')
         .setDescription('Start a vote to kick a user.')
