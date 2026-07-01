@@ -72,13 +72,22 @@ async function InteractionHandler(interaction, type) {
             if (settings && settings.economyDisabled) {
                 // Let owners bypass the lock
                 if (!owners.includes(interaction.user.id)) {
-                    const { EmbedBuilder } = require('discord.js');
-                    const embed = new EmbedBuilder()
-                        .setTitle('🔒 Economy Locked')
-                        .setDescription(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\`\n> Economy features are currently disabled.`)
-                        .setColor(0xe74c3c);
+                    const { ContainerBuilder } = require('discord.js');
+                    const ComponentUtils = require('./utils/ComponentUtils.js');
                     
-                    return await interaction.reply({ embeds: [embed], ephemeral: true });
+                    const titleDisplay = ComponentUtils.createText(`### 🔒 **Economy Locked**`);
+                    const descDisplay = ComponentUtils.createText(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\`\n> Economy features are currently disabled.`);
+                    
+                    const container = new ContainerBuilder()
+                        .setAccentColor(0xe74c3c)
+                        .addTextDisplayComponents(titleDisplay)
+                        .addSeparatorComponents(ComponentUtils.createSeparator())
+                        .addTextDisplayComponents(descDisplay);
+                    
+                    const payload = ComponentUtils.createContainerResponse(container);
+                    payload.ephemeral = true;
+                    
+                    return await interaction.reply(payload);
                 }
             }
         }
