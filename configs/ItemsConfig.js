@@ -64,7 +64,7 @@ module.exports = {
         dropWeight: 2, // Exotic
         usable: false,
         sellable: true
-    }
+    },
     'sock': {
         name: "Sock",
         description: "A damp wet sock..",
