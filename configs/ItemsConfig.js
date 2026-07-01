@@ -65,4 +65,13 @@ module.exports = {
         usable: false,
         sellable: true
     }
+    'sock': {
+        name: "Sock",
+        description: "A damp wet sock..",
+        emoji: '🧦', 
+        price: 500,
+        dropWeight: 4.5, // Uncommon
+        usable: false,
+        sellable: true
+    }
 };
