@@ -1,6 +1,6 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
+    ContainerBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -8,6 +8,7 @@ const {
 const Stat = require('../../schemas/stats');
 const Cooldown = require('../../schemas/cooldown');
 const cooldownMinutes = 10;
+const ComponentUtils = require('../../utils/ComponentUtils.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -63,37 +64,16 @@ module.exports = {
         }
 
         if (target.bot) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ You cannot vote for bots.')
-                ],
-                ephemeral: true
-            });
+            return interaction.reply(ComponentUtils.createError('You cannot vote for bots.'));
         }
 
         if (duration < 1 || duration > 15) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ Mute duration must be between **1** and **15** minutes.')
-                ],
-                ephemeral: true
-            });
+            return interaction.reply(ComponentUtils.createError('Mute duration must be between **1** and **15** minutes.'));
         }
 
         const targetMember = await interaction.guild.members.fetch(target.id);
         if (!targetMember.moderatable) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ I cannot mute that user.')
-                ],
-                ephemeral: true
-            });
+            return interaction.reply(ComponentUtils.createError('I cannot mute that user.'));
         }
 
         await interaction.guild.members.fetch();
@@ -119,14 +99,7 @@ module.exports = {
         };
 
         if (onlineCount < 2) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe74c3c)
-                        .setDescription('❌ Not enough online users to start a vote.')
-                ],
-                ephemeral: true
-            });
+            return interaction.reply(ComponentUtils.createError('Not enough online users to start a vote.'));
         }
         
         await Stat.findOneAndUpdate(
@@ -182,23 +155,19 @@ module.exports = {
             `**Voting ends** ${voteDurationString}`
         );
 
-        const embed = new EmbedBuilder()
-            .setTitle('🗳️ Vote Mute')
-            .setColor(0xf1c40f)
-            .setDescription(descriptionLines.join('\n'))
-            .addFields(
-                {
-                    name: 'Yes',
-                    value: '0',
-                    inline: true
-                },
-                {
-                    name: 'No',
-                    value: '0',
-                    inline: true
-                }
-            )
-            .setTimestamp();
+        const titleDisplay = ComponentUtils.createText(\### 🗳️ **Vote Mute**\);
+        const descDisplay = ComponentUtils.createText(descriptionLines.join('\n'));
+        const yesDisplay = ComponentUtils.createText(\**Yes**\n0\);
+        const noDisplay = ComponentUtils.createText(\**No**\n0\);
+
+        const container = new ContainerBuilder()
+            .setAccentColor(0xf1c40f)
+            .addTextDisplayComponents(titleDisplay)
+            .addSeparatorComponents(ComponentUtils.createSeparator())
+            .addTextDisplayComponents(descDisplay)
+            .addSeparatorComponents(ComponentUtils.createSeparator())
+            .addTextDisplayComponents(yesDisplay, noDisplay);
+
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('vote_yes')
@@ -218,14 +187,12 @@ module.exports = {
 
         await interaction.reply({
             content: '@here',
-            embeds: [embed],
-            components: [row],
-            allowedMentions: {
-                parse: ['everyone']
-            }
+            allowedMentions: { parse: ['everyone'] }
         });
-
-        const message = await interaction.fetchReply();
+        
+        const payload = ComponentUtils.createContainerResponse(container);
+        payload.components.push(row);
+        const message = await interaction.channel.send(payload);
 
         const collector = message.createMessageComponentCollector({
             time: voteDuration
@@ -262,14 +229,7 @@ module.exports = {
                 });
             }
             if (buttonInteraction.user.id === target.id) {
-                return buttonInteraction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(0xe74c3c)
-                            .setDescription('❌ You cannot vote on yourself!')
-                    ],
-                    ephemeral: true
-                });
+                return buttonInteraction.reply(ComponentUtils.createError('You cannot vote on yourself!'));
             }
 
             const member = await interaction.guild.members.fetch(
@@ -278,14 +238,7 @@ module.exports = {
             const status = member.presence?.status ?? 'offline';
 
             if (status === 'offline') {
-                return buttonInteraction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(0xe74c3c)
-                            .setDescription('❌ You cannot vote while appearing offline.')
-                    ],
-                    ephemeral: true
-                });
+                return buttonInteraction.reply(ComponentUtils.createError('You cannot vote while appearing offline.'));
             }
 
             if (

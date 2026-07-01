@@ -20,7 +20,7 @@ module.exports = {
 
         const titleDisplay = ComponentUtils.createText(`### 📢 **Bot Update: ${title}**`);
         const messageDisplay = ComponentUtils.createText(message);
-        const footerDisplay = ComponentUtils.createText(`-# Update deployed by ${interaction.user.username}`);
+        const footerDisplay = ComponentUtils.createText(`-# Update deployed by ${interaction.user.username} • ${new Date().toLocaleDateString()}`);
 
         const container = new ContainerBuilder()
             .setAccentColor(0x2b2d31)

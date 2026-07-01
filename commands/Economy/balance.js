@@ -20,7 +20,7 @@ module.exports = {
         const targetUser = interaction.options.getUser('user') || interaction.user;
 
         if (targetUser.bot) {
-            return interaction.followUp(ComponentUtils.createError('❌ Bots do not have economy profiles!'));
+            return interaction.followUp(ComponentUtils.createError('Bots do not have economy profiles!'));
         }
 
         try {
@@ -29,7 +29,7 @@ module.exports = {
             if (!userData) {
                 // If checking someone else who has no data
                 if (targetUser.id !== interaction.user.id) {
-                    return interaction.followUp(ComponentUtils.createError('❌ That user does not have an economy profile yet.'));
+                    return interaction.followUp(ComponentUtils.createError('That user does not have an economy profile yet.'));
                 }
                 // If checking self, create profile
                 userData = new EconomyUser({ userId: interaction.user.id });
@@ -47,7 +47,7 @@ module.exports = {
 
             const titleDisplay = ComponentUtils.createText(`### **${targetUser.displayName}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = ComponentUtils.createText(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\` Scrap**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const isOtherUser = targetUser.id !== interaction.user.id;
             const row = new ActionRowBuilder().addComponents(

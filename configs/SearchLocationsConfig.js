@@ -17,6 +17,23 @@ module.exports = [
         ]
     },
     {
+        name: "Porker's Car",
+        emoji: "🚗",
+        minReward: 100,
+        maxReward: 850,
+        possibleItems: ['weed', 'crude-oil'],
+        successMessages: [
+            { message: "You searched Porkies car and found **${amount}**!", signature: "a mediocre amount" }, 
+            { message: "You grafted Porkies baby food and sold it for **${amount}**.", signature: "maybe that's why hes always hungry" },
+            { message: "You stole Porkies booster seat and sold it for **${amount}**!", signature: "now hope he crashes" }
+        ],
+        failMessages: [
+            { message: "You searched relentlessly but all the doob was smoked already.", signature: "where's dad at" }, 
+            { message: "Porky Pig walked to school today because he was bullied", signature: "just wait till he gets picked up afterschool" },
+            { message: "The smell of doob in the car instantly made you high and you forgot what you were doing.", signature: "try again next time?" }
+        ]
+    },
+    {
         name: "Old Bunker",
         emoji: "🏚️",
         minReward: 500,

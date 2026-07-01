@@ -15,7 +15,7 @@ module.exports = {
     LastArrow: "<:LastArrow:1521618284133486792>",
     StartArrow: "<:StartArrow:1521618283034579075>",
 
-    currencySymbol: '£',
+    currencySymbol: '<:Scrap:1521924158399971409> ',
     
     // Dictionary of All Items in the Economy System
     items: ItemsConfig,
@@ -39,5 +39,15 @@ module.exports = {
         finePercentage: 0.1, // Lose 10% of wallet on fail
         successMessages: CrimeMessagesConfig.successMessages,
         failMessages: CrimeMessagesConfig.failMessages
+    },
+
+    // Rob configurations
+    rob: {
+        successChance: 0.4, // Base 40% chance of success
+        minStealPercentage: 0.05, // Steal at least 5% of target wallet
+        maxStealPercentage: 0.15, // Steal up to 15% of target wallet
+        finePercentage: 0.1, // Lose 10% of your own wallet on fail
+        minimumAmountToRob: 5000,
+        cooldown: 300 * 1000 // 5 minutes (300 seconds) to milliseconds * 1000
     }
 };

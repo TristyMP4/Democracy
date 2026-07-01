@@ -10,7 +10,8 @@ const economyUserSchema = new mongoose.Schema({
         default: {} 
     },
     lastCrime: { type: Date, default: null },
-    lastSearch: { type: Date, default: null }
+    lastSearch: { type: Date, default: null },
+    lastRob: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('EconomyUser', economyUserSchema);
