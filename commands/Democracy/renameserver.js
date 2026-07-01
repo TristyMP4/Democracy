@@ -9,6 +9,7 @@ const Cooldown = require('../../schemas/cooldown');
 const cooldownMinutes = 10;
 
 module.exports = {
+    democracy: true,
     data: new SlashCommandBuilder()
         .setName('renameserver')
         .setDescription('Start a vote to rename the server.')

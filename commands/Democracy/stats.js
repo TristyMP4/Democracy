@@ -9,6 +9,7 @@ const {
 const Stat = require('../../schemas/stats');
 
 module.exports = {
+    democracy: true,
     data: new SlashCommandBuilder()
         .setName('stats')
         .setDescription('View stats for a user.')
