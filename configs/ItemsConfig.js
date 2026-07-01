@@ -52,7 +52,7 @@ module.exports = {
         description: 'Call in a supply drop. Use this item to receive 1-3 random items!',
         emoji: '<:SupplySignal:1521922411153326120>', 
         price: 50000,
-        dropWeight: 5, // Very Rare, slightly lower than AK
+        dropWeight: 3, // Epic
         usable: true,
         sellable: true
     },
@@ -88,8 +88,35 @@ module.exports = {
         description: "A barrel of high quality oil.",
         emoji: '🛢️', 
         price: 8500,
-        dropWeight: 40, // Uncommon
+        dropWeight: 45, // Uncommon
         usable: false,
         sellable: true
-    }
+    },
+    'green-keycard': {
+        name: "Green Keycard",
+        description: "A keycard for old bunker that reaps many rewards.",
+        emoji: '<:Green_Keycard:1521954128589357127>', 
+        price: 5000,
+        dropWeight: 8, // Epic
+        usable: true,
+        sellable: true
+    },
+    'purple-keycard': {
+        name: "Purple Keycard",
+        description: "A high tier keycard that brings great riches.",
+        emoji: '<:Purple_Keycard:1521954129889591356>', 
+        price: 8000,
+        dropWeight: 6, // Epic
+        usable: true,
+        sellable: true
+    },
+    'red-keycard': {
+        name: "Red Keycard",
+        description: "An exotic tier keycard that brings all you could want.",
+        emoji: '<:Red_Keycard:1521956783009169530>', 
+        price: 12000,
+        dropWeight: 1, // Exotic
+        usable: true,
+        sellable: true
+    },
 };

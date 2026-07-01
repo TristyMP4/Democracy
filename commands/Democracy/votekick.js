@@ -84,7 +84,7 @@ module.exports = {
 
         const voteResult = await VoteManager.startVote(interaction, {
             title: '🗳️ **Vote Kick**',
-            description: descriptionLines.join('\n'),
+            description: descriptionLines.join(''),
             requiredPercentage: 0.75,
             duration: 120_000,
             requireOnline: true,

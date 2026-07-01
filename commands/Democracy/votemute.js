@@ -97,7 +97,7 @@ module.exports = {
 
         const voteResult = await VoteManager.startVote(interaction, {
             title: '🗳️ **Vote Mute**',
-            description: descriptionLines.join('\n'),
+            description: descriptionLines.join(''),
             requiredPercentage: 0.60,
             duration: 60_000,
             requireOnline: true,

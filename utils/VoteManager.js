@@ -72,11 +72,11 @@ module.exports = {
             if (pingType === 'here') descLines.push('@here', '');
             if (pingType === 'everyone') descLines.push('@everyone', '');
             descLines.push(description, '');
-            descLines.push(`*Required Votes to win:* ***${requiredVotes}***`);
+            descLines.push(`*Required Votes to win:* ***${requiredVotes}***\n`);
             if (requireOnline) {
-                descLines.push(`*Online Members:* **${onlineCount}**`);
+                descLines.push(`*Online Members:* **${onlineCount}**\n`);
             } else {
-                descLines.push(`*Members:* **${onlineCount}**`);
+                descLines.push(`*Members:* **${onlineCount}**\n`);
             }
             descLines.push(`**Voting ends** ${voteDurationString}`);
 

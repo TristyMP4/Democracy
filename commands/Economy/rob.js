@@ -84,7 +84,7 @@ module.exports = {
                 await attackerData.save();
 
                 const titleDisplay = ComponentUtils.createText(`### 🥷 **Heist Successful**`);
-                const descDisplay = ComponentUtils.createText(`You slipped into **${targetUser.username}**'s pockets and managed to steal **${EconomyConfig.currencySymbol}${stealAmount.toLocaleString()}** without them noticing!`);
+                const descDisplay = ComponentUtils.createText(`You slipped into **${targetUser}**'s pockets and managed to steal **${EconomyConfig.currencySymbol}${stealAmount.toLocaleString()}** without them noticing!`);
                 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.successColor)
