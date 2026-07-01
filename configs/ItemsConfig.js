@@ -36,7 +36,7 @@ module.exports = {
         description: 'A reliable handgun that can open the door to a snowball.',
         emoji: '🤏', 
         price: 2500,
-        dropWeight: 100, // Common
+        dropWeight: 70, // Common
         sellable: true
     },
     'semi-automatic-rifle': {
