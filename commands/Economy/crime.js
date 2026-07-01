@@ -72,20 +72,33 @@ module.exports = {
                 return interaction.followUp({ embeds: [embed] });
 
             } else {
-                // Failed - Calculate fine
-                let fine = Math.floor(userData.wallet * crimeConfig.finePercentage);
+                // Failed - Calculate fine (based on total wealth to prevent stashing loopholes)
+                let fine = Math.floor((userData.wallet + userData.bank) * crimeConfig.finePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
                 
-                // You can't go below 0
-                if (userData.wallet < fine) {
-                    fine = userData.wallet;
+                let remainingFine = fine;
+
+                if (userData.wallet >= remainingFine) {
+                    userData.wallet -= remainingFine;
+                    remainingFine = 0;
+                } else {
+                    remainingFine -= userData.wallet;
+                    userData.wallet = 0;
+                    
+                    if (userData.bank >= remainingFine) {
+                        userData.bank -= remainingFine;
+                        remainingFine = 0;
+                    } else {
+                        remainingFine -= userData.bank;
+                        userData.bank = 0;
+                    }
                 }
 
-                userData.wallet -= fine;
+                const actualFinePaid = fine - remainingFine;
                 await userData.save();
 
                 const outcomeObj = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
-                const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
+                const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${actualFinePaid.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🚓 Busted')
