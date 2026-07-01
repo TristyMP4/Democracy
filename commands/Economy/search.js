@@ -59,145 +59,151 @@ module.exports = {
             });
 
             collector.on('collect', async i => {
-                const choiceIndex = parseInt(i.customId.split('_')[1]);
-                const chosenLocation = options[choiceIndex];
+                try {
+                    const choiceIndex = parseInt(i.customId.split('_')[1]);
+                    const chosenLocation = options[choiceIndex];
 
-                // Disable buttons and turn the chosen one green
-                const disabledRow = new ActionRowBuilder();
-                options.forEach((loc, index) => {
-                    const isChosen = index === choiceIndex;
-                    disabledRow.addComponents(
-                        ComponentUtils.createButton({
-                            customId: `search_${index}`,
-                            label: loc.name,
-                            emoji: loc.emoji,
-                            style: isChosen ? ButtonStyle.Success : ButtonStyle.Secondary,
-                            disabled: true
-                        })
-                    );
-                });
+                    // Disable buttons and turn the chosen one green
+                    const disabledRow = new ActionRowBuilder();
+                    options.forEach((loc, index) => {
+                        const isChosen = index === choiceIndex;
+                        disabledRow.addComponents(
+                            ComponentUtils.createButton({
+                                customId: `search_${index}`,
+                                label: loc.name,
+                                emoji: loc.emoji,
+                                style: isChosen ? ButtonStyle.Success : ButtonStyle.Secondary,
+                                disabled: true
+                            })
+                        );
+                    });
 
-                await i.update({ components: [disabledRow] });
-                collector.stop('clicked');
+                    await i.update({ components: [disabledRow] });
+                    collector.stop('clicked');
 
-                // Fetch Global Multipliers
-                let settings = await EconomySettings.findOne({ id: 'global' });
-                if (!settings) {
-                    settings = new EconomySettings();
-                    await settings.save();
-                }
-
-                // Weighted RNG for outcomes (Luck boosts good outcomes)
-                const outcomesConfig = EconomyConfig.searchSettings.outcomes;
-                const weights = [
-                    { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * settings.luckMultiplier },
-                    { type: 'itemOnly', weight: outcomesConfig.itemOnly * settings.luckMultiplier },
-                    { type: 'moneyOnly', weight: outcomesConfig.moneyOnly * settings.luckMultiplier },
-                    { type: 'nothing', weight: outcomesConfig.nothing } // Luck doesn't boost bad outcomes
-                ];
-
-                const totalWeight = weights.reduce((acc, curr) => acc + curr.weight, 0);
-                let random = Math.random() * totalWeight;
-                let selectedOutcome = 'nothing';
-
-                for (const w of weights) {
-                    if (random < w.weight) {
-                        selectedOutcome = w.type;
-                        break;
+                    // Fetch Global Multipliers
+                    let settings = await EconomySettings.findOne({ id: 'global' });
+                    if (!settings) {
+                        settings = new EconomySettings();
+                        await settings.save();
                     }
-                    random -= w.weight;
-                }
 
-                // Make sure we fetch the latest user data to prevent desync
-                userData = await EconomyUser.findOne({ userId: interaction.user.id });
-                if (!userData.inventory) userData.inventory = new Map();
+                    // Weighted RNG for outcomes (Luck boosts good outcomes)
+                    const outcomesConfig = EconomyConfig.searchSettings.outcomes;
+                    const luckMulti = settings.luckMultiplier || 1.0;
+                    const weights = [
+                        { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * luckMulti },
+                        { type: 'itemOnly', weight: outcomesConfig.itemOnly * luckMulti },
+                        { type: 'moneyOnly', weight: outcomesConfig.moneyOnly * luckMulti },
+                        { type: 'nothing', weight: outcomesConfig.nothing } // Luck doesn't boost bad outcomes
+                    ];
 
-                let rewardMoney = 0;
-                let baseReward = 0;
-                let droppedItem = null;
+                    const totalWeight = weights.reduce((acc, curr) => acc + curr.weight, 0);
+                    let random = Math.random() * totalWeight;
+                    let selectedOutcome = 'nothing';
 
-                // Process Money
-                if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
-                    baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                    rewardMoney = Math.floor(baseReward * settings.moneyMultiplier);
-                    userData.wallet += rewardMoney;
-                }
-
-                // Process Item
-                if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'itemOnly') {
-                    if (chosenLocation.possibleItems && chosenLocation.possibleItems.length > 0) {
-                        
-                        // Calculate total weight of possible items for this location
-                        let totalItemWeight = 0;
-                        const itemWeights = [];
-                        for (const key of chosenLocation.possibleItems) {
-                            const weight = EconomyConfig.items[key].dropWeight || 100;
-                            totalItemWeight += weight;
-                            itemWeights.push({ key, weight });
+                    for (const w of weights) {
+                        if (random < w.weight) {
+                            selectedOutcome = w.type;
+                            break;
                         }
+                        random -= w.weight;
+                    }
 
-                        let itemRandom = Math.random() * totalItemWeight;
-                        let randomItemKey = chosenLocation.possibleItems[0]; // fallback
-                        
-                        for (const iw of itemWeights) {
-                            if (itemRandom < iw.weight) {
-                                randomItemKey = iw.key;
-                                break;
-                            }
-                            itemRandom -= iw.weight;
-                        }
+                    // Make sure we fetch the latest user data to prevent desync
+                    userData = await EconomyUser.findOne({ userId: interaction.user.id });
+                    if (!userData.inventory) userData.inventory = new Map();
 
-                        droppedItem = EconomyConfig.items[randomItemKey];
-                        
-                        const currentCount = userData.inventory.get(randomItemKey) || 0;
-                        userData.inventory.set(randomItemKey, currentCount + 1);
-                    } else if (selectedOutcome === 'itemOnly') {
-                        // Fallback to money if no items exist for this location
-                        selectedOutcome = 'moneyOnly';
-                        let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                        rewardMoney = Math.floor(reward * settings.moneyMultiplier);
+                    let rewardMoney = 0;
+                    let baseReward = 0;
+                    let droppedItem = null;
+
+                    // Process Money
+                    if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
+                        baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
+                        rewardMoney = Math.floor(baseReward * (settings.moneyMultiplier || 1.0));
                         userData.wallet += rewardMoney;
                     }
-                }
 
-                await userData.save();
+                    // Process Item
+                    if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'itemOnly') {
+                        if (chosenLocation.possibleItems && chosenLocation.possibleItems.length > 0) {
+                            
+                            // Calculate total weight of possible items for this location
+                            let totalItemWeight = 0;
+                            const itemWeights = [];
+                            for (const key of chosenLocation.possibleItems) {
+                                const weight = EconomyConfig.items[key].dropWeight || 100;
+                                totalItemWeight += weight;
+                                itemWeights.push({ key, weight });
+                            }
 
-                // Format the Result Embed
-                if (selectedOutcome === 'nothing') {
-                    const outcomeObj = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
-                    const msgTemplate = outcomeObj.message;
-                    
-                    const resultEmbed = new EmbedBuilder()
-                        .setTitle(`${interaction.user.displayName} searched ${chosenLocation.name}`)
-                        .setDescription(msgTemplate)
-                        .setColor(EconomyConfig.failColor)
-                        .setFooter({ text: outcomeObj.signature });
+                            let itemRandom = Math.random() * totalItemWeight;
+                            let randomItemKey = chosenLocation.possibleItems[0]; // fallback
+                            
+                            for (const iw of itemWeights) {
+                                if (itemRandom < iw.weight) {
+                                    randomItemKey = iw.key;
+                                    break;
+                                }
+                                itemRandom -= iw.weight;
+                            }
 
-                    await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
-                } else {
-                    const outcomeObj = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
-                    const msgTemplate = outcomeObj.message;
-                    let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
-
-                    if (droppedItem && rewardMoney > 0) {
-                        resultMessage += `\n> And you lucky ducky, you also found ${droppedItem.emoji} **${droppedItem.name}**!`;
-                    } else if (droppedItem && rewardMoney === 0) {
-                        resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find ${droppedItem.emoji} **${droppedItem.name}**!`;
+                            droppedItem = EconomyConfig.items[randomItemKey];
+                            
+                            const currentCount = userData.inventory.get(randomItemKey) || 0;
+                            userData.inventory.set(randomItemKey, currentCount + 1);
+                        } else if (selectedOutcome === 'itemOnly') {
+                            // Fallback to money if no items exist for this location
+                            selectedOutcome = 'moneyOnly';
+                            let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
+                            rewardMoney = Math.floor(reward * (settings.moneyMultiplier || 1.0));
+                            userData.wallet += rewardMoney;
+                        }
                     }
 
-                    let footerText = outcomeObj.signature;
-                    if (settings.moneyMultiplier > 1 && rewardMoney > baseReward) {
-                        const bonusAmount = rewardMoney - baseReward;
-                        footerText += ` | Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
+                    await userData.save();
+
+                    // Format the Result Embed
+                    if (selectedOutcome === 'nothing') {
+                        const outcomeObj = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
+                        const msgTemplate = outcomeObj.message;
+                        
+                        const resultEmbed = new EmbedBuilder()
+                            .setTitle(`🔍 ${interaction.user.username} searched ${chosenLocation.name}`)
+                            .setDescription(msgTemplate)
+                            .setColor(EconomyConfig.failColor)
+                            .setFooter({ text: outcomeObj.signature });
+
+                        await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
+                    } else {
+                        const outcomeObj = chosenLocation.successMessages[Math.floor(Math.random() * chosenLocation.successMessages.length)];
+                        const msgTemplate = outcomeObj.message;
+                        let resultMessage = msgTemplate.replace('${amount}', `${EconomyConfig.currencySymbol}${rewardMoney.toLocaleString()}`);
+
+                        if (droppedItem && rewardMoney > 0) {
+                            resultMessage += `\n> And you lucky ducky, you also found ${droppedItem.emoji} **${droppedItem.name}**!`;
+                        } else if (droppedItem && rewardMoney === 0) {
+                            resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find ${droppedItem.emoji} **${droppedItem.name}**!`;
+                        }
+
+                        let footerText = outcomeObj.signature;
+                        if ((settings.moneyMultiplier || 1.0) > 1 && rewardMoney > baseReward) {
+                            const bonusAmount = rewardMoney - baseReward;
+                            footerText += ` | Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
+                        }
+
+                        const resultEmbed = new EmbedBuilder()
+                            .setTitle(`🔍 ${interaction.user.username} searched ${chosenLocation.name}`)
+                            .setDescription(resultMessage)
+                            .setColor(EconomyConfig.successColor)
+                            .setFooter({ text: footerText });
+
+                        await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
                     }
-
-                    const resultEmbed = new EmbedBuilder()
-                        .setTitle(`🔍 ${interaction.user.displayName} searched ${chosenLocation.name}`)
-                        .setDescription(resultMessage)
-                        .setColor(EconomyConfig.successColor)
-                        .setFooter({ text: footerText });
-
-                    await interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
+                } catch (err) {
+                    console.error('Collector Error:', err);
+                    await i.followUp({ content: `An error crashed the interaction: \`${err.message}\`\n${err.stack.split('\\n')[1]}`, ephemeral: true }).catch(() => {});
                 }
             });
 
@@ -217,8 +223,7 @@ module.exports = {
 
                     const lateEmbed = new EmbedBuilder()
                     .setDescription("Looks like you didn't want to search anywhere.")
-                    .setColor(EconomyConfig.embedColor)
-                    .setFooter({ text: outcomeObj.signature });
+                    .setColor(EconomyConfig.embedColor);
 
                     await interaction.editReply({ 
                         content: `❌ You took too long to choose a location!`,

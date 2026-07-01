@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const User = require('../../schemas/User.js');
+const User = require('../../schemas/EconomyUser.js');
 const Cooldown = require('../../schemas/cooldown.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const VoteManager = require('../../utils/VoteManager.js');
