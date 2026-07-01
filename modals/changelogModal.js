@@ -32,8 +32,8 @@ module.exports = {
 
         try {
             const payload = ComponentUtils.createContainerResponse(container);
-            payload.content = '@everyone';
             
+            await targetChannel.send({ content: '@everyone' });
             await targetChannel.send(payload);
             
             // Clean up cache
