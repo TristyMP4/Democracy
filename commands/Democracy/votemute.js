@@ -156,10 +156,10 @@ module.exports = {
             `**Voting ends** ${voteDurationString}`
         );
 
-        const titleDisplay = ComponentUtils.createText(### 🗳️ **Vote Mute**);
+        const titleDisplay = ComponentUtils.createText(`### 🗳️ **Vote Mute**`);
         const descDisplay = ComponentUtils.createText(descriptionLines.join('\n'));
-        const yesDisplay = ComponentUtils.createText(\**Yes**\n0\);
-        const noDisplay = ComponentUtils.createText(\**No**\n0\);
+        const yesDisplay = ComponentUtils.createText(`**Yes**\n0`);
+        const noDisplay = ComponentUtils.createText(`**No**\n0`);
 
         const container = new ContainerBuilder()
             .setAccentColor(0xf1c40f)

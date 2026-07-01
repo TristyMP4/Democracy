@@ -143,10 +143,10 @@ module.exports = {
             `**Voting ends** ${voteDurationString}`
         );
 
-        const titleDisplay = ComponentUtils.createText(### 🗳️ **Vote Kick**);
+        const titleDisplay = ComponentUtils.createText(`### 🗳️ **Vote Kick**`);
         const descDisplay = ComponentUtils.createText(descriptionLines.join('\n'));
-        const yesDisplay = ComponentUtils.createText(**Yes**\n0);
-        const noDisplay = ComponentUtils.createText(**No**\n0);
+        const yesDisplay = ComponentUtils.createText(`**Yes**\n0`);
+        const noDisplay = ComponentUtils.createText(`**No**\n0`);
 
         const container = new ContainerBuilder()
             .setAccentColor(0xf1c40f)
@@ -362,7 +362,7 @@ module.exports = {
                         `> Required Votes to win: **${finalRequiredVotes}**`,
                     );
 
-                    const resultTitle = ComponentUtils.createText(### ✅ **Vote Passed**);
+                    const resultTitle = ComponentUtils.createText(`### ✅ **Vote Passed**`);
                     const resultDesc = ComponentUtils.createText(descriptionLines.join('\n'));
                     const resultContainer = new ContainerBuilder()
                         .setAccentColor(0x2ecc71)
