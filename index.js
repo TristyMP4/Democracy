@@ -76,13 +76,16 @@ async function InteractionHandler(interaction, type) {
                     const ComponentUtils = require('./utils/ComponentUtils.js');
                     
                     const titleDisplay = ComponentUtils.createText(`### 🔒 **Economy Locked**`);
-                    const descDisplay = ComponentUtils.createText(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\`\n> Economy features are currently disabled.`);
+                    const descDisplay = ComponentUtils.createText(`**This command cannot be executed right now!**\n*Reason:* \`${settings.economyDisabledReason || 'Maintenance.'}\``);
+                    const footer = ComponentUtils.createText(`-# Economy features are currently disabled.`);
                     
                     const container = new ContainerBuilder()
                         .setAccentColor(0xe74c3c)
                         .addTextDisplayComponents(titleDisplay)
                         .addSeparatorComponents(ComponentUtils.createSeparator())
-                        .addTextDisplayComponents(descDisplay);
+                        .addTextDisplayComponents(descDisplay)
+                        .addSeparatorComponents(ComponentUtils.createSeparator())
+                        .addTextDisplayComponents(footer);
                     
                     const payload = ComponentUtils.createContainerResponse(container);
                     payload.ephemeral = true;
