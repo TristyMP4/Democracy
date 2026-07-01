@@ -4,7 +4,7 @@ module.exports = [
         emoji: "🚪",
         minReward: 100,
         maxReward: 1000,
-        possibleItems: ['semi-automatic-pistol', 'wet-willow'],
+        possibleItems: ['semi-automatic-pistol', 'wet-willow', 'sock'],
         successMessages: [
             { message: "You searched Jacob's Room and found **${amount}** hidden under a pile of clothes!", signature: "where's willow?" }, 
             { message: "You bravely entered Jacob's Room and snagged **${amount}** from the desk.", signature: "are you sure it's not monopoly money?" },
