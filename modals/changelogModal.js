@@ -24,9 +24,9 @@ module.exports = {
 
         const container = new ContainerBuilder()
             .setAccentColor(0x2b2d31)
+            .addTextDisplayComponents(titleDisplay)
             .addTextDisplayComponents(ComponentUtils.createText(`-# @everyone`))
             .addSeparatorComponents(ComponentUtils.createSeparator())
-            .addTextDisplayComponents(titleDisplay)
             .addSeparatorComponents(ComponentUtils.createSeparator())
             .addTextDisplayComponents(messageDisplay)
             .addSeparatorComponents(ComponentUtils.createSeparator())
