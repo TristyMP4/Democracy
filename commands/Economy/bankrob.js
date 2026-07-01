@@ -32,11 +32,9 @@ module.exports = {
             return interaction.reply(ComponentUtils.createError(`The target must have at least ${EconomyConfig.currencySymbol}**${config.minTargetBank.toLocaleString()}** in their bank to be robbed.`));
         }
 
-        await interaction.guild.members.fetch();
-        const onlineCount = interaction.guild.members.cache.filter(m => {
-            if (m.user.bot) return false;
-            const status = m.presence?.status ?? 'offline';
-            return status !== 'offline';
+        // Use presences cache to count online users instead of fetching all members (prevents Opcode 8 rate limits)
+        const onlineCount = interaction.guild.presences.cache.filter(p => {
+            return p.status !== 'offline' && p.user && !p.user.bot;
         }).size;
         
         if (onlineCount < 3) {
