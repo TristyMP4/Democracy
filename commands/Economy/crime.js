@@ -64,7 +64,7 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setTitle('🦹 Crime Successful')
+                    .setTitle('🥷 Crime Successful')
                     .setDescription(message)
                     .setColor(EconomyConfig.successColor)
                     .setFooter({ text: footerText });

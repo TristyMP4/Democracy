@@ -108,7 +108,7 @@ module.exports = {
                 await attackerData.save();
 
                 const titleDisplay = ComponentUtils.createText(`### 🚓 **Busted!**`);
-                const descDisplay = ComponentUtils.createText(`**${targetUser.username}** caught you trying to reach into their wallet!\n\nYou were forced to pay a fine of **${EconomyConfig.currencySymbol}${fine.toLocaleString()}** to avoid the cops.`);
+                const descDisplay = ComponentUtils.createText(`**${targetUser}** caught you trying to reach into their wallet!\n\nYou were forced to pay a fine of **${EconomyConfig.currencySymbol}${fine.toLocaleString()}** to avoid the cops.`);
                 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.failColor)

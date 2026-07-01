@@ -19,8 +19,8 @@ module.exports = {
                 userData = new EconomyUser({ userId: interaction.user.id });
             }
 
-            // Cooldown check (30 seconds)
-            const cooldownTime = 30 * 1000;
+            // Cooldown check (15 seconds)
+            const cooldownTime = 15 * 1000;
             if (userData.lastSearch && (Date.now() - userData.lastSearch.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastSearch.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're too tired to search again! Try again in **${remaining}s**.`));
