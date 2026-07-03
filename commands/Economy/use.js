@@ -78,8 +78,8 @@ module.exports = {
 
                 await userData.save();
 
-                const titleDisplay = ComponentUtils.createText(`### 🚁 **Supply Drop Arrived!**`);
-                const descDisplay = ComponentUtils.createText(`-# You threw the Supply Signal and a chopper dropped off a crate!\n\n**You received:**\n${receivedText}`);
+                const titleDisplay = ComponentUtils.createText(`### 🛩️ **Supply Drop Used!**`);
+                const descDisplay = ComponentUtils.createText(`-# You threw the Supply Signal and a cargo plane dropped off a crate!\n\n**You received:**\n${receivedText}`);
 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.successColor)
