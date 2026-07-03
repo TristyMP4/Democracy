@@ -60,5 +60,11 @@ module.exports = {
         minTargetBank: 10000, // Target must have at least 10,000 in bank
         minBalanceToJoin: 5000, // Participants must have at least 5,000 in bank or wallet
         cooldown: 7200 * 1000 // 2 hours (7200 seconds)
+    },
+
+    // Death System settings
+    deathSettings: {
+        keepRareItems: true, // Whether rare items are kept upon death
+        keepItemsUnderWeight: 4 // Items with a dropWeight <= this value are kept when you die
     }
 };

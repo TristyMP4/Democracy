@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonStyle, ComponentType, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
@@ -24,7 +24,7 @@ module.exports = {
         }
 
         try {
-            const userData = await EconomyUser.findOne({ userId: targetUser.id });
+            const userData = await EconomyUtils.getUser(targetUser.id);
             
             if (!userData || !userData.inventory || userData.inventory.size === 0) {
                 const emptyContainer = new ContainerBuilder()

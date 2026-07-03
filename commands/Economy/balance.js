@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
@@ -24,17 +24,7 @@ module.exports = {
         }
 
         try {
-            let userData = await EconomyUser.findOne({ userId: targetUser.id });
-            
-            if (!userData) {
-                // If checking someone else who has no data
-                if (targetUser.id !== interaction.user.id) {
-                    return interaction.followUp(ComponentUtils.createError('That user does not have an economy profile yet.'));
-                }
-                // If checking self, create profile
-                userData = new EconomyUser({ userId: interaction.user.id });
-                await userData.save();
-            }
+            const userData = await EconomyUtils.getUser(targetUser.id);
 
             let netWorth = userData.wallet + userData.bank;
             if (userData.inventory) {

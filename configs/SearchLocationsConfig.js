@@ -11,9 +11,9 @@ module.exports = [
             { message: "Jacob was asleep. You crept in and swiped **${amount}**!", signature: "sneaky sneaky" }
         ],
         failMessages: [
-            { message: "Jacob caught you and kicked you out. You got nothing.", signature: "you're probably better off" }, 
-            { message: "You searched Jacob's Room but only found empty food wrappers.", signature: "no surprise there" },
-            { message: "It smelled too bad in there, you had to turn back.", signature: "stink bug" }
+            { message: "Jacob caught you and kicked you out. You got nothing.", signature: "you're probably better off", deathChance: 0.05 }, 
+            { message: "You searched Jacob's Room but only found empty food wrappers.", signature: "no surprise there", deathChance: 0.01 },
+            { message: "It smelled too bad in there, you had to turn back.", signature: "stink bug", deathChance: 0.1 }
         ]
     },
     {
@@ -28,9 +28,9 @@ module.exports = [
             { message: "You stole Porkies booster seat and sold it for **${amount}**!", signature: "now hope he crashes" }
         ],
         failMessages: [
-            { message: "You searched relentlessly but all the doob was smoked already.", signature: "where's dad at" }, 
-            { message: "Porky Pig walked to school today because he was bullied", signature: "just wait till he gets picked up afterschool" },
-            { message: "The smell of doob in the car instantly made you high and you forgot what you were doing.", signature: "try again next time?" }
+            { message: "You searched relentlessly but all the doob was smoked already.", signature: "where's dad at", deathChance: 0.02 }, 
+            { message: "Porky Pig walked to school today because he was bullied", signature: "just wait till he gets picked up afterschool", deathChance: 0.01 },
+            { message: "The smell of doob in the car instantly made you high and you forgot what you were doing.", signature: "try again next time?", deathChance: 0.1 }
         ]
     },
     {
@@ -44,8 +44,8 @@ module.exports = [
             { message: "You survived the Old Bunker and walked out with **${amount}**.", signature: "make sure theres no mat-49 wallbanger ready to pummel you." }
         ],
         failMessages: [
-            { message: "You got slapped by a full Boss Kit trio.", signature: "better luck next time" }, 
-            { message: "The Old Bunker was looted already.", signature: "come back when its your turn" }
+            { message: "You got slapped by a full Boss Kit trio.", signature: "better luck next time", deathChance: 0.20 }, 
+            { message: "The Old Bunker was looted already.", signature: "come back when its your turn", deathChance: 0.05 }
         ]
     },
     {
@@ -59,8 +59,8 @@ module.exports = [
             { message: "You pushed a guy away from refinery and sold his low grade for **${amount}**!", signature: "fuck you" }
         ],
         failMessages: [
-            { message: "You got your recycler loot robbed", signature: "karma's a bitch" }, 
-            { message: "No one was at the outpost", signature: "loner" }
+            { message: "You got your recycler loot robbed", signature: "karma's a bitch", deathChance: 0.05 }, 
+            { message: "No one was at the outpost", signature: "loner", deathChance: 0 }
         ]
     },
     {
@@ -74,8 +74,8 @@ module.exports = [
             { message: "You sniped the scientists and secured **${amount}** at the Oil Rig.", signature: "Sniper elite." }
         ],
         failMessages: [
-            { message: "Heavy scientists slammed you. You stood no chance.", signature: "bot behaviour" }, 
-            { message: "You got countered by the better team", signature: "no crate for you" }
+            { message: "Heavy scientists slammed you. You stood no chance.", signature: "bot behaviour", deathChance: 0.30 }, 
+            { message: "You got countered by the better team", signature: "no crate for you", deathChance: 0.25 }
         ]
     },
     {
@@ -89,8 +89,8 @@ module.exports = [
             { message: "You contested Cargo and wiped out competition **${amount}**", signature: "well well well" }
         ],
         failMessages: [
-            { message: "You missed the ladder and your boat drove off.", signature: "how the fuck did you miss" }, 
-            { message: "Counters wiped you out.", signature: "Should have held." }
+            { message: "You missed the ladder and your boat drove off.", signature: "how the fuck did you miss", deathChance: 0.15 }, 
+            { message: "Counters wiped you out.", signature: "Should have held.", deathChance: 0.20 }
         ]
     }
 ];

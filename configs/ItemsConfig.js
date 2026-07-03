@@ -3,7 +3,7 @@ module.exports = {
         name: 'AK-Alpha',
         description: 'A powerful assault rifle crafted from modern polymers. - High Fire Rate',
         emoji: '<:AK109Alpha:1521922025336082576>', 
-        price: 8500,
+        price: 30000,
         dropWeight: 10, // Very Rare
         sellable: true
     },
@@ -11,7 +11,7 @@ module.exports = {
         name: 'XM-250',
         description: 'Devastating light machine gun, tears through anything you throw its way. - Dropped by the Collector.',
         emoji: '<:XM250:1521922031241789510>', 
-        price: 30000,
+        price: 60000,
         dropWeight: 3, // Legendary
         sellable: true
     },
@@ -19,7 +19,7 @@ module.exports = {
         name: 'Collector Armour Rig',
         description: 'A heavy duty chest-rig belonging to the Collector.',
         emoji: '<:CollectorRig:1521922849898762310>', 
-        price: 30000,
+        price: 50000,
         dropWeight: 3, // Legendary
         sellable: true
     },
@@ -27,15 +27,15 @@ module.exports = {
         name: 'Thompson',
         description: 'A mid tier SMG that is a reliable choice in a gunfight.',
         emoji: '<:Thompson:1521922029790433525>', 
-        price: 5500,
-        dropWeight: 30, // Rare
+        price: 20000,
+        dropWeight: 20, // Rare
         sellable: true
     },
     'semi-automatic-pistol': {
         name: 'Semi Automatic Pistol',
         description: 'A reliable handgun that can open the door to a snowball.',
         emoji: '<:SemiAutomaticPistol:1521922027013931009>', 
-        price: 2500,
+        price: 3000,
         dropWeight: 65, // Common
         sellable: true
     },
@@ -43,8 +43,9 @@ module.exports = {
         name: 'Semi Automatic Rifle',
         description: 'High damaging semi rifle chambered in 5.56',
         emoji: '<:SemiAutomaticRifle:1521922028368826398>', 
-        price: 5000,
+        price: 15000,
         dropWeight: 30, // Rare
+        shop: true,
         sellable: true
     },
     'supply-signal': {
@@ -98,6 +99,7 @@ module.exports = {
         emoji: '<:Green_Keycard:1521954128589357127>', 
         price: 5000,
         dropWeight: 8, // Epic
+        shop: true,
         usable: true,
         sellable: true
     },
@@ -119,4 +121,14 @@ module.exports = {
         usable: true,
         sellable: true
     },
+    'life-saver': {
+        name: "Life Saver",
+        description: "Saves your life in the event of a death.",
+        emoji: '💝', 
+        price: 250000,
+        dropWeight: 0, // Unobtainable
+        shop: true,
+        usable: false,
+        sellable: false
+    }
 };

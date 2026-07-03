@@ -8,11 +8,11 @@ module.exports = {
         { message: "You doorcamped your neighbors and made **${amount}**.", signature: "you disgusting creature." }
     ],
     failMessages: [
-        { message: "Your raid on the local clan failed and they extorted you for **${fine}** for them to not use your boom on you.", signature: "thats a shame." },
-        { message: "The local zerg cornered you. You bribed them with **${fine}** worth of Sulfur to let you go.", signature: "should've brought an f1" },
-        { message: "You had a chance to go deep on the local clan and sold the bag. You lost **${fine}**.", signature: "try harder next time." },
-        { message: "You got roofcamped leaving the monument. You lost **${fine}**.", signature: "imagine getting roofcamped :/" },
-        { message: "You tripped a landmine during the raid and dropped **${fine}** in the panic.", signature: "look where you're going next time." },
-        { message: "The safe zone turrets locked onto you. You dropped **${fine}** while fleeing.", signature: "i think they like you." }
+        { message: "Your raid on the local clan failed and they extorted you for **${fine}** for them to not use your boom on you.", signature: "thats a shame.", deathChance: 0.05 },
+        { message: "The local zerg cornered you. You bribed them with **${fine}** worth of Sulfur to let you go.", signature: "should've brought an f1", deathChance: 0.05 },
+        { message: "You had a chance to go deep on the local clan and sold the bag. You lost **${fine}**.", signature: "try harder next time.", deathChance: 0.1 },
+        { message: "You got roofcamped leaving the monument. You lost **${fine}**.", signature: "imagine getting roofcamped :/", deathChance: 0.15 },
+        { message: "You tripped a landmine during the raid and dropped **${fine}** in the panic.", signature: "look where you're going next time.", deathChance: 0.2 },
+        { message: "The safe zone turrets locked onto you. You dropped **${fine}** while fleeing.", signature: "i think they like you.", deathChance: 0.3 }
     ]
 };

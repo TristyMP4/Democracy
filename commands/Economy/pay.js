@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const parseAmount = require('../../utils/AmountParser.js');
@@ -36,8 +36,8 @@ module.exports = {
 
         try {
             // Find sender
-            let senderData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!senderData || senderData.wallet <= 0) {
+            let senderData = await EconomyUtils.getUser(interaction.user.id);
+            if (senderData.wallet <= 0) {
                 return interaction.followUp(ComponentUtils.createError('You do not have any money in your wallet!'));
             }
 
@@ -51,18 +51,9 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${senderData.wallet.toLocaleString()}** in your wallet!`));
             }
 
-            // Find or create receiver
-            let receiverData = await EconomyUser.findOne({ userId: targetUser.id });
-            if (!receiverData) {
-                receiverData = new EconomyUser({ userId: targetUser.id });
-            }
-
             // Perform transaction
-            senderData.wallet -= amount;
-            receiverData.wallet += amount;
-
-            await senderData.save();
-            await receiverData.save();
+            await EconomyUtils.removeCash(interaction.user.id, amount, 'wallet');
+            await EconomyUtils.addCash(targetUser.id, amount, 'wallet');
 
             const titleDisplay = ComponentUtils.createText(`### 💸 **Payment Successful**`);
             const descDisplay = ComponentUtils.createText(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!`);

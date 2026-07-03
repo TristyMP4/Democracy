@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const parseAmount = require('../../utils/AmountParser.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
@@ -21,8 +21,8 @@ module.exports = {
         const amountInput = interaction.options.getString('amount');
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!userData || userData.wallet <= 0) {
+            const userData = await EconomyUtils.getUser(interaction.user.id);
+            if (userData.wallet <= 0) {
                 return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your wallet to deposit!'));
             }
 
@@ -36,14 +36,15 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
             }
 
-            userData.wallet -= amountToDeposit;
-            userData.bank += amountToDeposit;
+            await EconomyUtils.removeCash(interaction.user.id, amountToDeposit, 'wallet');
+            await EconomyUtils.addCash(interaction.user.id, amountToDeposit, 'bank');
 
-            await userData.save();
+            // Refetch to get updated balances for display
+            const updatedUser = await EconomyUtils.getUser(interaction.user.id);
 
             const embed = new EmbedBuilder()
                 .setTitle('🏦 Deposit Successful')
-                .setDescription(`You deposited **${EconomyConfig.currencySymbol}${amountToDeposit.toLocaleString()}** into your bank.\n> **New Wallet:** ${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}\n> **New Bank:** ${EconomyConfig.currencySymbol}${userData.bank.toLocaleString()}`)
+                .setDescription(`You deposited **${EconomyConfig.currencySymbol}${amountToDeposit.toLocaleString()}** into your bank.\n> **New Wallet:** ${EconomyConfig.currencySymbol}${updatedUser.wallet.toLocaleString()}\n> **New Bank:** ${EconomyConfig.currencySymbol}${updatedUser.bank.toLocaleString()}`)
                 .setColor(EconomyConfig.successColor);
 
             await interaction.followUp({ embeds: [embed] });

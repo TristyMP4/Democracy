@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
-const User = require('../../schemas/EconomyUser.js');
 const Cooldown = require('../../schemas/cooldown.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const VoteManager = require('../../utils/VoteManager.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,8 +27,8 @@ module.exports = {
         }
 
         const config = EconomyConfig.bankrob;
-        const targetProfile = await User.findOne({ userId: target.id });
-        if (!targetProfile || targetProfile.bank < config.minTargetBank) {
+        const targetProfile = await EconomyUtils.getUser(target.id);
+        if (targetProfile.bank < config.minTargetBank) {
             return interaction.reply(ComponentUtils.createError(`The target must have at least ${EconomyConfig.currencySymbol}**${config.minTargetBank.toLocaleString()}** in their bank to be robbed.`));
         }
 
@@ -59,8 +59,8 @@ module.exports = {
         );
 
         const customValidate = async (buttonInteraction) => {
-            const participantProfile = await User.findOne({ userId: buttonInteraction.user.id });
-            const totalWealth = (participantProfile?.wallet || 0) + (participantProfile?.bank || 0);
+            const participantProfile = await EconomyUtils.getUser(buttonInteraction.user.id);
+            const totalWealth = participantProfile.wallet + participantProfile.bank;
             if (totalWealth < config.minBalanceToJoin) {
                 return `You must have at least ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.`;
             }
@@ -95,16 +95,11 @@ module.exports = {
             });
         }
 
-        const initiatorProfile = await User.findOne({ userId: interaction.user.id });
-        const luckMultiplier = initiatorProfile?.luckMultiplier || 1;
+        const rollResult = await EconomyUtils.calculateLuckRoll(config.successChance);
 
-        const successRoll = Math.random();
-        const chance = config.successChance * luckMultiplier;
-        const isSuccess = successRoll <= chance;
-
-        if (isSuccess) {
-            const currentTargetProfile = await User.findOne({ userId: target.id });
-            const targetBank = currentTargetProfile?.bank || 0;
+        if (rollResult.isSuccess) {
+            const currentTargetProfile = await EconomyUtils.getUser(target.id);
+            const targetBank = currentTargetProfile.bank;
             
             const randomStealPct = Math.random() * (config.maxStealPercentage - config.minStealPercentage) + config.minStealPercentage;
             let stolenAmount = Math.floor(targetBank * randomStealPct);
@@ -120,17 +115,10 @@ module.exports = {
 
             const splitAmount = Math.floor(stolenAmount / yesVotes.size);
 
-            await User.findOneAndUpdate(
-                { userId: target.id },
-                { $inc: { bank: -stolenAmount } }
-            );
+            await EconomyUtils.removeCash(target.id, stolenAmount, 'bank');
 
             for (const participantId of yesVotes) {
-                await User.findOneAndUpdate(
-                    { userId: participantId },
-                    { $inc: { wallet: splitAmount } },
-                    { upsert: true }
-                );
+                await EconomyUtils.addCash(participantId, splitAmount, 'wallet');
             }
 
             try {
@@ -147,18 +135,10 @@ module.exports = {
         } else {
             let totalLost = 0;
             for (const participantId of yesVotes) {
-                const pProfile = await User.findOne({ userId: participantId });
-                if (!pProfile) continue;
-                
-                let loss = 0;
-                if (pProfile.bank > 0) {
-                    loss = Math.floor(pProfile.bank * config.finePercentage);
-                    await User.findOneAndUpdate({ userId: participantId }, { $inc: { bank: -loss } });
-                } else {
-                    loss = Math.floor((pProfile.wallet || 0) * config.finePercentage);
-                    await User.findOneAndUpdate({ userId: participantId }, { $inc: { wallet: -loss } });
-                }
-                totalLost += loss;
+                const pProfile = await EconomyUtils.getUser(participantId);
+                const fine = Math.floor((pProfile.wallet + pProfile.bank) * config.finePercentage);
+                const { actualRemoved } = await EconomyUtils.removeCash(participantId, fine, 'cascade');
+                totalLost += actualRemoved;
             }
 
             await VoteManager.displayResult(message, {

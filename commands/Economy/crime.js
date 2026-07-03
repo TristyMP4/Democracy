@@ -1,8 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
-const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 module.exports = {
     economy: true,
@@ -14,53 +13,32 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!userData) {
-                userData = new EconomyUser({ userId: interaction.user.id });
-            }
+            let user = await EconomyUtils.getUser(interaction.user.id);
 
-            // Cooldown check (60 seconds)
             const cooldownTime = 60 * 1000;
-            if (userData.lastCrime && (Date.now() - userData.lastCrime.getTime()) < cooldownTime) {
-                const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastCrime.getTime())) / 1000);
+            if (user.lastCrime && (Date.now() - user.lastCrime.getTime()) < cooldownTime) {
+                const remaining = Math.ceil((cooldownTime - (Date.now() - user.lastCrime.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're too hot right now! Lie low for **${remaining}s**.`));
             }
 
-            // Update cooldown
-            userData.lastCrime = new Date();
-
-            // Fetch Global Multipliers
-            let settings = await EconomySettings.findOne({ id: 'global' });
-            if (!settings) {
-                settings = new EconomySettings();
-                await settings.save();
-            }
+            user.lastCrime = new Date();
+            await user.save(); // Save cooldown immediately so they can't spam while it processes
 
             const crimeConfig = EconomyConfig.crime;
-            
-            // Luck determines success
-            const chance = Math.random();
-            const requiredChance = 1 - (crimeConfig.successChance * settings.luckMultiplier);
-            
-            const isSuccess = chance >= requiredChance;
+            const rollResult = await EconomyUtils.calculateLuckRoll(crimeConfig.successChance);
 
-            if (isSuccess) {
-                // Base reward
+            if (rollResult.isSuccess) {
                 let baseReward = Math.floor(Math.random() * (crimeConfig.maxReward - crimeConfig.minReward + 1)) + crimeConfig.minReward;
-                
-                // Apply global money multiplier
-                let reward = Math.floor(baseReward * settings.moneyMultiplier);
+                const moneyResult = await EconomyUtils.calculateMoney(baseReward);
 
-                userData.wallet += reward;
-                await userData.save();
+                await EconomyUtils.addCash(interaction.user.id, moneyResult.finalAmount, 'wallet');
 
                 const outcomeObj = crimeConfig.successMessages[Math.floor(Math.random() * crimeConfig.successMessages.length)];
-                const message = outcomeObj.message.replace('${amount}', `${EconomyConfig.currencySymbol}${reward.toLocaleString()}`);
+                const message = outcomeObj.message.replace('${amount}', `${EconomyConfig.currencySymbol}${moneyResult.finalAmount.toLocaleString()}`);
 
                 let footerText = outcomeObj.signature;
-                if (settings.moneyMultiplier > 1 && reward > baseReward) {
-                    const bonusAmount = reward - baseReward;
-                    footerText += ` | Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
+                if (moneyResult.multiplier > 1 && moneyResult.bonus > 0) {
+                    footerText += ` | Money Multiplier: ${moneyResult.multiplier} (+ ${EconomyConfig.currencySymbol}${moneyResult.bonus.toLocaleString()})`;
                 }
 
                 const embed = new EmbedBuilder()
@@ -72,33 +50,26 @@ module.exports = {
                 return interaction.followUp({ embeds: [embed] });
 
             } else {
-                // Failed - Calculate fine (based on total wealth to prevent stashing loopholes)
-                let fine = Math.floor((userData.wallet + userData.bank) * crimeConfig.finePercentage);
+                user = await EconomyUtils.getUser(interaction.user.id);
+                
+                const outcomeObj = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
+                const deathChance = outcomeObj.deathChance || 0;
+
+                if (Math.random() < deathChance) {
+                    await EconomyUtils.handleDeath(interaction.user.id);
+                    const embed = new EmbedBuilder()
+                        .setTitle('💀 Wasted')
+                        .setDescription(`Your crime went horribly wrong and you were killed in the crossfire! Your wallet and inventory were wiped.`)
+                        .setColor(EconomyConfig.failColor);
+                    return interaction.followUp({ embeds: [embed] });
+                }
+                
+                let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
                 
-                let remainingFine = fine;
+                const { actualRemoved } = await EconomyUtils.removeCash(interaction.user.id, fine, 'cascade');
 
-                if (userData.wallet >= remainingFine) {
-                    userData.wallet -= remainingFine;
-                    remainingFine = 0;
-                } else {
-                    remainingFine -= userData.wallet;
-                    userData.wallet = 0;
-                    
-                    if (userData.bank >= remainingFine) {
-                        userData.bank -= remainingFine;
-                        remainingFine = 0;
-                    } else {
-                        remainingFine -= userData.bank;
-                        userData.bank = 0;
-                    }
-                }
-
-                const actualFinePaid = fine - remainingFine;
-                await userData.save();
-
-                const outcomeObj = crimeConfig.failMessages[Math.floor(Math.random() * crimeConfig.failMessages.length)];
-                const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${actualFinePaid.toLocaleString()}`);
+                const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${actualRemoved.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
                     .setTitle('🚓 Busted')

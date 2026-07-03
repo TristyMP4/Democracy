@@ -1,8 +1,7 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
-const EconomySettings = require('../../schemas/EconomySettings.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 module.exports = {
     economy: true,
@@ -24,7 +23,7 @@ module.exports = {
     async autocomplete(interaction) {
         const focusedValue = interaction.options.getFocused().toLowerCase();
         
-        let userData = await EconomyUser.findOne({ userId: interaction.user.id });
+        let userData = await EconomyUtils.getUser(interaction.user.id);
         let choices = [];
 
         if (userData && userData.inventory) {
@@ -46,11 +45,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         
-        let settings = await EconomySettings.findOne({ id: 'global' });
-        if (!settings) {
-            settings = new EconomySettings();
-            await settings.save();
-        }
+        const settings = await EconomyUtils.getSettings();
 
         const itemInput = interaction.options.getString('item').toLowerCase();
         let amount = interaction.options.getInteger('amount') || 1;
@@ -68,29 +63,25 @@ module.exports = {
         const totalValue = itemConfig.price * amount;
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
+            let userData = await EconomyUtils.getUser(interaction.user.id);
             if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < amount) {
                 return interaction.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell!`));
             }
 
+            const moneyResult = await EconomyUtils.calculateMoney(totalValue);
+            const finalValue = moneyResult.finalAmount;
+
             // Deduct from inventory
-            const currentAmount = userData.inventory.get(itemInput);
-            if (currentAmount === amount) {
-                userData.inventory.delete(itemInput);
-            } else {
-                userData.inventory.set(itemInput, currentAmount - amount);
-            }
+            await EconomyUtils.removeItem(interaction.user.id, itemInput, amount);
 
             // Add money
-            const finalValue = totalValue * settings.moneyMultiplier;
-            userData.wallet += finalValue;
-            await userData.save();
+            await EconomyUtils.addCash(interaction.user.id, finalValue, 'wallet');
 
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
             const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${finalValue.toLocaleString()}**!`);
             
             let footerDisplay = null;
-            if (settings.moneyMultiplier > 1) {
+            if ((settings.moneyMultiplier || 1.0) > 1) {
                 const bonusAmount = finalValue - totalValue;
                 footerDisplay = ComponentUtils.createText(`-# Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`);
             }

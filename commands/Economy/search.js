@@ -1,8 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
-const EconomySettings = require('../../schemas/EconomySettings.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 module.exports = {
     economy: true,
@@ -14,22 +13,17 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!userData) {
-                userData = new EconomyUser({ userId: interaction.user.id });
-            }
+            let user = await EconomyUtils.getUser(interaction.user.id);
 
-            // Cooldown check (15 seconds)
             const cooldownTime = 15 * 1000;
-            if (userData.lastSearch && (Date.now() - userData.lastSearch.getTime()) < cooldownTime) {
-                const remaining = Math.ceil((cooldownTime - (Date.now() - userData.lastSearch.getTime())) / 1000);
+            if (user.lastSearch && (Date.now() - user.lastSearch.getTime()) < cooldownTime) {
+                const remaining = Math.ceil((cooldownTime - (Date.now() - user.lastSearch.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're too tired to search again! Try again in **${remaining}s**.`));
             }
 
-            userData.lastSearch = new Date();
-            await userData.save();
+            user.lastSearch = new Date();
+            await user.save();
 
-            // Pick 3 random locations
             const shuffledLocations = [...EconomyConfig.searchLocations].sort(() => 0.5 - Math.random());
             const options = shuffledLocations.slice(0, 3);
 
@@ -51,7 +45,6 @@ module.exports = {
 
             const message = await interaction.followUp({ embeds: [embed], components: [row] });
 
-            // Create Collector
             const collector = message.createMessageComponentCollector({ 
                 componentType: ComponentType.Button, 
                 time: 15000,
@@ -63,7 +56,6 @@ module.exports = {
                     const choiceIndex = parseInt(i.customId.split('_')[1]);
                     const chosenLocation = options[choiceIndex];
 
-                    // Disable buttons and turn the chosen one green
                     const disabledRow = new ActionRowBuilder();
                     options.forEach((loc, index) => {
                         const isChosen = index === choiceIndex;
@@ -81,14 +73,8 @@ module.exports = {
                     await i.update({ components: [disabledRow] });
                     collector.stop('clicked');
 
-                    // Fetch Global Multipliers
-                    let settings = await EconomySettings.findOne({ id: 'global' });
-                    if (!settings) {
-                        settings = new EconomySettings();
-                        await settings.save();
-                    }
+                    const settings = await EconomyUtils.getSettings();
 
-                    // Weighted RNG for outcomes (Luck boosts good outcomes)
                     const outcomesConfig = EconomyConfig.searchSettings.outcomes;
                     const luckMulti = settings.luckMultiplier || 1.0;
                     const weights = [
@@ -110,22 +96,18 @@ module.exports = {
                         random -= w.weight;
                     }
 
-                    // Make sure we fetch the latest user data to prevent desync
-                    userData = await EconomyUser.findOne({ userId: interaction.user.id });
-                    if (!userData.inventory) userData.inventory = new Map();
-
                     let rewardMoney = 0;
                     let baseReward = 0;
                     let droppedItem = null;
 
-                    // Process Money
                     if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
                         baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                        rewardMoney = Math.floor(baseReward * (settings.moneyMultiplier || 1.0));
-                        userData.wallet += rewardMoney;
+                        const moneyResult = await EconomyUtils.calculateMoney(baseReward);
+                        rewardMoney = moneyResult.finalAmount;
+                        
+                        await EconomyUtils.addCash(interaction.user.id, rewardMoney, 'wallet');
                     }
 
-                    // Process Item
                     if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'itemOnly') {
                         if (chosenLocation.possibleItems && chosenLocation.possibleItems.length > 0) {
                             
@@ -150,23 +132,33 @@ module.exports = {
                             }
 
                             droppedItem = EconomyConfig.items[randomItemKey];
-                            
-                            const currentCount = userData.inventory.get(randomItemKey) || 0;
-                            userData.inventory.set(randomItemKey, currentCount + 1);
+                            await EconomyUtils.addItem(interaction.user.id, randomItemKey, 1);
                         } else if (selectedOutcome === 'itemOnly') {
                             // Fallback to money if no items exist for this location
                             selectedOutcome = 'moneyOnly';
                             let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                            rewardMoney = Math.floor(reward * (settings.moneyMultiplier || 1.0));
-                            userData.wallet += rewardMoney;
+                            const moneyResult = await EconomyUtils.calculateMoney(reward);
+                            rewardMoney = moneyResult.finalAmount;
+                            baseReward = reward; // For footer display
+                            
+                            await EconomyUtils.addCash(interaction.user.id, rewardMoney, 'wallet');
                         }
                     }
 
-                    await userData.save();
-
-                    // Format the Result Embed
                     if (selectedOutcome === 'nothing') {
                         const outcomeObj = chosenLocation.failMessages[Math.floor(Math.random() * chosenLocation.failMessages.length)];
+                        const deathChance = outcomeObj.deathChance || 0;
+
+                        if (Math.random() < deathChance) {
+                            await EconomyUtils.handleDeath(interaction.user.id);
+                            const resultEmbed = new EmbedBuilder()
+                                .setTitle(`💀 Wasted`)
+                                .setDescription(`You searched ${chosenLocation.name} but something went horribly wrong and you were killed! Your wallet and inventory were wiped.`)
+                                .setColor(EconomyConfig.failColor);
+
+                            return interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
+                        }
+
                         const msgTemplate = outcomeObj.message;
                         
                         const resultEmbed = new EmbedBuilder()
@@ -188,9 +180,10 @@ module.exports = {
                         }
 
                         let footerText = outcomeObj.signature;
-                        if ((settings.moneyMultiplier || 1.0) > 1 && rewardMoney > baseReward) {
+                        const moneyMulti = settings.moneyMultiplier || 1.0;
+                        if (moneyMulti > 1 && rewardMoney > baseReward) {
                             const bonusAmount = rewardMoney - baseReward;
-                            footerText += ` | Money Multiplier: ${settings.moneyMultiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
+                            footerText += ` | Money Multiplier: ${moneyMulti} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
                         }
 
                         const resultEmbed = new EmbedBuilder()
@@ -209,7 +202,6 @@ module.exports = {
 
             collector.on('end', async (collected, reason) => {
                 if (reason === 'time') {
-                    // Time out
                     const disabledRow = new ActionRowBuilder();
                     options.forEach((loc, index) => {
                         disabledRow.addComponents(

@@ -1,0 +1,206 @@
+const EconomyUser = require('../schemas/EconomyUser.js');
+const EconomySettings = require('../schemas/EconomySettings.js');
+const EconomyConfig = require('../configs/EconomyConfig.js');
+
+module.exports = {
+    /**
+     * Gets a user from the economy database, or creates one if it doesn't exist
+     * @param {string} userId The discord user ID
+     * @returns {Promise<EconomyUser>}
+     */
+    async getUser(userId) {
+        let user = await EconomyUser.findOne({ userId });
+        if (!user) {
+            user = new EconomyUser({ userId });
+            await user.save();
+        }
+        return user;
+    },
+
+    /**
+     * Adds cash to a user
+     * @param {string} userId The discord user ID
+     * @param {number} amount The amount to add
+     * @param {string} type 'wallet' or 'bank'
+     * @returns {Promise<EconomyUser>}
+     */
+    async addCash(userId, amount, type = 'wallet') {
+        const user = await this.getUser(userId);
+        user[type] += amount;
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Removes cash from a user, preventing negative balances
+     * @param {string} userId The discord user ID
+     * @param {number} amount The amount to remove
+     * @param {string} type 'wallet', 'bank', or 'cascade' (wallet then bank)
+     * @returns {Promise<{user: EconomyUser, actualRemoved: number}>}
+     */
+    async removeCash(userId, amount, type = 'wallet') {
+        const user = await this.getUser(userId);
+        let actualRemoved = 0;
+
+        if (type === 'cascade') {
+            let remaining = amount;
+            if (user.wallet >= remaining) {
+                user.wallet -= remaining;
+                actualRemoved += remaining;
+                remaining = 0;
+            } else {
+                actualRemoved += user.wallet;
+                remaining -= user.wallet;
+                user.wallet = 0;
+                
+                if (user.bank >= remaining) {
+                    user.bank -= remaining;
+                    actualRemoved += remaining;
+                    remaining = 0;
+                } else {
+                    actualRemoved += user.bank;
+                    remaining -= user.bank;
+                    user.bank = 0;
+                }
+            }
+        } else {
+            if (user[type] < amount) {
+                actualRemoved = user[type];
+                user[type] = 0;
+            } else {
+                actualRemoved = amount;
+                user[type] -= amount;
+            }
+        }
+        
+        await user.save();
+        return { user, actualRemoved };
+    },
+
+    /**
+     * Adds an item to a user's inventory
+     * @param {string} userId The discord user ID
+     * @param {string} itemKey The key of the item from ItemsConfig
+     * @param {number} amount Amount of items to add
+     * @returns {Promise<EconomyUser>}
+     */
+    async addItem(userId, itemKey, amount = 1) {
+        const user = await this.getUser(userId);
+        if (!user.inventory) user.inventory = new Map();
+        
+        const currentCount = user.inventory.get(itemKey) || 0;
+        user.inventory.set(itemKey, currentCount + amount);
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Removes an item from a user's inventory
+     * @param {string} userId The discord user ID
+     * @param {string} itemKey The key of the item from ItemsConfig
+     * @param {number} amount Amount of items to remove
+     * @returns {Promise<EconomyUser>}
+     */
+    async removeItem(userId, itemKey, amount = 1) {
+        const user = await this.getUser(userId);
+        if (!user.inventory) return user;
+
+        const currentCount = user.inventory.get(itemKey) || 0;
+        if (currentCount <= amount) {
+            user.inventory.delete(itemKey);
+        } else {
+            user.inventory.set(itemKey, currentCount - amount);
+        }
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Handles a user's death by wiping their wallet and stripping their inventory
+     * conditionally based on EconomyConfig
+     * @param {string} userId The discord user ID
+     * @returns {Promise<EconomyUser>}
+     */
+    async handleDeath(userId) {
+        const user = await this.getUser(userId);
+        
+        // Wipe wallet completely
+        user.wallet = 0;
+
+        // Wipe inventory, protecting items based on config
+        if (user.inventory) {
+            const protectedWeight = EconomyConfig.deathSettings.keepItemsUnderWeight;
+            const keepRareItems = EconomyConfig.deathSettings.keepRareItems;
+
+            for (const [itemKey, count] of user.inventory.entries()) {
+                const itemData = EconomyConfig.items[itemKey];
+                
+                // If item doesn't exist in config anymore, just wipe it
+                if (!itemData) {
+                    user.inventory.delete(itemKey);
+                    continue;
+                }
+
+                // If keeping rare items is enabled and the dropWeight is sufficiently low (rare)
+                if (keepRareItems && (itemData.dropWeight || 100) <= protectedWeight) {
+                    continue; // Preserve this item
+                } else {
+                    user.inventory.delete(itemKey); // Wipe it
+                }
+            }
+        }
+
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Gets global economy settings, creating them if missing
+     * @returns {Promise<EconomySettings>}
+     */
+    async getSettings() {
+        let settings = await EconomySettings.findOne({ id: 'global' });
+        if (!settings) {
+            settings = new EconomySettings();
+            await settings.save();
+        }
+        return settings;
+    },
+
+    /**
+     * Calculates the final money reward and multiplier breakdown
+     * @param {number} baseAmount The raw unmultiplied amount
+     * @returns {Promise<{finalAmount: number, multiplier: number, bonus: number}>}
+     */
+    async calculateMoney(baseAmount) {
+        const settings = await this.getSettings();
+        const multiplier = settings.moneyMultiplier || 1.0;
+        const finalAmount = Math.floor(baseAmount * multiplier);
+        
+        return {
+            finalAmount,
+            multiplier,
+            bonus: finalAmount - baseAmount
+        };
+    },
+
+    /**
+     * Calculates the final success chance based on luck multiplier
+     * @param {number} baseSuccessChance The raw unmultiplied success chance (e.g. 0.4 for 40%)
+     * @returns {Promise<{chance: number, roll: number, isSuccess: boolean, multiplier: number}>}
+     */
+    async calculateLuckRoll(baseSuccessChance) {
+        const settings = await this.getSettings();
+        const multiplier = settings.luckMultiplier || 1.0;
+        
+        const chance = baseSuccessChance * multiplier;
+        const roll = Math.random();
+        
+        return {
+            chance,
+            roll,
+            isSuccess: roll <= chance,
+            multiplier
+        };
+    }
+};

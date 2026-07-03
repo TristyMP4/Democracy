@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
-const EconomyUser = require('../../schemas/EconomyUser.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 module.exports = {
     economy: true,
@@ -29,16 +29,17 @@ module.exports = {
         const itemConfig = EconomyConfig.items[itemId];
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
             if (!itemConfig) {
                 return interaction.followUp(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct ID.`));
             }
-            if (!userData || !userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
+
+            let userData = await EconomyUtils.getUser(interaction.user.id);
+            if (!userData.inventory || !userData.inventory.get(itemId) || userData.inventory.get(itemId) < 1) {
                 return interaction.followUp(ComponentUtils.createError(`You do not have a **${itemConfig.name}** in your inventory!`));
             }
 
             // Consume item
-            userData.inventory.set(itemId, userData.inventory.get(itemId) - 1);
+            await EconomyUtils.removeItem(interaction.user.id, itemId, 1);
 
             // Execute custom logic based on item
             if (itemId === 'supply-signal') {
@@ -70,13 +71,10 @@ module.exports = {
                     const receivedItem = EconomyConfig.items[randomKey];
                     
                     // Add to inventory
-                    const currentCount = userData.inventory.get(randomKey) || 0;
-                    userData.inventory.set(randomKey, currentCount + 1);
+                    await EconomyUtils.addItem(interaction.user.id, randomKey, 1);
 
                     receivedText += `${receivedItem.emoji} **${receivedItem.name}**\n`;
                 }
-
-                await userData.save();
 
                 const titleDisplay = ComponentUtils.createText(`### 🛩️ **Supply Drop Used!**`);
                 const descDisplay = ComponentUtils.createText(`-# You threw the Supply Signal and a cargo plane dropped off a crate!\n\n**You received:**\n${receivedText}`);
@@ -91,7 +89,6 @@ module.exports = {
             }
 
             // Fallback for generic items
-            await userData.save();
             const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
             const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);
             const fallbackContainer = new ContainerBuilder()
