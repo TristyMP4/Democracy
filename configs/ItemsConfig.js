@@ -97,7 +97,7 @@ module.exports = {
         name: "Green Keycard",
         description: "A keycard for old bunker that reaps many rewards.",
         emoji: '<:Green_Keycard:1521954128589357127>', 
-        price: 5000,
+        price: 500000,
         dropWeight: 8, // Epic
         shop: true,
         usable: true,
@@ -107,7 +107,7 @@ module.exports = {
         name: "Purple Keycard",
         description: "A high tier keycard that brings great riches.",
         emoji: '<:Purple_Keycard:1521954129889591356>', 
-        price: 8000,
+        price: 7500000,
         dropWeight: 6, // Epic
         usable: true,
         sellable: true
@@ -116,7 +116,7 @@ module.exports = {
         name: "Red Keycard",
         description: "An exotic tier keycard that brings all you could want.",
         emoji: '<:Red_Keycard:1521956783009169530>', 
-        price: 12000,
+        price: 1500000,
         dropWeight: 1, // Exotic
         usable: true,
         sellable: true

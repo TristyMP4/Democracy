@@ -32,7 +32,7 @@ module.exports = {
                 const start = page * itemsPerPage;
                 const currentItems = shopItems.slice(start, start + itemsPerPage);
 
-                let description = `### 🛒 Dank Memer Shop\n*New offerings appear occasionally.*\n\n**Balance:** ${EconomyConfig.currencySymbol}${(user.wallet + user.bank).toLocaleString()}\n\n`;
+                let description = `### 🛒 Democracy Shop\n*New offerings appear occasionally.*\n\n**Balance:** ${EconomyConfig.currencySymbol}${(user.wallet + user.bank).toLocaleString()}\n\n`;
 
                 const row1 = new ActionRowBuilder();
                 const row2 = new ActionRowBuilder();
@@ -89,7 +89,7 @@ module.exports = {
 
             collector.on('collect', async i => {
                 if (i.user.id !== interaction.user.id) {
-                    return i.reply({ content: 'This is not your shop session!', ephemeral: true });
+                    return i.reply(ComponentUtils.createError('Bots do not have economy profiles!'));
                 }
 
                 try {
