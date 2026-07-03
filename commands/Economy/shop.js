@@ -32,7 +32,7 @@ module.exports = {
                 const start = page * itemsPerPage;
                 const currentItems = shopItems.slice(start, start + itemsPerPage);
 
-                let description = `### 🛒 Democracy Shop\n*New offerings appear occasionally.*\n\n**Balance:** ${EconomyConfig.currencySymbol}${(user.wallet + user.bank).toLocaleString()}\n\n`;
+                let description = `### 🛒 Democracy Shop\n*New offerings appear occasionally.*\n> **Balance:** ${EconomyConfig.currencySymbol}${(user.wallet + user.bank).toLocaleString()}\n\n`;
 
                 const row1 = new ActionRowBuilder();
                 const row2 = new ActionRowBuilder();
@@ -89,7 +89,7 @@ module.exports = {
 
             collector.on('collect', async i => {
                 if (i.user.id !== interaction.user.id) {
-                    return i.reply(ComponentUtils.createError('Bots do not have economy profiles!'));
+                    return i.reply(ComponentUtils.createError('This is not your shop session!'));
                 }
 
                 try {
@@ -129,7 +129,7 @@ module.exports = {
 
                         let quantity = parseInt(modalSubmit.fields.getTextInputValue('quantity'));
                         if (isNaN(quantity) || quantity <= 0) {
-                            return modalSubmit.reply({ content: '❌ Please enter a valid number greater than 0.', ephemeral: true });
+                            return modalSubmit.reply(ComponentUtils.createError('Please enter a valid number greater than 0.'));
                         }
 
                         const totalCost = itemData.price * quantity;
@@ -139,7 +139,7 @@ module.exports = {
                         const totalBalance = user.wallet + user.bank;
 
                         if (totalBalance < totalCost) {
-                            return modalSubmit.reply({ content: `❌ You don't have enough money! You need **${EconomyConfig.currencySymbol}${(totalCost - totalBalance).toLocaleString()}** more.`, ephemeral: true });
+                            return modalSubmit.reply(ComponentUtils.createError(`You don't have enough money! You need **${EconomyConfig.currencySymbol}${(totalCost - totalBalance).toLocaleString()}** more.`));
                         }
 
                         // Show Confirmation
@@ -177,7 +177,7 @@ module.exports = {
                         // Refetch just in case
                         user = await EconomyUtils.getUser(interaction.user.id);
                         if ((user.wallet + user.bank) < totalCost) {
-                            return confirmClick.update({ content: '❌ You no longer have enough money!', embeds: [], components: [] });
+                            return confirmClick.update(ComponentUtils.createError('You no longer have enough money!'));
                         }
 
                         const { actualRemoved } = await EconomyUtils.removeCash(interaction.user.id, totalCost, 'cascade');

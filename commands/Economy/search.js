@@ -196,7 +196,7 @@ module.exports = {
                     }
                 } catch (err) {
                     console.error('Collector Error:', err);
-                    await i.followUp({ content: `An error crashed the interaction: \`${err.message}\`\n${err.stack.split('\\n')[1]}`, ephemeral: true }).catch(() => {});
+                    await i.followUp(ComponentUtils.createError(`An error crashed the interaction: \`${err.message}\`\n${err.stack.split('\\n')[1]}`)).catch(() => {});
                 }
             });
 
@@ -213,15 +213,7 @@ module.exports = {
                         );
                     });
 
-                    const lateEmbed = new EmbedBuilder()
-                    .setDescription("Looks like you didn't want to search anywhere.")
-                    .setColor(EconomyConfig.embedColor);
-
-                    await interaction.editReply({ 
-                        content: `❌ You took too long to choose a location!`,
-                        components: [disabledRow],
-                        embeds: []
-                    }).catch(() => {});
+                    await interaction.editReply(ComponentUtils.createError('You took too long to choose a location!')).catch(() => {});
                 }
             });
 
