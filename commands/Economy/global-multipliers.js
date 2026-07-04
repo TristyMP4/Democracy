@@ -19,6 +19,11 @@ module.exports = {
                 .setDescription('The global luck multiplier (default 1.0)')
                 .setRequired(false)
         )
+        .addNumberOption(option => 
+            option.setName('cooldown')
+                .setDescription('The global cooldown multiplier (default 1.0)')
+                .setRequired(false)
+        )
         .addIntegerOption(option => 
             option.setName('duration')
                 .setDescription('Duration in minutes (leave blank for permanent)')
@@ -36,6 +41,7 @@ module.exports = {
 
         const moneyOpt = interaction.options.getNumber('money');
         const luckOpt = interaction.options.getNumber('luck');
+        const cooldownOpt = interaction.options.getNumber('cooldown');
         const duration = interaction.options.getInteger('duration');
 
         try {
@@ -46,6 +52,7 @@ module.exports = {
 
             if (moneyOpt !== null) settings.moneyMultiplier = moneyOpt;
             if (luckOpt !== null) settings.luckMultiplier = luckOpt;
+            if (cooldownOpt !== null) settings.cooldownMultiplier = cooldownOpt;
             
             if (duration !== null && duration > 0) {
                 const expiry = new Date();
@@ -57,7 +64,7 @@ module.exports = {
 
             await settings.save();
 
-            let desc = `The economy scaling has been adjusted globally.\n\n**Money Multiplier:** x${settings.moneyMultiplier}\n**Luck Multiplier:** x${settings.luckMultiplier}`;
+            let desc = `The economy scaling has been adjusted globally.\n\n**Money Multiplier:** x${settings.moneyMultiplier}\n**Luck Multiplier:** x${settings.luckMultiplier}\n**Cooldown Multiplier:** x${settings.cooldownMultiplier || 1.0}`;
             if (settings.multiplierExpiry) {
                 desc += `\n**Expires:** <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>`;
             } else {

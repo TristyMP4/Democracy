@@ -193,6 +193,7 @@ module.exports = {
         if (settings.multiplierExpiry && new Date() > settings.multiplierExpiry) {
             settings.moneyMultiplier = 1.0;
             settings.luckMultiplier = 1.0;
+            settings.cooldownMultiplier = 1.0;
             settings.multiplierExpiry = null;
             await settings.save();
         }

@@ -45,6 +45,10 @@ module.exports = {
                 globalText += `**Luck:** x${settings.luckMultiplier}\n`;
                 hasGlobal = true;
             }
+            if (settings.cooldownMultiplier !== 1.0) {
+                globalText += `**Cooldown:** x${settings.cooldownMultiplier}\n`;
+                hasGlobal = true;
+            }
 
             if (hasGlobal) {
                 if (settings.multiplierExpiry) {

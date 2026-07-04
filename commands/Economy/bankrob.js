@@ -48,12 +48,15 @@ module.exports = {
             return interaction.reply(ComponentUtils.createError(`You cannot organize another heist until <t:${Math.floor(existingCooldown.expiresAt.getTime() / 1000)}:f>.`));
         }
 
+        const settings = await EconomyUtils.getSettings();
+        const cooldownTime = config.cooldown * (settings.cooldownMultiplier || 1.0);
+
         await Cooldown.findOneAndUpdate(
             { userId: interaction.user.id, commandName },
             {
                 userId: interaction.user.id,
                 commandName,
-                expiresAt: new Date(Date.now() + config.cooldown)
+                expiresAt: new Date(Date.now() + cooldownTime)
             },
             { upsert: true }
         );

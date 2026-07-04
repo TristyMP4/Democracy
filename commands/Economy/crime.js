@@ -14,8 +14,9 @@ module.exports = {
 
         try {
             let user = await EconomyUtils.getUser(interaction.user.id);
+            const settings = await EconomyUtils.getSettings();
 
-            const cooldownTime = 60 * 1000;
+            const cooldownTime = (60 * 1000) * (settings.cooldownMultiplier || 1.0);
             if (user.lastCrime && (Date.now() - user.lastCrime.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - user.lastCrime.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're too hot right now! Lie low for **${remaining}s**.`));

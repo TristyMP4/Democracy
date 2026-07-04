@@ -36,7 +36,8 @@ module.exports = {
             }
 
             // Cooldown check
-            const cooldownTime = EconomyConfig.rob.cooldown;
+            const settings = await EconomyUtils.getSettings();
+            const cooldownTime = EconomyConfig.rob.cooldown * (settings.cooldownMultiplier || 1.0);
             if (attackerData.lastRob && (Date.now() - attackerData.lastRob.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - attackerData.lastRob.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're bringing too much attention to yourself! Wait **${remaining}s** before robbing again.`));
