@@ -43,7 +43,7 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setTitle('🥷 Crime Successful')
+                    .setTitle(`${interaction.user.displayName} commited a crime | and they succeeded! 🥷🏿`)
                     .setDescription(message)
                     .setColor(EconomyConfig.successColor)
                     .setFooter({ text: footerText });
@@ -63,10 +63,10 @@ module.exports = {
                     if (fine < 100) fine = 100;
                     
                     const msgTemplate = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
-                    const desc = `${msgTemplate}\n\n> **You were killed in the crossfire! Your wallet and inventory were wiped.**`;
+                    const desc = `${msgTemplate}\n> **You were killed in the crime! Your wallet and inventory were wiped.**`;
 
                     const embed = new EmbedBuilder()
-                        .setTitle('💀 Wasted')
+                        .setTitle(`${interaction.user.displayName} commited a crime | and they died 💀`)
                         .setDescription(desc)
                         .setColor(EconomyConfig.failColor)
                         .setFooter({ text: outcomeObj.signature });
@@ -81,7 +81,7 @@ module.exports = {
                 const message = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${actualRemoved.toLocaleString()}`);
 
                 const embed = new EmbedBuilder()
-                    .setTitle('🚓 Busted')
+                    .setTitle(`${interaction.user.displayName} commited a crime | and they were caught! 🚓`)
                     .setDescription(message)
                     .setColor(EconomyConfig.failColor)
                     .setFooter({ text: outcomeObj.signature });

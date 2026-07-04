@@ -154,10 +154,10 @@ module.exports = {
                             await EconomyUtils.handleDeath(interaction.user.id);
                             
                             const msgTemplate = outcomeObj.message;
-                            const desc = `${msgTemplate}\n\n> **You were killed! Your wallet and inventory were wiped.**`;
+                            const desc = `${msgTemplate}\n> **You were killed! Your wallet and inventory were wiped.**`;
 
                             const resultEmbed = new EmbedBuilder()
-                                .setTitle(`💀 Wasted`)
+                                .setTitle(`🔍 ${interaction.user.username} searched ${chosenLocation.name} | and they died 💀`)
                                 .setDescription(desc)
                                 .setColor(EconomyConfig.failColor)
                                 .setFooter({ text: outcomeObj.signature });
