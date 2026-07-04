@@ -1,32 +1,32 @@
 module.exports = {
-    "babysitter": {
-        name: "Babysitter",
-        salary: 90000,
+    "jacob-housemaid": {
+        name: "Jacob's Housemaid",
+        salary: 7500,
         cooldown: 40 * 60 * 1000, // 40 minutes in ms
         requiredShifts: 0,
         shiftsPerDay: 0, // Visual only for now
-        emoji: '👶'
+        emoji: '👼'
     },
-    "discord_mod": {
-        name: "Discord Mod",
-        salary: 85000,
-        cooldown: 40 * 60 * 1000,
-        requiredShifts: 0,
+    "goffs-doob-dealer": {
+        name: "Goff's Doob Dealer",
+        salary: 20000,
+        cooldown: 80 * 60 * 1000,
+        requiredShifts:  25,
         shiftsPerDay: 0,
-        emoji: '🤓'
+        emoji: '<:WeedDoob:1521922663705215126>'
     },
-    "fast_food_cook": {
-        name: "Fast Food Cook",
-        salary: 100000,
-        cooldown: 43 * 60 * 1000,
-        requiredShifts: 0,
+    "slave-trader" : {
+        name: "Slave Trader",
+        salary: 35000,
+        cooldown: 85 * 60 * 1000,
+        requiredShifts: 40,
         shiftsPerDay: 1,
-        emoji: '🍔'
+        emoji: '🥷'
     },
-    "house_wife": {
-        name: "House Wife",
-        salary: 110000,
-        cooldown: 43 * 60 * 1000,
+    "discord-mod": {
+        name: "Discord Moderator",
+        salary: 50000,
+        cooldown: 95 * 60 * 1000,
         requiredShifts: 0,
         shiftsPerDay: 1,
         emoji: '🧹'
