@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ContainerBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, TextDisplayBuilder } = require('discord.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
@@ -107,7 +107,10 @@ module.exports = {
             userData.currentJob = jobInput;
             userData.lastShift = null;
             await userData.save();
-            return interaction.followUp(ComponentUtils.createSuccess(`🎉 Congratulations! You passed the interview and are now officially hired as a **${jobConfig.name}**! Use \`/work shift\` to start earning money.`));
+            const successContainer = new ContainerBuilder()
+                .setAccentColor(0x2ecc71)
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`🎉 Congratulations! You passed the interview and are now officially hired as a **${jobConfig.name}**! Use \`/work shift\` to start earning money.`));
+            return interaction.followUp(ComponentUtils.createContainerResponse(successContainer));
         } else {
             return interaction.followUp(ComponentUtils.createError(`❌ The interview did not go well. They decided to go with another candidate. Try applying again!`));
         }
@@ -124,7 +127,10 @@ module.exports = {
         userData.jobApplyCooldown = new Date(Date.now() + 60 * 60 * 1000); // 1 hour cooldown
         await userData.save();
 
-        return interaction.followUp(ComponentUtils.createSuccess(`You slammed your resignation letter on the boss's desk and quit your job as a **${oldJobName}**! You must wait **1 Hour** before you can apply for a new job.`));
+        const quitContainer = new ContainerBuilder()
+            .setAccentColor(0x2ecc71)
+            .addTextDisplayComponents(new TextDisplayBuilder().setContent(`You slammed your resignation letter on the boss's desk and quit your job as a **${oldJobName}**! You must wait **1 Hour** before you can apply for a new job.`));
+        return interaction.followUp(ComponentUtils.createContainerResponse(quitContainer));
     },
 
     async handleList(interaction, userData) {
@@ -263,7 +269,10 @@ module.exports = {
                 bonusText = `\n-# 💸 Money Multiplier: ${salaryResult.multiplier} (+ ${EconomyConfig.currencySymbol}${bonus.toLocaleString()})`;
             }
 
-            return interaction.editReply(ComponentUtils.createSuccess(`👔 **Shift Completed!**\nYou finished your shift as a **${jobConfig.name}** and got paid ${EconomyConfig.currencySymbol}**${salaryResult.finalAmount.toLocaleString()}**!${bonusText}`));
+            const shiftContainer = new ContainerBuilder()
+                .setAccentColor(0x2ecc71)
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`👔 **Shift Completed!**\nYou finished your shift as a **${jobConfig.name}** and got paid ${EconomyConfig.currencySymbol}**${salaryResult.finalAmount.toLocaleString()}**!${bonusText}`));
+            return interaction.editReply(ComponentUtils.createContainerResponse(shiftContainer));
         } else {
             await userData.save();
             return interaction.editReply(ComponentUtils.createError(`❌ **Shift Failed!**\nYou completely messed up your tasks as a **${jobConfig.name}** and your boss refused to pay you. Better luck next shift!`));

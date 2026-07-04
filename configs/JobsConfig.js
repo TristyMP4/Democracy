@@ -28,7 +28,7 @@ module.exports = {
         salary: 50000,
         cooldown: 95 * 60 * 1000,
         requiredShifts: 80,
-        shiftsPerDay: 1,
+        shiftsPerDay: 2,
         emoji: '💻'
     }
 };
