@@ -114,6 +114,7 @@ module.exports = {
 
             let totalValue = 0;
             let receiptLines = [];
+            let successItems = [];
 
             for (const validItem of validItems) {
                 let amountStr = submitted.fields.getTextInputValue(`qty_${validItem.id}`);
@@ -134,6 +135,7 @@ module.exports = {
                 totalValue += itemTotal;
 
                 await EconomyUtils.removeItem(interaction.user.id, validItem.id, amount);
+                successItems.push({ item: validItem, amount, itemTotal });
                 receiptLines.push(`> ✅ Sold **${amount.toLocaleString()}x** ${validItem.config.emoji} **${validItem.config.name}** for ${EconomyConfig.currencySymbol}**${itemTotal.toLocaleString()}**`);
             }
 
@@ -147,7 +149,14 @@ module.exports = {
             await EconomyUtils.addCash(interaction.user.id, finalValue, 'wallet');
 
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
-            const descDisplay = ComponentUtils.createText(`${interaction.user} sold their items!\n\n${receiptLines.join('\n')}\n\n**Total Received:** ${EconomyConfig.currencySymbol}**${finalValue.toLocaleString()}**`);
+            
+            let descDisplay;
+            if (successItems.length === 1 && receiptLines.length === 1) {
+                const sItem = successItems[0];
+                descDisplay = ComponentUtils.createText(`${interaction.user} sold **${sItem.amount.toLocaleString()}x** ${sItem.item.config.emoji} **${sItem.item.config.name}** and got paid ${EconomyConfig.currencySymbol}**${finalValue.toLocaleString()}**!`);
+            } else {
+                descDisplay = ComponentUtils.createText(`${interaction.user} sold their items!\n${receiptLines.join('\n')}\n**Total Received:** ${EconomyConfig.currencySymbol}**${finalValue.toLocaleString()}**`);
+            }
             
             let footerDisplay = null;
             if (moneyResult.multiplier > 1) {

@@ -87,7 +87,7 @@ module.exports = {
         }
 
         if (userData.jobApplyCooldown && Date.now() < userData.jobApplyCooldown.getTime()) {
-            return interaction.followUp(ComponentUtils.createError(`You recently quit a job! You must wait until <t:${Math.floor(userData.jobApplyCooldown.getTime() / 1000)}:t> to apply again.`));
+            return interaction.followUp(ComponentUtils.createError(`You are on an application cooldown! You must wait until <t:${Math.floor(userData.jobApplyCooldown.getTime() / 1000)}:t> to apply again.`));
         }
 
         const jobInput = interaction.options.getString('job').toLowerCase();
@@ -112,7 +112,9 @@ module.exports = {
                 .addTextDisplayComponents(new TextDisplayBuilder().setContent(`🎉 Congratulations! You passed the interview and are now officially hired as a **${jobConfig.name}**! Use \`/work shift\` to start earning money.`));
             return interaction.followUp(ComponentUtils.createContainerResponse(successContainer));
         } else {
-            return interaction.followUp(ComponentUtils.createError(`❌ The interview did not go well. They decided to go with another candidate. Try applying again!`));
+            userData.jobApplyCooldown = new Date(Date.now() + 60 * 60 * 1000); // 1 hour cooldown
+            await userData.save();
+            return interaction.followUp(ComponentUtils.createError(`❌ The interview did not go well. They decided to go with another candidate. You must wait **1 Hour** before you can apply for a job again.`));
         }
     },
 
