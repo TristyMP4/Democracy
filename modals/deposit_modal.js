@@ -51,7 +51,7 @@ module.exports = {
 
             const titleDisplay = ComponentUtils.createText(`### **${interaction.user.username}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = ComponentUtils.createText(`🪙 **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol} **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
 
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),

@@ -83,16 +83,16 @@ module.exports = {
         );
 
         const descriptionLines = [
-            `Target: ${target}`,
-            `Started by: ${interaction.user}`
+            `Target: ${target}\n`,
+            `Started by: ${interaction.user}\n`
         ];
 
         if (reason?.trim()) {
-            descriptionLines.push(`**Reason:** \`${reason}\``);
+            descriptionLines.push(`**Reason:** \`${reason}\`\n`);
         }
         descriptionLines.push(
-            '> A mute vote has been started.',
-            `> If **60%** of online members vote **Yes**, the user will be muted for **${duration} minute${duration === 1 ? '' : 's'}**.`
+            '> A mute vote has been started. \n',
+            `> If **60%** of online members vote **Yes**, the user will be muted for **${duration} minute${duration === 1 ? '' : 's'}**.\n`
         );
 
         const voteResult = await VoteManager.startVote(interaction, {

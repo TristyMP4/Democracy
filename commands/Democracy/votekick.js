@@ -70,16 +70,16 @@ module.exports = {
         );
 
         const descriptionLines = [
-            `Target: ${target}`,
-            `Started by: ${interaction.user}`
+            `Target: ${target}\n`,
+            `Started by: ${interaction.user}\n`
         ];
 
         if (reason?.trim()) {
             descriptionLines.push(`**Reason:** \`${reason}\``);
         }
         descriptionLines.push(
-            '> A kick vote has been started.',
-            `> If **75%** of online members vote **Yes**, the user will be **kicked from the server.**.`
+            '> A kick vote has been started.\n',
+            `> If **75%** of online members vote **Yes**, the user will be **kicked from the server.**.\n`
         );
 
         const voteResult = await VoteManager.startVote(interaction, {

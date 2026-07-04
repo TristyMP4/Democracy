@@ -206,11 +206,11 @@ module.exports = {
                         currentPlayer.hand.push(deck.pop());
                         const score = CardUtils.calculateScore(currentPlayer.hand);
                         if (score > 21) currentPlayer.status = 'bust';
-                        await btnInteraction.update({ components: [] }); // Acknowledge
+                        await btnInteraction.deferUpdate(); // Acknowledge without removing components yet
 
                     } else if (btnInteraction.customId === 'stand') {
                         currentPlayer.status = 'stand';
-                        await btnInteraction.update({ components: [] });
+                        await btnInteraction.deferUpdate();
 
                     } else if (btnInteraction.customId === 'double') {
                         // Check if they have enough money to double
@@ -229,7 +229,7 @@ module.exports = {
                         if (score > 21) currentPlayer.status = 'bust';
                         else currentPlayer.status = 'stand';
 
-                        await btnInteraction.update({ components: [] });
+                        await btnInteraction.deferUpdate();
                     }
                 }
             }

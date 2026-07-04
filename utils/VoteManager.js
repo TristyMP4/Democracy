@@ -71,7 +71,7 @@ module.exports = {
             const descLines = [];
             if (pingType === 'here') descLines.push('@here', '');
             if (pingType === 'everyone') descLines.push('@everyone\n', '');
-            descLines.push(description, '');
+            descLines.push(description, '\n');
             descLines.push(`*Required Votes to win:* ***${requiredVotes}***\n`);
             if (requireOnline) {
                 descLines.push(`*Online Members:* **${onlineCount}**\n`);
