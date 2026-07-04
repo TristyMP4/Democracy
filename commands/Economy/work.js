@@ -193,7 +193,7 @@ module.exports = {
         };
 
         const responsePayload = ComponentUtils.createContainerResponse(generatePage(currentPage));
-        responsePayload.components = [getRow(currentPage)];
+        responsePayload.components.push(getRow(currentPage));
         
         const message = await interaction.followUp({ ...responsePayload, fetchReply: true });
 
@@ -209,7 +209,7 @@ module.exports = {
             if (i.customId === 'work_list_last') currentPage = totalPages - 1;
 
             const updatedPayload = ComponentUtils.createContainerResponse(generatePage(currentPage));
-            updatedPayload.components = [getRow(currentPage)];
+            updatedPayload.components.push(getRow(currentPage));
             
             await i.update(updatedPayload);
         });
@@ -217,7 +217,9 @@ module.exports = {
         collector.on('end', () => {
             const disabledRow = getRow(currentPage);
             disabledRow.components.forEach(c => c.setDisabled(true));
-            message.edit({ components: [disabledRow] }).catch(() => {});
+            const finalPayload = ComponentUtils.createContainerResponse(generatePage(currentPage));
+            finalPayload.components.push(disabledRow);
+            message.edit(finalPayload).catch(() => {});
         });
     },
 
@@ -296,7 +298,7 @@ module.exports = {
             .addTextDisplayComponents(ComponentUtils.createText(`### 🧠 Memory Minigame\nClick the buttons in the **exact original order** they were shown!`));
 
         const activePayload = ComponentUtils.createContainerResponse(activeContainer);
-        activePayload.components = [row];
+        activePayload.components.push(row);
         
         await message.edit(activePayload);
 
@@ -326,11 +328,14 @@ module.exports = {
                         newRow.addComponents(btn);
                     }
 
+                    const updatedPayload = ComponentUtils.createContainerResponse(activeContainer);
+                    updatedPayload.components.push(newRow);
+
                     if (currentStep >= 5) {
                         collector.stop('win');
-                        await i.update({ components: [newRow] });
+                        await i.update(updatedPayload);
                     } else {
-                        await i.update({ components: [newRow] });
+                        await i.update(updatedPayload);
                     }
                 } else {
                     // Wrong!
@@ -350,7 +355,9 @@ module.exports = {
                         }
                         newRow.addComponents(btn);
                     }
-                    await i.update({ components: [newRow] });
+                    const failedPayload = ComponentUtils.createContainerResponse(activeContainer);
+                    failedPayload.components.push(newRow);
+                    await i.update(failedPayload);
                 }
             });
 
@@ -390,13 +397,12 @@ module.exports = {
         for (const c of buttonColors) {
             row.addComponents(new ButtonBuilder().setCustomId(`color_${c.name}`).setLabel(c.name).setStyle(c.style));
         }
-
         const activeContainer = new ContainerBuilder()
             .setAccentColor(EconomyConfig.embedColor)
             .addTextDisplayComponents(ComponentUtils.createText(`### 🎨 Color Minigame\nWhich color was paired with the word **${targetPair.word}**?`));
 
         const activePayload = ComponentUtils.createContainerResponse(activeContainer);
-        activePayload.components = [row];
+        activePayload.components.push(row);
         
         await message.edit(activePayload);
 
