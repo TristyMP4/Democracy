@@ -109,9 +109,6 @@ module.exports = {
         const yesVotes = new Set();
         const noVotes = new Set();
 
-        const { container } = buildContainer(yesVotes, noVotes);
-
-        const payload = ComponentUtils.createContainerResponse(container);
         if (pingType === 'everyone' || pingType === 'here') {
             const pingStr = pingType === 'everyone' ? '@everyone' : '@here';
             try {
@@ -119,6 +116,8 @@ module.exports = {
             } catch (e) {}
         }
         
+        const { container } = buildContainer(yesVotes, noVotes);
+        const payload = ComponentUtils.createContainerResponse(container);
         const message = await interaction.reply({ ...payload, fetchReply: true });
 
         return new Promise((resolve) => {
