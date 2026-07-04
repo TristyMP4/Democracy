@@ -68,6 +68,12 @@ module.exports = {
         await userData.save();
 
         let timeStr = expiryDate ? `Expires on <t:${Math.floor(expiryDate.getTime() / 1000)}:f>` : 'Permanent';
-        return interaction.followUp(ComponentUtils.createSuccess(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **x${value}**.\n\n${timeStr}`));
+        
+        const { ContainerBuilder } = require('discord.js');
+        const container = new ContainerBuilder()
+            .setAccentColor(0x2ecc71)
+            .addTextDisplayComponents(ComponentUtils.createText(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **x${value}**.\n\n${timeStr}`));
+            
+        return interaction.followUp(ComponentUtils.createContainerResponse(container));
     }
 };

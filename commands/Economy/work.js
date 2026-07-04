@@ -5,10 +5,10 @@ const EconomyUtils = require('../../utils/EconomyUtils.js');
 
 const MINIGAME_WORDS = ["APPLE", "TIGER", "OCEAN", "CLOUD", "BREAD", "RIVER", "CHAIR", "GHOST", "PIZZA", "SNAKE", "HOUSE", "FLAME", "TRAIN", "PAPER", "BLADE"];
 const MINIGAME_COLORS = [
-    { name: "Red", style: ButtonStyle.Danger },
-    { name: "Blue", style: ButtonStyle.Primary },
-    { name: "Green", style: ButtonStyle.Success },
-    { name: "Grey", style: ButtonStyle.Secondary }
+    { name: "Red", style: ButtonStyle.Danger, emoji: "🟥" },
+    { name: "Blue", style: ButtonStyle.Primary, emoji: "🟦" },
+    { name: "Green", style: ButtonStyle.Success, emoji: "🟩" },
+    { name: "Grey", style: ButtonStyle.Secondary, emoji: "⬜" }
 ];
 
 function shuffleArray(array) {
@@ -390,7 +390,7 @@ module.exports = {
         let displayList = [];
         for (let i = 0; i < 3; i++) {
             pairs.push({ word: shuffledWords[i], color: shuffledColors[i] });
-            displayList.push(`> 🟩 **${shuffledColors[i].name}** - ${shuffledWords[i]}`);
+            displayList.push(`> ${shuffledColors[i].emoji} **${shuffledColors[i].name}** - ${shuffledWords[i]}`);
         }
 
         const container = new ContainerBuilder()
