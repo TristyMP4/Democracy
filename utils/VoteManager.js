@@ -112,12 +112,11 @@ module.exports = {
         const { container } = buildContainer(yesVotes, noVotes);
 
         const payload = ComponentUtils.createContainerResponse(container);
-        if (pingType === 'everyone') {
-            payload.content = '@everyone';
-            payload.allowedMentions = { parse: ['everyone'] };
-        } else if (pingType === 'here') {
-            payload.content = '@here';
-            payload.allowedMentions = { parse: ['everyone'] };
+        if (pingType === 'everyone' || pingType === 'here') {
+            const pingStr = pingType === 'everyone' ? '@everyone' : '@here';
+            try {
+                await interaction.channel.send({ content: `${pingStr} A new vote has started!`, allowedMentions: { parse: ['everyone'] } });
+            } catch (e) {}
         }
         
         const message = await interaction.reply({ ...payload, fetchReply: true });
