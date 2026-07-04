@@ -66,5 +66,23 @@ module.exports = {
     deathSettings: {
         keepRareItems: true, // Whether rare items are kept upon death
         keepItemsUnderWeight: 4 // Items with a dropWeight <= this value are kept when you die
+    },
+
+    // Gambling configurations
+    gambling: {
+        wheel: {
+            gifUrl: 'https://media1.tenor.com/m/fX8BgbT88BMAAAAd/rust-wheel.gif', // Placeholder GIF
+            slots: [
+                { number: 1, weight: 24, emoji: '🟨' },
+                { number: 3, weight: 10, emoji: '🟩' },
+                { number: 5, weight: 8, emoji: '🟦' },
+                { number: 10, weight: 4, emoji: '🟥' },
+                { number: 20, weight: 2, emoji: '🟪' }
+            ]
+        },
+        blackjack: {
+            dealerHitSoft17: false, // Standard rule
+            multiplayerJoinTime: 30000 // 30 seconds to join
+        }
     }
 };
