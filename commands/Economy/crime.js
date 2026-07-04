@@ -57,6 +57,7 @@ module.exports = {
 
                 if (Math.random() < deathChance) {
                     await EconomyUtils.handleDeath(interaction.user.id);
+
                     const embed = new EmbedBuilder()
                         .setTitle('💀 Wasted')
                         .setDescription(`Your crime went horribly wrong and you were killed in the crossfire! Your wallet and inventory were wiped.`)

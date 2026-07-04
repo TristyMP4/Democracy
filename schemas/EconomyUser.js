@@ -9,9 +9,13 @@ const economyUserSchema = new mongoose.Schema({
         of: Number, 
         default: {} 
     },
-    lastCrime: { type: Date, default: null },
+    lastDaily: { type: Date, default: null },
     lastSearch: { type: Date, default: null },
-    lastRob: { type: Date, default: null }
+    lastCrime: { type: Date, default: null },
+    luckMultiplier: { type: Number, default: 1.0 },
+    luckExpiry: { type: Date, default: null },
+    moneyMultiplier: { type: Number, default: 1.0 },
+    moneyExpiry: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('EconomyUser', economyUserSchema);

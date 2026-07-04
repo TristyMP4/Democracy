@@ -71,7 +71,7 @@ module.exports = {
     // Gambling configurations
     gambling: {
         wheel: {
-            gifUrl: 'https://media1.tenor.com/m/fX8BgbT88BMAAAAd/rust-wheel.gif', // Placeholder GIF
+            gifUrl: 'https://c.tenor.com/OGvOzcBHLjcAAAAd/tenor.gif',
             slots: [
                 { number: 1, weight: 24, emoji: '🟨' },
                 { number: 3, weight: 10, emoji: '🟩' },
@@ -81,7 +81,7 @@ module.exports = {
             ]
         },
         blackjack: {
-            dealerHitSoft17: false, // Standard rule
+            dealerHitSoft17: true, // Standard rule
             multiplayerJoinTime: 30000 // 30 seconds to join
         }
     }

@@ -70,7 +70,7 @@ module.exports = {
                         );
                     });
 
-                    await i.update({ components: [disabledRow] });
+                    await i.deferUpdate();
                     collector.stop('clicked');
 
                     const settings = await EconomyUtils.getSettings();
@@ -102,7 +102,7 @@ module.exports = {
 
                     if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
                         baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                        const moneyResult = await EconomyUtils.calculateMoney(baseReward);
+                        const moneyResult = await EconomyUtils.calculateMoney(baseReward, interaction.user.id);
                         rewardMoney = moneyResult.finalAmount;
                         
                         await EconomyUtils.addCash(interaction.user.id, rewardMoney, 'wallet');
@@ -137,7 +137,7 @@ module.exports = {
                             // Fallback to money if no items exist for this location
                             selectedOutcome = 'moneyOnly';
                             let reward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
-                            const moneyResult = await EconomyUtils.calculateMoney(reward);
+                            const moneyResult = await EconomyUtils.calculateMoney(reward, interaction.user.id);
                             rewardMoney = moneyResult.finalAmount;
                             baseReward = reward; // For footer display
                             

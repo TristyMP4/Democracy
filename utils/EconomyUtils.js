@@ -13,8 +13,32 @@ module.exports = {
         if (!user) {
             user = new EconomyUser({ userId });
             await user.save();
+            return user;
         }
+
+        let changed = false;
+        const now = new Date();
+        if (user.luckExpiry && now > user.luckExpiry) {
+            user.luckMultiplier = 1.0;
+            user.luckExpiry = null;
+            changed = true;
+        }
+        if (user.moneyExpiry && now > user.moneyExpiry) {
+            user.moneyMultiplier = 1.0;
+            user.moneyExpiry = null;
+            changed = true;
+        }
+        
+        if (changed) await user.save();
         return user;
+    },
+
+    /**
+     * Gets all users in the economy database (used for leaderboards)
+     * @returns {Promise<EconomyUser[]>}
+     */
+    async getAllUsers() {
+        return await EconomyUser.find({});
     },
 
     /**
@@ -163,18 +187,31 @@ module.exports = {
         if (!settings) {
             settings = new EconomySettings();
             await settings.save();
+            return settings;
         }
+
+        if (settings.multiplierExpiry && new Date() > settings.multiplierExpiry) {
+            settings.moneyMultiplier = 1.0;
+            settings.luckMultiplier = 1.0;
+            settings.multiplierExpiry = null;
+            await settings.save();
+        }
+
         return settings;
     },
 
     /**
      * Calculates the final money reward and multiplier breakdown
      * @param {number} baseAmount The raw unmultiplied amount
+     * @param {string} userId The discord user ID to apply individual multipliers
      * @returns {Promise<{finalAmount: number, multiplier: number, bonus: number}>}
      */
-    async calculateMoney(baseAmount) {
+    async calculateMoney(baseAmount, userId) {
         const settings = await this.getSettings();
-        const multiplier = settings.moneyMultiplier || 1.0;
+        const user = userId ? await this.getUser(userId) : { moneyMultiplier: 1.0 };
+        
+        // Additive stacking: Global 1.5x + User 1.5x = 2.0x (since base is 1.0)
+        let multiplier = Math.max(0, (settings.moneyMultiplier || 1.0) + ((user.moneyMultiplier || 1.0) - 1.0));
         const finalAmount = Math.floor(baseAmount * multiplier);
         
         return {
@@ -187,11 +224,14 @@ module.exports = {
     /**
      * Calculates the final success chance based on luck multiplier
      * @param {number} baseSuccessChance The raw unmultiplied success chance (e.g. 0.4 for 40%)
+     * @param {string} userId The discord user ID to apply individual multipliers
      * @returns {Promise<{chance: number, roll: number, isSuccess: boolean, multiplier: number}>}
      */
-    async calculateLuckRoll(baseSuccessChance) {
+    async calculateLuckRoll(baseSuccessChance, userId) {
         const settings = await this.getSettings();
-        const multiplier = settings.luckMultiplier || 1.0;
+        const user = userId ? await this.getUser(userId) : { luckMultiplier: 1.0 };
+        
+        let multiplier = Math.max(0, (settings.luckMultiplier || 1.0) + ((user.luckMultiplier || 1.0) - 1.0));
         
         const chance = baseSuccessChance * multiplier;
         const roll = Math.random();
@@ -202,5 +242,18 @@ module.exports = {
             isSuccess: roll <= chance,
             multiplier
         };
+    },
+
+    /**
+     * Extracts the icon URL from the configured currency symbol if it's a custom Discord emoji.
+     * @returns {string|null}
+     */
+    getCurrencyIconURL() {
+        const match = EconomyConfig.currencySymbol.match(/<a?:.+?:(\d+)>/);
+        if (match) {
+            const isAnimated = EconomyConfig.currencySymbol.startsWith('<a:');
+            return `https://cdn.discordapp.com/emojis/${match[1]}.${isAnimated ? 'gif' : 'png'}`;
+        }
+        return null;
     }
 };

@@ -7,7 +7,7 @@ module.exports = {
     owner: true,
     economy: true,
     data: new SlashCommandBuilder()
-        .setName('multipliers')
+        .setName('global-multipliers')
         .setDescription('Set the global economy multipliers.')
         .addNumberOption(option => 
             option.setName('money')

@@ -86,7 +86,10 @@ module.exports = {
             }
 
             user = await EconomyUtils.getUser(interaction.user.id);
-            resultEmbed.setFooter({ text: `Balance: ${EconomyConfig.currencySymbol}${(user.wallet + user.bank).toLocaleString()}` });
+            resultEmbed.setFooter({ 
+                text: `Balance: ${(user.wallet + user.bank).toLocaleString()}`,
+                iconURL: EconomyUtils.getCurrencyIconURL() || undefined
+            });
 
             await interaction.editReply({ embeds: [resultEmbed] });
 
