@@ -13,10 +13,13 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            let user = await EconomyUtils.getUser(interaction.user.id);
+            const user = await EconomyUtils.getUser(interaction.user.id);
             const settings = await EconomyUtils.getSettings();
 
-            const cooldownTime = (15 * 1000) * (settings.cooldownMultiplier || 1.0);
+            const globalMultiplier = settings.cooldownMultiplier || 1.0;
+            const userMultiplier = user.cooldownMultiplier || 1.0;
+            const cooldownTime = (15 * 1000) * globalMultiplier * userMultiplier;
+            
             if (user.lastSearch && (Date.now() - user.lastSearch.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - user.lastSearch.getTime())) / 1000);
                 return interaction.followUp(ComponentUtils.createError(`You're too tired to search again! Try again in **${remaining}s**.`));

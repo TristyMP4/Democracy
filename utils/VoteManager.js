@@ -222,5 +222,8 @@ module.exports = {
             .addActionRowComponents(disabledRow);
 
         await message.edit(ComponentUtils.createContainerResponse(resultContainer));
+        try {
+            await message.channel.send(ComponentUtils.createContainerResponse(resultContainer));
+        } catch (e) {}
     }
 };

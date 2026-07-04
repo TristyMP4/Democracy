@@ -288,6 +288,9 @@ module.exports = {
                 
                 finalEmbed.setDescription(`### Result\n${resultMsg}`);
                 await interaction.editReply({ embeds: [finalEmbed], components: [] });
+                try {
+                    await interaction.channel.send({ content: `<@${interaction.user.id}> Your Blackjack game finished!`, embeds: [finalEmbed] });
+                } catch (e) {}
 
             } else {
                 // Multiplayer Evaluation
@@ -341,6 +344,9 @@ module.exports = {
 
                 finalEmbed.setDescription(`### Result\n${resultMsg}`);
                 await interaction.editReply({ embeds: [finalEmbed], components: [] });
+                try {
+                    await interaction.channel.send({ content: `<@${interaction.user.id}> The multiplayer Blackjack game finished!`, embeds: [finalEmbed] });
+                } catch (e) {}
             }
 
         } catch (error) {

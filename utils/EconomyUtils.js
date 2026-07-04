@@ -28,6 +28,11 @@ module.exports = {
             user.moneyExpiry = null;
             changed = true;
         }
+        if (user.cooldownExpiry && now > user.cooldownExpiry) {
+            user.cooldownMultiplier = 1.0;
+            user.cooldownExpiry = null;
+            changed = true;
+        }
         
         if (changed) await user.save();
         return user;

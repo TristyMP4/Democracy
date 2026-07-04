@@ -238,7 +238,10 @@ module.exports = {
 
         const jobConfig = EconomyConfig.jobs[userData.currentJob];
         const settings = await EconomyUtils.getSettings();
-        const actualCooldown = jobConfig.cooldown * (settings.cooldownMultiplier || 1.0);
+        
+        const globalMultiplier = settings.cooldownMultiplier || 1.0;
+        const userMultiplier = userData.cooldownMultiplier || 1.0;
+        const actualCooldown = jobConfig.cooldown * globalMultiplier * userMultiplier;
 
         if (userData.lastShift && Date.now() - userData.lastShift.getTime() < actualCooldown) {
             const nextShiftTime = Math.floor((userData.lastShift.getTime() + actualCooldown) / 1000);

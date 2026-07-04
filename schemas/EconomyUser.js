@@ -16,6 +16,8 @@ const economyUserSchema = new mongoose.Schema({
     luckExpiry: { type: Date, default: null },
     moneyMultiplier: { type: Number, default: 1.0 },
     moneyExpiry: { type: Date, default: null },
+    cooldownMultiplier: { type: Number, default: 1.0 },
+    cooldownExpiry: { type: Date, default: null },
     
     // Jobs System
     currentJob: { type: String, default: null },
