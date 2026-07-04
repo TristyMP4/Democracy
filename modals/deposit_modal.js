@@ -56,7 +56,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),
                 new ButtonBuilder().setCustomId('deposit_btn').setLabel('Deposit').setStyle(ButtonStyle.Secondary).setDisabled(false),
-                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji('🔄').setStyle(ButtonStyle.Secondary).setDisabled(false)
+                new ButtonBuilder().setCustomId('refresh_bal_btn').setEmoji(`${EconomyConfig.RefreshIcon}`).setStyle(ButtonStyle.Secondary).setDisabled(false)
             );
 
             const container = new ContainerBuilder()
