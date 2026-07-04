@@ -88,6 +88,36 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             }
 
+            if (itemId === 'weed') {
+                const isPositive = Math.random() >= 0.5;
+                const multiplier = isPositive ? 1.5 : -0.5;
+                
+                const expiry = new Date();
+                expiry.setMinutes(expiry.getMinutes() + 10);
+                
+                userData.luckMultiplier = multiplier;
+                userData.luckExpiry = expiry;
+                await userData.save();
+                
+                let textDesc = '';
+                if (isPositive) {
+                    textDesc = `You smoked the Weed and suddenly feel hyper-focused! Your individual luck multiplier has **increased** (+1.5x) for the next 10 minutes!`;
+                } else {
+                    textDesc = `You smoked the Weed but it was laced with something foul... You feel sluggish and your individual luck multiplier has **decreased** (-1.5x) for the next 10 minutes!`;
+                }
+                
+                const titleDisplay = ComponentUtils.createText(`### 🌿 **You smoked some Weed**`);
+                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(isPositive ? EconomyConfig.successColor : EconomyConfig.failColor)
+                    .addTextDisplayComponents(titleDisplay)
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(descDisplay);
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            }
+
             // Fallback for generic items
             const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
             const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);

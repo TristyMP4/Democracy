@@ -60,30 +60,6 @@ const statSchema = new Schema({
                 }
             }
         ]
-    },
-
-    voteskips: {
-        initiated: { type: Number, default: 0 },
-        passed: { type: Number, default: 0 },
-        failed: { type: Number, default: 0 },
-
-        history: [
-            {
-                trackTitle: {
-                    type: String,
-                    default: 'Unknown track'
-                },
-
-                initiatedBy: {
-                    type: String
-                },
-
-                date: {
-                    type: Date,
-                    default: Date.now
-                }
-            }
-        ]
     }
 });
 
