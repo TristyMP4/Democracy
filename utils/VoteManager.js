@@ -69,8 +69,6 @@ module.exports = {
         const buildContainer = (yesSet, noSet) => {
             const titleDisplay = ComponentUtils.createText(`### ${title}`);
             const descLines = [];
-            if (pingType === 'here') descLines.push('@here', '');
-            if (pingType === 'everyone') descLines.push('@everyone\n', '');
             descLines.push(description, '\n');
             descLines.push(`*Required Votes to win:* ***${requiredVotes}***\n`);
             if (requireOnline) {
@@ -114,7 +112,11 @@ module.exports = {
         const { container } = buildContainer(yesVotes, noVotes);
 
         const payload = ComponentUtils.createContainerResponse(container);
-        if (pingType !== 'none') {
+        if (pingType === 'everyone') {
+            payload.content = '@everyone';
+            payload.allowedMentions = { parse: ['everyone'] };
+        } else if (pingType === 'here') {
+            payload.content = '@here';
             payload.allowedMentions = { parse: ['everyone'] };
         }
         
