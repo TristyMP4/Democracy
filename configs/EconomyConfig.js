@@ -1,6 +1,7 @@
 const ItemsConfig = require('./ItemsConfig.js');
 const SearchLocationsConfig = require('./SearchLocationsConfig.js');
 const CrimeMessagesConfig = require('./CrimeMessagesConfig.js');
+const JobsConfig = require('./JobsConfig.js');
 
 module.exports = {
     embedColor: 0x2b2d31,
@@ -19,6 +20,9 @@ module.exports = {
     
     // Dictionary of All Items in the Economy System
     items: ItemsConfig,
+
+    // Dictionary of All Jobs in the Economy System
+    jobs: JobsConfig,
 
     searchSettings: {
         // Base probabilities for search outcomes (luck multiplier will boost higher tier outcomes)

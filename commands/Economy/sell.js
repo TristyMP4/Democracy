@@ -7,11 +7,35 @@ module.exports = {
     economy: true,
     data: new SlashCommandBuilder()
         .setName('sell')
-        .setDescription('Sell an item from your inventory for money.')
+        .setDescription('Sell up to 5 items from your inventory for money.')
         .addStringOption(option => 
-            option.setName('item')
-                .setDescription('The item you want to sell')
+            option.setName('item1')
+                .setDescription('The first item you want to sell')
                 .setRequired(true)
+                .setAutocomplete(true)
+        )
+        .addStringOption(option => 
+            option.setName('item2')
+                .setDescription('The second item you want to sell')
+                .setRequired(false)
+                .setAutocomplete(true)
+        )
+        .addStringOption(option => 
+            option.setName('item3')
+                .setDescription('The third item you want to sell')
+                .setRequired(false)
+                .setAutocomplete(true)
+        )
+        .addStringOption(option => 
+            option.setName('item4')
+                .setDescription('The fourth item you want to sell')
+                .setRequired(false)
+                .setAutocomplete(true)
+        )
+        .addStringOption(option => 
+            option.setName('item5')
+                .setDescription('The fifth item you want to sell')
+                .setRequired(false)
                 .setAutocomplete(true)
         ),
 
@@ -32,78 +56,98 @@ module.exports = {
             }
         }
 
-        // Filter based on focused value and limit to 25
         const filtered = choices.filter(choice => choice.name.toLowerCase().includes(focusedValue)).slice(0, 25);
         await interaction.respond(filtered);
     },
 
     async execute(interaction) {
-        const itemInput = interaction.options.getString('item').toLowerCase();
-
-        // Validate item exists in economy
-        const itemConfig = EconomyConfig.items[itemInput];
-        if (!itemConfig) {
-            return interaction.reply(ComponentUtils.createError(`That item does not exist! Try checking your \`/inventory\` for the correct name.`));
+        const itemsToSell = [];
+        for (let i = 1; i <= 5; i++) {
+            const itemInput = interaction.options.getString(`item${i}`);
+            if (itemInput) itemsToSell.push(itemInput.toLowerCase());
         }
+
+        const uniqueItems = [...new Set(itemsToSell)];
 
         try {
             let userData = await EconomyUtils.getUser(interaction.user.id);
-            if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < 1) {
-                return interaction.reply(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell!`));
+            const validItems = [];
+            const modalId = `sell_modal_${Date.now()}`;
+
+            const modal = new ModalBuilder()
+                .setCustomId(modalId)
+                .setTitle(`Sell Items`);
+
+            for (const itemInput of uniqueItems) {
+                const itemConfig = EconomyConfig.items[itemInput];
+                if (!itemConfig || !itemConfig.sellable) continue;
+                
+                if (!userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < 1) continue;
+
+                validItems.push({ id: itemInput, config: itemConfig });
+
+                const quantityInput = new TextInputBuilder()
+                    .setCustomId(`qty_${itemInput}`)
+                    .setLabel(`Quantity of ${itemConfig.name}`)
+                    .setStyle(TextInputStyle.Short)
+                    .setValue('1')
+                    .setRequired(true);
+
+                modal.addComponents(new ActionRowBuilder().addComponents(quantityInput));
             }
 
-            // Create Modal
-            const modal = new ModalBuilder()
-                .setCustomId(`sell_modal_${itemInput}`)
-                .setTitle(`Sell ${itemConfig.name}`);
-
-            const quantityInput = new TextInputBuilder()
-                .setCustomId('quantity')
-                .setLabel('Quantity to sell')
-                .setStyle(TextInputStyle.Short)
-                .setValue('1')
-                .setRequired(true);
-
-            modal.addComponents(new ActionRowBuilder().addComponents(quantityInput));
+            if (validItems.length === 0) {
+                return interaction.reply(ComponentUtils.createError(`You do not have any valid or sellable items from that list in your inventory!`));
+            }
 
             await interaction.showModal(modal);
 
-            // Wait for modal submit
             const submitted = await interaction.awaitModalSubmit({
                 time: 60000,
-                filter: i => i.user.id === interaction.user.id && i.customId === `sell_modal_${itemInput}`
+                filter: i => i.user.id === interaction.user.id && i.customId === modalId
             }).catch(() => null);
 
             if (!submitted) return;
-
-            let amount = parseInt(submitted.fields.getTextInputValue('quantity'));
-            if (isNaN(amount) || amount <= 0) {
-                return submitted.reply(ComponentUtils.createError('Invalid quantity! Must be a number greater than 0.'));
-            }
-
             await submitted.deferReply();
 
-            // Re-fetch user to prevent race conditions during modal wait
             userData = await EconomyUtils.getUser(interaction.user.id);
-            if (!userData || !userData.inventory || !userData.inventory.get(itemInput) || userData.inventory.get(itemInput) < amount) {
-                return submitted.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell that many!`));
+
+            let totalValue = 0;
+            let receiptLines = [];
+
+            for (const validItem of validItems) {
+                let amountStr = submitted.fields.getTextInputValue(`qty_${validItem.id}`);
+                let amount = parseInt(amountStr);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    receiptLines.push(`❌ Invalid quantity for ${validItem.config.name}`);
+                    continue;
+                }
+
+                if (!userData.inventory || !userData.inventory.get(validItem.id) || userData.inventory.get(validItem.id) < amount) {
+                    receiptLines.push(`❌ Failed to sell ${validItem.config.name} (Not enough in inventory)`);
+                    continue;
+                }
+
+                const basePrice = validItem.config.sellPrice !== undefined ? validItem.config.sellPrice : validItem.config.price;
+                const itemTotal = basePrice * amount;
+                totalValue += itemTotal;
+
+                await EconomyUtils.removeItem(interaction.user.id, validItem.id, amount);
+                receiptLines.push(`> ✅ Sold **${amount.toLocaleString()}x** ${validItem.config.emoji} **${validItem.config.name}** for ${EconomyConfig.currencySymbol}**${itemTotal.toLocaleString()}**`);
             }
 
-            const basePrice = itemConfig.sellPrice !== undefined ? itemConfig.sellPrice : itemConfig.price;
-            const totalValue = basePrice * amount;
-            const settings = await EconomyUtils.getSettings();
-            
+            if (totalValue === 0) {
+                return submitted.followUp(ComponentUtils.createError(`You did not sell any items successfully.\n\n${receiptLines.join('\n')}`));
+            }
+
             const moneyResult = await EconomyUtils.calculateMoney(totalValue, interaction.user.id);
             const finalValue = moneyResult.finalAmount;
 
-            // Deduct from inventory
-            await EconomyUtils.removeItem(interaction.user.id, itemInput, amount);
-
-            // Add money
             await EconomyUtils.addCash(interaction.user.id, finalValue, 'wallet');
 
             const titleDisplay = ComponentUtils.createText(`### 🛒 **${interaction.user.displayName}'s Sale Receipt**`);
-            const descDisplay = ComponentUtils.createText(`${interaction.user} sold **${amount.toLocaleString()}x** ${itemConfig.emoji} **${itemConfig.name}** and got paid **${EconomyConfig.currencySymbol}${finalValue.toLocaleString()}**!`);
+            const descDisplay = ComponentUtils.createText(`${interaction.user} sold their items!\n\n${receiptLines.join('\n')}\n\n**Total Received:** ${EconomyConfig.currencySymbol}**${finalValue.toLocaleString()}**`);
             
             let footerDisplay = null;
             if (moneyResult.multiplier > 1) {
@@ -120,14 +164,15 @@ module.exports = {
                 container.addSeparatorComponents(ComponentUtils.createSeparator());
                 container.addTextDisplayComponents(footerDisplay);
             }
+
             await submitted.followUp(ComponentUtils.createContainerResponse(container));
 
         } catch (error) {
             console.error('Sell Error:', error);
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp(ComponentUtils.createError('❌ An error occurred while selling the item.')).catch(() => {});
+                await interaction.followUp(ComponentUtils.createError('❌ An error occurred while selling the items.')).catch(() => {});
             } else {
-                await interaction.reply(ComponentUtils.createError('❌ An error occurred while selling the item.')).catch(() => {});
+                await interaction.reply(ComponentUtils.createError('❌ An error occurred while selling the items.')).catch(() => {});
             }
         }
     }

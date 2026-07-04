@@ -10,7 +10,7 @@ module.exports = {
     },
     'xm-250': {
         name: 'XM-250',
-        description: 'Devastating light machine gun, tears through anything you throw its way. - Dropped by the Collector.',
+        description: 'Devastating heavy machine gun, tears through anything you throw its way. - Dropped by the Collector.',
         emoji: '<:XM250:1521922031241789510>', 
         price: 60000,
         dropWeight: 3, // Legendary
@@ -81,7 +81,7 @@ module.exports = {
     },
     'weed': {
         name: "Weed",
-        description: "A small tuft of weed ready to be smoked.",
+        description: "A small tuft of weed ready. Smoking it seems to bring a lucky reward..",
         emoji: '<:WeedDoob:1521922663705215126>', 
         price: 50000,
         sellPrice: 7500,

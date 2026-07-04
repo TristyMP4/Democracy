@@ -15,7 +15,13 @@ const economyUserSchema = new mongoose.Schema({
     luckMultiplier: { type: Number, default: 1.0 },
     luckExpiry: { type: Date, default: null },
     moneyMultiplier: { type: Number, default: 1.0 },
-    moneyExpiry: { type: Date, default: null }
+    moneyExpiry: { type: Date, default: null },
+    
+    // Jobs System
+    currentJob: { type: String, default: null },
+    totalShiftsWorked: { type: Number, default: 0 },
+    lastShift: { type: Date, default: null },
+    jobApplyCooldown: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('EconomyUser', economyUserSchema);
