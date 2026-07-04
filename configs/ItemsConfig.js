@@ -2,8 +2,9 @@ module.exports = {
     'ak-alpha': {
         name: 'AK-Alpha',
         description: 'A powerful assault rifle crafted from modern polymers. - High Fire Rate',
-        emoji: '<:AK109Alpha:1521922025336082576>', 
-        price: 30000,
+        emoji: '<:AK109Alpha:1521922025336082576>',
+        price: 50000,
+        sellPrice: 10000,
         dropWeight: 10, // Very Rare
         sellable: true
     },
@@ -26,8 +27,9 @@ module.exports = {
     'thompson': {
         name: 'Thompson',
         description: 'A mid tier SMG that is a reliable choice in a gunfight.',
-        emoji: '<:Thompson:1521922029790433525>', 
+        emoji: '<:Thompson:1521922029790433525>',
         price: 20000,
+        sellPrice: 8500,
         dropWeight: 20, // Rare
         sellable: true
     },
@@ -36,6 +38,7 @@ module.exports = {
         description: 'A reliable handgun that can open the door to a snowball.',
         emoji: '<:SemiAutomaticPistol:1521922027013931009>', 
         price: 3000,
+        sellPrice: 2000, 
         dropWeight: 65, // Common
         sellable: true
     },
@@ -52,7 +55,8 @@ module.exports = {
         name: 'Supply Signal',
         description: 'Call in a supply drop. Use this item to receive 1-3 random items!',
         emoji: '<:SupplySignal:1521922411153326120>', 
-        price: 50000,
+        price: 200000,
+        sellPrice: 50000,
         dropWeight: 3, // Epic
         usable: true,
         sellable: true
@@ -79,7 +83,8 @@ module.exports = {
         name: "Weed",
         description: "A small tuft of weed ready to be smoked.",
         emoji: '<:WeedDoob:1521922663705215126>', 
-        price: 5000,
+        price: 50000,
+        sellPrice: 7500,
         dropWeight: 50, // Relatively Common
         usable: true,
         sellable: true
@@ -98,6 +103,7 @@ module.exports = {
         description: "A keycard for old bunker that reaps many rewards.",
         emoji: '<:Green_Keycard:1521954128589357127>', 
         price: 500000,
+        sellPrice: 25000,
         dropWeight: 8, // Epic
         shop: true,
         usable: true,
@@ -108,6 +114,7 @@ module.exports = {
         description: "A high tier keycard that brings great riches.",
         emoji: '<:Purple_Keycard:1521954129889591356>', 
         price: 7500000,
+        sellPrice: 150000,
         dropWeight: 6, // Epic
         usable: true,
         sellable: true
@@ -117,6 +124,7 @@ module.exports = {
         description: "An exotic tier keycard that brings all you could want.",
         emoji: '<:Red_Keycard:1521956783009169530>', 
         price: 1500000,
+        sellPrice: 375000,
         dropWeight: 1, // Exotic
         usable: true,
         sellable: true
@@ -126,6 +134,7 @@ module.exports = {
         description: "Saves your life in the event of a death.",
         emoji: '💝', 
         price: 250000,
+        sellPrice: 15000,
         dropWeight: 0, // Unobtainable
         shop: true,
         usable: false,

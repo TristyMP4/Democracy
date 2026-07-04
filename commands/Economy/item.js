@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const ItemsConfig = require('../../configs/ItemsConfig.js');
+const EconomyConfig = require('../../configs/EconomyConfig.js');
 
 function getRarity(weight) {
     if (weight >= 60) return 'Common';
@@ -49,10 +50,13 @@ module.exports = {
         }
 
         const rarityString = getRarity(item.dropWeight || 100);
-        const sellableStr = item.sellable ? '✅ Yes' : '❌ No';
+        
+        const baseSellPrice = item.sellPrice !== undefined ? item.sellPrice : item.price;
+        const sellableStr = item.sellable && baseSellPrice ? `✅ Yes (${EconomyConfig.currencySymbol}${baseSellPrice.toLocaleString()})` : '❌ No';
+        
         const usableStr = item.usable ? '✅ Yes' : '❌ No';
         const emojiDisplay = item.emoji || '📦';
-        const priceDisplay = item.price ? `$${item.price.toLocaleString()}` : 'Not for sale';
+        const priceDisplay = item.price ? `${EconomyConfig.currencySymbol}${item.price.toLocaleString()}` : 'Not for sale';
 
         const titleDisplay = ComponentUtils.createText(`### ${emojiDisplay} **${item.name}**`);
         const descDisplay = ComponentUtils.createText(item.description || '*No description provided.*');

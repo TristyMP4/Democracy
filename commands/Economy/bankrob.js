@@ -73,7 +73,7 @@ module.exports = {
         const voteResult = await VoteManager.startVote(interaction, {
             title: '🏦 **Bank Heist**',
             description: `A heist is being organized against ${target}'s bank account!\n> You need ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.\n> If the heist fails, you will lose **${config.finePercentage * 100}%** of your money!`,
-            fixedRequiredVotes: 1,
+            fixedRequiredVotes: 2,
             duration: 150_000,
             requireOnline: true,
             targetId: target.id,
@@ -98,13 +98,21 @@ module.exports = {
             });
         }
 
-        const rollResult = await EconomyUtils.calculateLuckRoll(config.successChance);
+        const extraPeople = Math.max(0, yesVotes.size - 2);
+        const bonusChance = extraPeople * 0.05; // +5% per extra person beyond the first 2
+        const baseChance = Math.min(0.80, config.successChance + bonusChance);
+
+        const rollResult = await EconomyUtils.calculateLuckRoll(baseChance, interaction.user.id);
 
         if (rollResult.isSuccess) {
             const currentTargetProfile = await EconomyUtils.getUser(target.id);
             const targetBank = currentTargetProfile.bank;
             
-            const randomStealPct = Math.random() * (config.maxStealPercentage - config.minStealPercentage) + config.minStealPercentage;
+            const bonusSteal = extraPeople * 0.0625; // +6.25% steal per extra person
+            const calculatedMinSteal = Math.min(0.80, config.minStealPercentage + bonusSteal);
+            const calculatedMaxSteal = Math.min(1.0, config.maxStealPercentage + bonusSteal);
+
+            const randomStealPct = Math.random() * (calculatedMaxSteal - calculatedMinSteal) + calculatedMinSteal;
             let stolenAmount = Math.floor(targetBank * randomStealPct);
             
             if (stolenAmount <= 0) {
@@ -124,8 +132,10 @@ module.exports = {
                 await EconomyUtils.addCash(participantId, splitAmount, 'wallet');
             }
 
+            const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
+
             try {
-                await target.send(ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\n\nA crew broke into your vault and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!`));
+                await target.send(ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\nA crew broke into your bank account and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n\n**The Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
             } catch (err) {}
 
             await VoteManager.displayResult(message, {
@@ -144,10 +154,19 @@ module.exports = {
                 totalLost += actualRemoved;
             }
 
+            if (totalLost > 0) {
+                await EconomyUtils.addCash(target.id, totalLost, 'bank');
+            }
+
+            const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
+            try {
+                await target.send(ComponentUtils.createSuccess(`🛡️ **BANK HEIST THWARTED!** 🛡️\nA crew tried to rob your bank, but security stopped them! You were awarded ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}** from their fines as restitution.\n\n**The Failed Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
+            } catch (err) {}
+
             await VoteManager.displayResult(message, {
                 passed: false,
                 title: 'Heist Failed',
-                description: `The crew was caught!\n\n> Everyone lost **${config.finePercentage * 100}%** of their balance.\n> Total Fines Paid: ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}**`,
+                description: `The crew was caught!\n> Everyone lost **${config.finePercentage * 100}%** of their balance.\n> Restitution Paid to ${target}: ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}**`,
                 yesVotes, noVotes: new Set(), requiredVotes: 1
             });
         }

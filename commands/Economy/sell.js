@@ -89,7 +89,8 @@ module.exports = {
                 return submitted.followUp(ComponentUtils.createError(`You do not have enough **${itemConfig.name}** to sell that many!`));
             }
 
-            const totalValue = itemConfig.price * amount;
+            const basePrice = itemConfig.sellPrice !== undefined ? itemConfig.sellPrice : itemConfig.price;
+            const totalValue = basePrice * amount;
             const settings = await EconomyUtils.getSettings();
             
             const moneyResult = await EconomyUtils.calculateMoney(totalValue, interaction.user.id);
