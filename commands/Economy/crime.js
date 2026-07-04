@@ -57,11 +57,18 @@ module.exports = {
 
                 if (Math.random() < deathChance) {
                     await EconomyUtils.handleDeath(interaction.user.id);
+                    
+                    let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
+                    if (fine < 100) fine = 100;
+                    
+                    const msgTemplate = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
+                    const desc = `${msgTemplate}\n\n> **You were killed in the crossfire! Your wallet and inventory were wiped.**`;
 
                     const embed = new EmbedBuilder()
                         .setTitle('💀 Wasted')
-                        .setDescription(`Your crime went horribly wrong and you were killed in the crossfire! Your wallet and inventory were wiped.`)
-                        .setColor(EconomyConfig.failColor);
+                        .setDescription(desc)
+                        .setColor(EconomyConfig.failColor)
+                        .setFooter({ text: outcomeObj.signature });
                     return interaction.followUp({ embeds: [embed] });
                 }
                 

@@ -151,10 +151,15 @@ module.exports = {
 
                         if (Math.random() < deathChance) {
                             await EconomyUtils.handleDeath(interaction.user.id);
+                            
+                            const msgTemplate = outcomeObj.message;
+                            const desc = `${msgTemplate}\n\n> **You were killed! Your wallet and inventory were wiped.**`;
+
                             const resultEmbed = new EmbedBuilder()
                                 .setTitle(`💀 Wasted`)
-                                .setDescription(`You searched ${chosenLocation.name} but something went horribly wrong and you were killed! Your wallet and inventory were wiped.`)
-                                .setColor(EconomyConfig.failColor);
+                                .setDescription(desc)
+                                .setColor(EconomyConfig.failColor)
+                                .setFooter({ text: outcomeObj.signature });
 
                             return interaction.editReply({ embeds: [resultEmbed], components: [disabledRow] });
                         }
