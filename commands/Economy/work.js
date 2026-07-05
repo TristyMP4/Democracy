@@ -390,7 +390,7 @@ module.exports = {
         let displayList = [];
         for (let i = 0; i < 3; i++) {
             pairs.push({ word: shuffledWords[i], color: shuffledColors[i] });
-            displayList.push(`> ${shuffledColors[i].emoji} **${shuffledColors[i].name}** - ${shuffledWords[i]}`);
+            displayList.push(`> ${shuffledColors[i].emoji} \`${shuffledColors[i].name}\` - **${shuffledWords[i]}**`);
         }
 
         const container = new ContainerBuilder()

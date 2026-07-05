@@ -88,6 +88,7 @@ module.exports = {
                 // Failed - Calculate fine (based on total wealth to prevent stashing loopholes)
                 let fine = Math.floor((attackerData.wallet + attackerData.bank) * robConfig.finePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
+                if (robConfig.maxFine && fine > robConfig.maxFine) fine = robConfig.maxFine; // Cap fine
                 
                 const { actualRemoved } = await EconomyUtils.removeCash(interaction.user.id, fine, 'cascade');
 

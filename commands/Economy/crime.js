@@ -64,6 +64,7 @@ module.exports = {
                     
                     let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
                     if (fine < 100) fine = 100;
+                    if (crimeConfig.maxFine && fine > crimeConfig.maxFine) fine = crimeConfig.maxFine;
                     
                     const msgTemplate = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
                     const desc = `${msgTemplate}\n> **You were killed in the crime! Your wallet and inventory were wiped.**`;
@@ -78,6 +79,7 @@ module.exports = {
                 
                 let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
+                if (crimeConfig.maxFine && fine > crimeConfig.maxFine) fine = crimeConfig.maxFine; // Cap fine
                 
                 const { actualRemoved } = await EconomyUtils.removeCash(interaction.user.id, fine, 'cascade');
 

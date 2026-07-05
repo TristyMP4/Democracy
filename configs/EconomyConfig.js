@@ -41,6 +41,7 @@ module.exports = {
         minReward: 500,
         maxReward: 5000,
         finePercentage: 0.1, // Lose 10% of wallet on fail
+        maxFine: 20000, // Cap the fine at 20k
         successMessages: CrimeMessagesConfig.successMessages,
         failMessages: CrimeMessagesConfig.failMessages
     },
@@ -51,6 +52,7 @@ module.exports = {
         minStealPercentage: 0.05, // Steal at least 5% of target wallet
         maxStealPercentage: 0.15, // Steal up to 15% of target wallet
         finePercentage: 0.1, // Lose 10% of your own wallet on fail
+        maxFine: 20000, // Cap the fine at 20k
         minimumAmountToRob: 5000,
         cooldown: 300 * 1000 // 5 minutes (300 seconds) to milliseconds * 1000
     },
