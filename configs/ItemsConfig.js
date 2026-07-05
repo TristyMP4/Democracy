@@ -139,6 +139,17 @@ module.exports = {
         usable: true,
         sellable: true
     },
+    'milk': {
+        name: "Milk",
+        description: "Carton of Milk - Clears all active personal effects.",
+        emoji: '<:Milk:1523456911629090857>', 
+        price: 15000,
+        sellPrice: 2500,
+        dropWeight: 35,
+        usable: true,
+        shop: false,
+        sellable: true
+    },
     'crude-oil': {
         name: "Crude Oil",
         description: "A barrel of high quality oil.",

@@ -71,9 +71,9 @@ module.exports = {
                 // Consume 1 ammo
                 await EconomyUtils.removeItem(interaction.user.id, requiredAmmo, 1);
 
-                // Roll for hit/miss using damagePercentage
-                const hitChance = itemConfig.damagePercentage;
-                const isHit = Math.random() < hitChance;
+                // Roll for hit/miss using damagePercentage and shooter's Luck Multiplier
+                const hitRollResult = await EconomyUtils.calculateLuckRoll(itemConfig.damagePercentage, interaction.user.id);
+                const isHit = hitRollResult.isSuccess;
 
                 // Roll for durability
                 const durabilityChance = itemConfig.durabilityPercentage;
@@ -191,6 +191,30 @@ module.exports = {
 
                 const container = new ContainerBuilder()
                     .setAccentColor(isPositive ? EconomyConfig.successColor : EconomyConfig.failColor)
+                    .addTextDisplayComponents(titleDisplay)
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(descDisplay);
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            }
+
+            if (itemId === 'milk') {
+                userData.luckMultiplier = 1.0;
+                userData.luckExpiry = null;
+                
+                userData.moneyMultiplier = 1.0;
+                userData.moneyExpiry = null;
+                
+                userData.cooldownMultiplier = 1.0;
+                userData.cooldownExpiry = null;
+                
+                await userData.save();
+                
+                const titleDisplay = ComponentUtils.createText(`### 🥛 **You drank some Milk**`);
+                const descDisplay = ComponentUtils.createText(`-# Ah, refreshing! All of your active personal effects (luck, money, and cooldown multipliers) have been completely neutralized and wiped clean.`);
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(EconomyConfig.successColor)
                     .addTextDisplayComponents(titleDisplay)
                     .addSeparatorComponents(ComponentUtils.createSeparator())
                     .addTextDisplayComponents(descDisplay);

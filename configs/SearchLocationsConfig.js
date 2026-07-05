@@ -21,7 +21,7 @@ module.exports = [
         emoji: "🚗",
         minReward: 100,
         maxReward: 850,
-        possibleItems: ['weed', 'crude-oil'],
+        possibleItems: ['weed', 'crude-oil', 'milk'],
         successMessages: [
             { message: "You searched Porkies car and found **${amount}**!", signature: "a mediocre amount" }, 
             { message: "You grafted Porkies baby food and sold it for **${amount}**.", signature: "maybe that's why hes always hungry" },
