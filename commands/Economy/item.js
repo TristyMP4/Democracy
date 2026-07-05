@@ -14,6 +14,7 @@ function getRarity(weight) {
 }
 
 module.exports = {
+    economy: true,
     data: new SlashCommandBuilder()
         .setName('item')
         .setDescription('View detailed information about a specific item.')
