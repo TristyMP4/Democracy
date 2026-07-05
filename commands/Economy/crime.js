@@ -13,7 +13,7 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const user = await EconomyUtils.getUser(interaction.user.id);
+            let user = await EconomyUtils.getUser(interaction.user.id);
             const settings = await EconomyUtils.getSettings();
 
             const globalMultiplier = settings.cooldownMultiplier || 1.0;
