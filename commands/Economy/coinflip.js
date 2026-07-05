@@ -63,7 +63,7 @@ module.exports = {
                      .setDescription(`${embed.data.description}\n> 🎉 You won **${EconomyConfig.currencySymbol}${winnings.toLocaleString()}**!`);
             } else {
                 embed.setColor(EconomyConfig.failColor)
-                     .setDescription(`${embed.data.description}\n\n💀 You lost your bet of **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`);
+                     .setDescription(`${embed.data.description}\n> 💀 You lost your bet of **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`);
             }
 
             // Get updated balance
