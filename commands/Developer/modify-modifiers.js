@@ -72,7 +72,7 @@ module.exports = {
         const { ContainerBuilder } = require('discord.js');
         const container = new ContainerBuilder()
             .setAccentColor(0x2ecc71)
-            .addTextDisplayComponents(ComponentUtils.createText(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **x${value}**.\n\n${timeStr}`));
+            .addTextDisplayComponents(ComponentUtils.createText(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **x${value}**.\n${timeStr}`));
             
         return interaction.followUp(ComponentUtils.createContainerResponse(container));
     }

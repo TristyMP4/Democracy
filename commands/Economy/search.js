@@ -80,7 +80,8 @@ module.exports = {
                     const settings = await EconomyUtils.getSettings();
 
                     const outcomesConfig = EconomyConfig.searchSettings.outcomes;
-                    const luckMulti = settings.luckMultiplier || 1.0;
+                    const luckRoll = await EconomyUtils.calculateLuckRoll(1, interaction.user.id);
+                    const luckMulti = luckRoll.multiplier;
                     const weights = [
                         { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * luckMulti },
                         { type: 'itemOnly', weight: outcomesConfig.itemOnly * luckMulti },

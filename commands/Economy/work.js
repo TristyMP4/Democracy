@@ -276,7 +276,7 @@ module.exports = {
 
             const shiftContainer = new ContainerBuilder()
                 .setAccentColor(0x2ecc71)
-                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`👔 **Shift Completed!**\nYou finished your shift as a **${jobConfig.name}** and got paid ${EconomyConfig.currencySymbol}**${salaryResult.finalAmount.toLocaleString()}**!${bonusText}`));
+                .addTextDisplayComponents(new TextDisplayBuilder().setContent(`🎩 **Shift Completed!**\nYou finished your shift as a **${jobConfig.name}** and got paid ${EconomyConfig.currencySymbol}**${salaryResult.finalAmount.toLocaleString()}**!${bonusText}`));
             return interaction.editReply(ComponentUtils.createContainerResponse(shiftContainer));
         } else {
             await userData.save();
