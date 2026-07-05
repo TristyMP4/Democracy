@@ -265,7 +265,7 @@ module.exports = {
 
         if (wonMinigame) {
             const salaryResult = await EconomyUtils.calculateMoney(jobConfig.salary, interaction.user.id);
-            await EconomyUtils.addCash(interaction.user.id, salaryResult.finalAmount, 'wallet');
+            await EconomyUtils.addCash(interaction.user.id, salaryResult.finalAmount, 'bank');
             await userData.save();
 
             let bonusText = '';
