@@ -75,6 +75,7 @@ async function InteractionHandler(interaction, type) {
                 if (interaction.commandName === 'blackjack' && interaction.options.getUser('opponent1')) isMultiplayer = true;
                 
                 if (onlineCount < 4 && !isMultiplayer && interaction.deferReply && interaction.reply) {
+                    interaction.economySpamPrevention = true;
                     const originalDefer = interaction.deferReply.bind(interaction);
                     interaction.deferReply = async (options = {}) => {
                         options.ephemeral = true;

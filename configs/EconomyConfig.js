@@ -88,6 +88,7 @@ module.exports = {
         },
         blackjack: {
             dealerHitSoft17: true, // Standard rule
+            dealerMaxScore: 17, // Dealer cannot exceed this score (unless they bust)
             multiplayerJoinTime: 30000 // 30 seconds to join
         }
     }

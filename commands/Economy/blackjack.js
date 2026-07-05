@@ -250,6 +250,11 @@ module.exports = {
                     dealerScore = CardUtils.calculateScore(dealer.hand);
                 }
             }
+            
+            // Apply dealer max score cap
+            if (EconomyConfig.gambling.blackjack.dealerMaxScore && dealerScore > EconomyConfig.gambling.blackjack.dealerMaxScore && dealerScore <= 21) {
+                dealerScore = EconomyConfig.gambling.blackjack.dealerMaxScore;
+            }
 
             // Evaluation
             const finalEmbed = generateGameStateEmbed(-1, false);
@@ -353,7 +358,8 @@ module.exports = {
                 await interaction.editReply({ embeds: [finalEmbed], components: [] });
                 try {
                     const gameMsg = await interaction.fetchReply();
-                    await interaction.channel.send({ content: `🃏 <@${interaction.user.id}> The multiplayer Blackjack game finished!\n> [Click here to view results](${gameMsg.url})` });
+                    const mentions = players.map(p => `<@${p.user.id}>`).join(' ');
+                    await interaction.channel.send({ content: `🃏 ${mentions} The multiplayer Blackjack game finished!\n> [Click here to view results](${gameMsg.url})` });
                 } catch (e) {}
             }
 

@@ -108,7 +108,7 @@ module.exports = {
             }).catch(() => null);
 
             if (!submitted) return;
-            await submitted.deferReply();
+            await submitted.deferReply({ ephemeral: interaction.economySpamPrevention === true });
 
             userData = await EconomyUtils.getUser(interaction.user.id);
 
