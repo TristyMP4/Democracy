@@ -45,10 +45,11 @@ module.exports = {
             // Take money
             await EconomyUtils.removeCash(interaction.user.id, bet, 'cascade');
 
-            // Roll
-            const isHeads = Math.random() < 0.5;
-            const resultSide = isHeads ? 'heads' : 'tails';
-            const won = resultSide === chosenSide;
+            // Roll (45% chance of winning)
+            const won = Math.random() < 0.45;
+            
+            // Set the visual result side based on whether they won or lost
+            const resultSide = won ? chosenSide : (chosenSide === 'heads' ? 'tails' : 'heads');
 
             const embed = new EmbedBuilder()
                 .setTitle('🪙 Coin Flip')

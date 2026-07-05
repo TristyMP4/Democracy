@@ -62,7 +62,11 @@ module.exports = {
                 if (Math.random() < deathChance) {
                     await EconomyUtils.handleDeath(interaction.user.id);
                     
-                    let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
+                    const safeLuck = Math.max(0.01, rollResult.multiplier);
+                    const randomSkew = Math.pow(Math.random(), safeLuck);
+                    const adjustedFinePercentage = crimeConfig.finePercentage * randomSkew;
+                    
+                    let fine = Math.floor((user.wallet + user.bank) * adjustedFinePercentage);
                     if (fine < 100) fine = 100;
                     if (crimeConfig.maxFine && fine > crimeConfig.maxFine) fine = crimeConfig.maxFine;
                     
@@ -77,7 +81,11 @@ module.exports = {
                     return interaction.followUp({ embeds: [embed] });
                 }
                 
-                let fine = Math.floor((user.wallet + user.bank) * crimeConfig.finePercentage);
+                const safeLuck = Math.max(0.01, rollResult.multiplier);
+                const randomSkew = Math.pow(Math.random(), safeLuck);
+                const adjustedFinePercentage = crimeConfig.finePercentage * randomSkew;
+                
+                let fine = Math.floor((user.wallet + user.bank) * adjustedFinePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
                 if (crimeConfig.maxFine && fine > crimeConfig.maxFine) fine = crimeConfig.maxFine; // Cap fine
                 

@@ -50,7 +50,7 @@ module.exports = {
     rob: {
         successChance: 0.4, // Base 40% chance of success
         minStealPercentage: 0.05, // Steal at least 5% of target wallet
-        maxStealPercentage: 0.15, // Steal up to 15% of target wallet
+        maxStealPercentage: 0.25, // Steal up to 25% of target wallet
         finePercentage: 0.1, // Lose 10% of your own wallet on fail
         maxFine: 20000, // Cap the fine at 20k
         minimumAmountToRob: 5000,

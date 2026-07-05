@@ -62,7 +62,11 @@ module.exports = {
                 const stealMin = targetData.wallet * robConfig.minStealPercentage;
                 const stealMax = targetData.wallet * robConfig.maxStealPercentage;
                 
-                let stealAmount = Math.round(Math.random() * (stealMax - stealMin) + stealMin);
+                // Luck bends the curve: high luck pushes towards 25%, bad luck pushes towards 5%
+                const safeLuck = Math.max(0.01, rollResult.multiplier);
+                const randomSkew = Math.pow(Math.random(), 1.0 / safeLuck);
+                
+                let stealAmount = Math.round(randomSkew * (stealMax - stealMin) + stealMin);
                 if (stealAmount < 1) stealAmount = 1; // Always steal at least 1 if successful and they have money
                 if (stealAmount > targetData.wallet) stealAmount = targetData.wallet;
 
@@ -86,7 +90,13 @@ module.exports = {
                 attackerData = await EconomyUtils.getUser(interaction.user.id);
 
                 // Failed - Calculate fine (based on total wealth to prevent stashing loopholes)
-                let fine = Math.floor((attackerData.wallet + attackerData.bank) * robConfig.finePercentage);
+                // Fine is a random percentage up to the config cap (10%).
+                // Luck multiplier bends the curve: bad luck pushes it towards 10%, good luck pushes it towards 0%
+                const safeLuck = Math.max(0.01, rollResult.multiplier);
+                const randomSkew = Math.pow(Math.random(), safeLuck);
+                const adjustedFinePercentage = robConfig.finePercentage * randomSkew;
+                
+                let fine = Math.floor((attackerData.wallet + attackerData.bank) * adjustedFinePercentage);
                 if (fine < 100) fine = 100; // Minimum fine
                 if (robConfig.maxFine && fine > robConfig.maxFine) fine = robConfig.maxFine; // Cap fine
                 
