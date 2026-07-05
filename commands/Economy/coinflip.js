@@ -8,11 +8,10 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('coinflip')
         .setDescription('Flip a coin to double your money!')
-        .addIntegerOption(option => 
+        .addStringOption(option => 
             option.setName('bet')
-                .setDescription('The amount of money to bet')
+                .setDescription('The amount of money to bet (e.g. 1k, half, all)')
                 .setRequired(true)
-                .setMinValue(100)
         )
         .addStringOption(option => 
             option.setName('side')
@@ -28,10 +27,17 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const bet = interaction.options.getInteger('bet');
+            const betInput = interaction.options.getString('bet');
             const chosenSide = interaction.options.getString('side');
 
             let user = await EconomyUtils.getUser(interaction.user.id);
+            const parseAmount = require('../../utils/AmountParser.js');
+            const bet = parseAmount(betInput, user.wallet + user.bank);
+
+            if (bet < 100) {
+                return interaction.followUp(ComponentUtils.createError(`The minimum bet is **${EconomyConfig.currencySymbol}100**.`));
+            }
+
             if ((user.wallet + user.bank) < bet) {
                 return interaction.followUp(ComponentUtils.createError(`You do not have enough money to bet **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`));
             }

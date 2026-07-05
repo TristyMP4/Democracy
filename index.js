@@ -74,7 +74,7 @@ async function InteractionHandler(interaction, type) {
                 if (interaction.commandName === 'bankrob') isMultiplayer = true;
                 if (interaction.commandName === 'blackjack' && interaction.options.getUser('opponent1')) isMultiplayer = true;
                 
-                if (onlineCount < 4 && !isMultiplayer) {
+                if (onlineCount < 4 && !isMultiplayer && interaction.deferReply && interaction.reply) {
                     const originalDefer = interaction.deferReply.bind(interaction);
                     interaction.deferReply = async (options = {}) => {
                         options.ephemeral = true;
@@ -183,6 +183,7 @@ async function InteractionHandler(interaction, type) {
         }
     } catch (error) {
         console.error(error);
+        if (interaction.isAutocomplete()) return;
 		// If there is already a response, say after a deferReply(), we override the response with an error message.
         await interaction.deferReply({ ephemeral: true }).catch( () => {} );
         await interaction.editReply({

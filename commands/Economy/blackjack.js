@@ -9,11 +9,10 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('blackjack')
         .setDescription('Play a game of Blackjack solo or against others!')
-        .addIntegerOption(option => 
+        .addStringOption(option => 
             option.setName('bet')
-                .setDescription('The amount of money to bet')
+                .setDescription('The amount of money to bet (e.g. 1k, half, all)')
                 .setRequired(true)
-                .setMinValue(100)
         )
         .addUserOption(option => 
             option.setName('opponent1')
@@ -30,7 +29,7 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const bet = interaction.options.getInteger('bet');
+            const betInput = interaction.options.getString('bet');
             const opp1 = interaction.options.getUser('opponent1');
             const opp2 = interaction.options.getUser('opponent2');
 
@@ -41,8 +40,15 @@ module.exports = {
 
             const isMultiplayer = participants.length > 1;
 
-            // Check host balance
+            // Check host balance and parse bet
             const hostData = await EconomyUtils.getUser(interaction.user.id);
+            const parseAmount = require('../../utils/AmountParser.js');
+            const bet = parseAmount(betInput, hostData.wallet + hostData.bank);
+
+            if (bet < 100) {
+                return interaction.followUp(ComponentUtils.createError(`The minimum bet is **${EconomyConfig.currencySymbol}100**.`));
+            }
+
             if ((hostData.wallet + hostData.bank) < bet) {
                 return interaction.followUp(ComponentUtils.createError(`You do not have enough money to bet **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`));
             }

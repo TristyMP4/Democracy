@@ -294,7 +294,7 @@ module.exports = {
             .setAccentColor(EconomyConfig.embedColor)
             .addTextDisplayComponents(ComponentUtils.createText(`### 🧠 Memory Minigame\nMemorize the exact order of these 5 words. You have **3 seconds**...\n\n${displayList}`));
             
-        const message = await interaction.followUp({ ...ComponentUtils.createContainerResponse(container), fetchReply: true });
+        await interaction.editReply(ComponentUtils.createContainerResponse(container));
         
         // Wait 3 seconds
         await new Promise(r => setTimeout(r, 3000));
@@ -314,7 +314,7 @@ module.exports = {
         const activePayload = ComponentUtils.createContainerResponse(activeContainer);
         activePayload.components.push(row);
         
-        await message.edit(activePayload);
+        const message = await interaction.editReply(activePayload);
 
         return new Promise((resolve) => {
             const collector = message.createMessageComponentCollector({ time: 30000 });
@@ -395,12 +395,12 @@ module.exports = {
 
         const container = new ContainerBuilder()
             .setAccentColor(EconomyConfig.embedColor)
-            .addTextDisplayComponents(ComponentUtils.createText(`### 🎨 Color Minigame\nMemorize which word belongs to which color. You have **3 seconds**...\n\n${displayList.join('\n')}`));
+            .addTextDisplayComponents(ComponentUtils.createText(`### 🎨 Color Minigame\nMemorize which word belongs to which color. You have **5 seconds**...\n\n${displayList.join('\n')}`));
             
-        const message = await interaction.followUp({ ...ComponentUtils.createContainerResponse(container), fetchReply: true });
+        await interaction.editReply(ComponentUtils.createContainerResponse(container));
         
         // Wait 3 seconds
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 5000));
 
         // Pick 1 random target word
         const targetPair = pairs[Math.floor(Math.random() * pairs.length)];
@@ -418,7 +418,7 @@ module.exports = {
         const activePayload = ComponentUtils.createContainerResponse(activeContainer);
         activePayload.components.push(row);
         
-        await message.edit(activePayload);
+        const message = await interaction.editReply(activePayload);
 
         return new Promise((resolve) => {
             const collector = message.createMessageComponentCollector({ time: 15000, max: 1 });
