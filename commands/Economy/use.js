@@ -107,7 +107,7 @@ module.exports = {
                 if (breaks) {
                     // Break the gun
                     await EconomyUtils.removeItem(interaction.user.id, itemId, 1);
-                    actionText += `\n\n> 🔧 **Snap!** Your ${itemConfig.name} broke after the shot!`;
+                    actionText += `\n> 🔧 **Snap!** Your ${itemConfig.name} broke after the shot!`;
                 }
 
                 const container = new ContainerBuilder()
