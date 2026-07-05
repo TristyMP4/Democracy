@@ -7,7 +7,7 @@ module.exports = {
     owner: true,
     data: new SlashCommandBuilder()
         .setName('set-cooldown')
-        .setDescription('Extend or shorten a user\'s current cooldown. (DEV ONLY)')
+        .setDescription('Extend or shorten a user\'s current cooldown.')
         .addUserOption(option => 
             option.setName('user')
                 .setDescription('The user to modify')

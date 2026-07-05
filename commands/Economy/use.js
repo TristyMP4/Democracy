@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ContainerBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, EmbedBuilder } = require('discord.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
@@ -20,7 +20,12 @@ module.exports = {
                 }
             });
             return opt;
-        }),
+        })
+        .addUserOption(option => 
+            option.setName('target')
+                .setDescription('The user to target (required for weapons)')
+                .setRequired(false)
+        ),
 
     async execute(interaction) {
         await interaction.deferReply();
@@ -38,8 +43,81 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You do not have a **${itemConfig.name}** in your inventory!`));
             }
 
-            // Consume item
-            await EconomyUtils.removeItem(interaction.user.id, itemId, 1);
+            // We do not consume guns automatically, they only break on durability rolls
+            const isGun = itemConfig.damagePercentage !== undefined;
+            if (!isGun) {
+                await EconomyUtils.removeItem(interaction.user.id, itemId, 1);
+            }
+
+            if (isGun) {
+                const target = interaction.options.getUser('target');
+                if (!target) {
+                    return interaction.followUp(ComponentUtils.createError('You must specify a `target` to shoot a gun!'));
+                }
+                if (target.bot) {
+                    return interaction.followUp(ComponentUtils.createError('You cannot shoot a bot!'));
+                }
+                if (target.id === interaction.user.id) {
+                    return interaction.followUp(ComponentUtils.createError('You cannot shoot yourself!'));
+                }
+                
+                // Check ammo
+                const requiredAmmo = itemConfig.ammo[0];
+                if (!userData.inventory || !userData.inventory.get(requiredAmmo) || userData.inventory.get(requiredAmmo) < 1) {
+                    const ammoName = EconomyConfig.items[requiredAmmo].name;
+                    return interaction.followUp(ComponentUtils.createError(`You need at least 1x **${ammoName}** to fire the ${itemConfig.name}!`));
+                }
+
+                // Consume 1 ammo
+                await EconomyUtils.removeItem(interaction.user.id, requiredAmmo, 1);
+
+                // Roll for hit/miss using damagePercentage
+                const hitChance = itemConfig.damagePercentage;
+                const isHit = Math.random() < hitChance;
+
+                // Roll for durability
+                const durabilityChance = itemConfig.durabilityPercentage;
+                const breaks = Math.random() >= durabilityChance;
+
+                let actionText = '';
+                
+                try {
+                    const dmEmbed = new EmbedBuilder()
+                        .setTitle('🔫 You were shot at!')
+                        .setColor(isHit ? EconomyConfig.failColor : EconomyConfig.successColor);
+
+                    if (isHit) {
+                        dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!`);
+                    } else {
+                        dmEmbed.setDescription(`**${interaction.user.username}** shot at you with their ${itemConfig.name} but **missed**! You survived!`);
+                    }
+                    await target.send({ embeds: [dmEmbed] });
+                } catch (e) {
+                    // Ignore DM errors
+                }
+                
+                if (isHit) {
+                    // Kill target
+                    const deathResult = await EconomyUtils.handleDeath(target.id);
+                    actionText = `💥 **BOOM!** You shot <@${target.id}> with the ${itemConfig.name} and killed them!\n${deathResult.message}`;
+                } else {
+                    actionText = `💨 **WHOOSH!** You shot at <@${target.id}> with the ${itemConfig.name} but missed!`;
+                }
+
+                if (breaks) {
+                    // Break the gun
+                    await EconomyUtils.removeItem(interaction.user.id, itemId, 1);
+                    actionText += `\n\n> 🔧 **Snap!** Your ${itemConfig.name} broke after the shot!`;
+                }
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(isHit ? EconomyConfig.failColor : 0x2b2d31) // subtle grey or fail red
+                    .addTextDisplayComponents(ComponentUtils.createText(`### 🔫 **Shots Fired!**`))
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(ComponentUtils.createText(actionText));
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            }
 
             // Execute custom logic based on item
             if (itemId === 'supply-signal') {
@@ -89,21 +167,23 @@ module.exports = {
             }
 
             if (itemId === 'weed') {
+                const currentMultiplier = (userData.luckExpiry && userData.luckExpiry > new Date()) ? (userData.luckMultiplier || 1.0) : 1.0;
+                
                 const isPositive = Math.random() >= 0.5;
-                const multiplier = isPositive ? 1.5 : -0.5;
+                const diff = isPositive ? 0.5 : -0.5;
                 
                 const expiry = new Date();
                 expiry.setMinutes(expiry.getMinutes() + 10);
                 
-                userData.luckMultiplier = multiplier;
+                userData.luckMultiplier = currentMultiplier + diff;
                 userData.luckExpiry = expiry;
                 await userData.save();
                 
                 let textDesc = '';
                 if (isPositive) {
-                    textDesc = `You smoked the Weed and suddenly feel hyper-focused! Your individual luck multiplier has **increased** (+1.5x) for the next 10 minutes!`;
+                    textDesc = `You smoked the Weed and suddenly feel hyper-focused! Your individual luck multiplier has **increased** (+0.5x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
                 } else {
-                    textDesc = `You smoked the Weed but it was laced with something foul... You feel sluggish and your individual luck multiplier has **decreased** (-1.5x) for the next 10 minutes!`;
+                    textDesc = `You smoked the Weed but it was laced with something foul... You feel sluggish and your individual luck multiplier has **decreased** (-0.5x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
                 }
                 
                 const titleDisplay = ComponentUtils.createText(`### 🌿 **You smoked some Weed**`);

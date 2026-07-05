@@ -49,7 +49,8 @@ module.exports = {
             );
         }
 
-        const rarityString = getRarity(item.dropWeight || 100);
+        const actualWeight = item.dropWeight !== undefined ? item.dropWeight : 100;
+        const rarityString = getRarity(actualWeight);
         
         const baseSellPrice = item.sellPrice !== undefined ? item.sellPrice : item.price;
         const sellableStr = item.sellable && baseSellPrice ? `✅ Yes (${EconomyConfig.currencySymbol}${baseSellPrice.toLocaleString()})` : '❌ No';
@@ -62,7 +63,7 @@ module.exports = {
         const descDisplay = ComponentUtils.createText(item.description || '*No description provided.*');
         
         const priceField = ComponentUtils.createText(`**Value**\n${priceDisplay}`);
-        const rarityField = ComponentUtils.createText(`**Rarity**\n${rarityString} *(Weight: ${item.dropWeight || 0})*`);
+        const rarityField = ComponentUtils.createText(`**Rarity**\n${rarityString} *(Weight: ${actualWeight})*`);
         
         const sellableField = ComponentUtils.createText(`**Sellable**\n${sellableStr}`);
         const usableField = ComponentUtils.createText(`**Usable**\n${usableStr}`);

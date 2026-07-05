@@ -4,7 +4,7 @@ module.exports = {
     owner: true,
     data: new SlashCommandBuilder()
         .setName('changelog')
-        .setDescription('Public a changelog message to a specific channel.')
+        .setDescription('Publish a changelog message to a specific channel.')
         .addChannelOption(option =>
             option.setName('channel')
                 .setDescription('The channel to send the changelog to')

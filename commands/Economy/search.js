@@ -155,10 +155,10 @@ module.exports = {
                         const deathChance = outcomeObj.deathChance || 0;
 
                         if (Math.random() < deathChance) {
-                            await EconomyUtils.handleDeath(interaction.user.id);
+                            const deathResult = await EconomyUtils.handleDeath(interaction.user.id);
                             
                             const msgTemplate = outcomeObj.message;
-                            const desc = `${msgTemplate}\n> **You were killed! Your wallet and inventory were wiped.**`;
+                            const desc = `${msgTemplate}\n${deathResult.message}`;
 
                             const resultEmbed = new EmbedBuilder()
                                 .setTitle(`🔍 ${interaction.user.username} searched ${chosenLocation.name} | and they died 💀`)
@@ -186,7 +186,7 @@ module.exports = {
                         if (droppedItem && rewardMoney > 0) {
                             resultMessage += `\n> And you lucky ducky, you also found ${droppedItem.emoji} **${droppedItem.name}**!`;
                         } else if (droppedItem && rewardMoney === 0) {
-                            resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\nHowever, you did find ${droppedItem.emoji} **${droppedItem.name}**!`;
+                            resultMessage = `You searched ${chosenLocation.name} but couldn't find any cash.\n> However, you did find ${droppedItem.emoji} **${droppedItem.name}**!`;
                         }
 
                         let footerText = outcomeObj.signature;

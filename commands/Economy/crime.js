@@ -60,7 +60,8 @@ module.exports = {
                 const deathChance = outcomeObj.deathChance || 0;
 
                 if (Math.random() < deathChance) {
-                    await EconomyUtils.handleDeath(interaction.user.id);
+                    const deathResult = await EconomyUtils.handleDeath(interaction.user.id);
+                    user = deathResult.user;
                     
                     const safeLuck = Math.max(0.01, rollResult.multiplier);
                     const randomSkew = Math.pow(Math.random(), safeLuck);
@@ -71,7 +72,7 @@ module.exports = {
                     if (crimeConfig.maxFine && fine > crimeConfig.maxFine) fine = crimeConfig.maxFine;
                     
                     const msgTemplate = outcomeObj.message.replace('${fine}', `${EconomyConfig.currencySymbol}${fine.toLocaleString()}`);
-                    const desc = `${msgTemplate}\n> **You were killed in the crime! Your wallet and inventory were wiped.**`;
+                    const desc = `${msgTemplate}\n${deathResult.message}`;
 
                     const embed = new EmbedBuilder()
                         .setTitle(`${interaction.user.displayName} commited a crime | and they died 💀`)

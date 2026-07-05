@@ -6,7 +6,7 @@ module.exports = {
     owner: true,
     data: new SlashCommandBuilder()
         .setName('modify-modifiers')
-        .setDescription('Modify the current multipliers/modifiers of a specific user. (DEV ONLY)')
+        .setDescription('Modify the current multipliers/modifiers of a specific user.')
         .addUserOption(option => 
             option.setName('user')
                 .setDescription('The user to modify')

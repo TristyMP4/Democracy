@@ -109,7 +109,14 @@ module.exports = {
 
             // Calculate Totals
             const totalMoney = Math.max(0, (settings.moneyMultiplier || 1.0) + ((userData.moneyMultiplier || 1.0) - 1.0));
-            const totalLuck = Math.max(0, (settings.luckMultiplier || 1.0) + ((userData.luckMultiplier || 1.0) - 1.0));
+            
+            let rawLuckMulti = (settings.luckMultiplier || 1.0) + ((userData.luckMultiplier || 1.0) - 1.0);
+            let totalLuck;
+            if (rawLuckMulti >= 0.05) {
+                totalLuck = rawLuckMulti;
+            } else {
+                totalLuck = 0.05 * Math.exp(rawLuckMulti - 0.05);
+            }
             
             embed.addFields({ 
                 name: '📊 Total Effective Rates', 

@@ -148,11 +148,27 @@ module.exports = {
      * Handles a user's death by wiping their wallet and stripping their inventory
      * conditionally based on EconomyConfig
      * @param {string} userId The discord user ID
-     * @returns {Promise<EconomyUser>}
+     * @returns {Promise<{user: EconomyUser, saved: boolean, message: string}>}
      */
     async handleDeath(userId) {
         const user = await this.getUser(userId);
         
+        // Check for life-saver
+        if (user.inventory && user.inventory.get('life-saver') > 0) {
+            const currentCount = user.inventory.get('life-saver');
+            if (currentCount === 1) {
+                user.inventory.delete('life-saver');
+            } else {
+                user.inventory.set('life-saver', currentCount - 1);
+            }
+            await user.save();
+            return { 
+                user, 
+                saved: true, 
+                message: "> **You died, but your 💝Life Saver saved you!**" 
+            };
+        }
+
         // Wipe wallet completely
         user.wallet = 0;
 
@@ -180,7 +196,11 @@ module.exports = {
         }
 
         await user.save();
-        return user;
+        return { 
+            user, 
+            saved: false, 
+            message: "> **You were killed! Your wallet and inventory were wiped.**" 
+        };
     },
 
     /**

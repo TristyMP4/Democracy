@@ -3,24 +3,32 @@ module.exports = {
         name: 'AK-Alpha',
         description: 'A powerful assault rifle crafted from modern polymers. - High Fire Rate',
         emoji: '<:AK109Alpha:1521922025336082576>',
+        ammo: ["762x39-rifle-ammo"], 
+        damagePercentage: 0.55,
+        durabilityPercentage: 0.50,
         price: 50000,
         sellPrice: 10000,
         dropWeight: 10, // Very Rare
+        usable: true,
         sellable: true
     },
     'xm-250': {
         name: 'XM-250',
         description: 'Devastating heavy machine gun, tears through anything you throw its way. - Dropped by the Collector.',
         emoji: '<:XM250:1521922031241789510>', 
-        price: 60000,
+        ammo: ["762x39-rifle-ammo"], 
+        damagePercentage: 0.7,
+        durabilityPercentage: 0.45,
+        price: 85000,
         dropWeight: 3, // Legendary
+        usable: true,
         sellable: true
     },
     'collector-armour-rig': {
         name: 'Collector Armour Rig',
         description: 'A heavy duty chest-rig belonging to the Collector.',
         emoji: '<:CollectorRig:1521922849898762310>', 
-        price: 50000,
+        price: 65000,
         dropWeight: 3, // Legendary
         sellable: true
     },
@@ -28,37 +36,79 @@ module.exports = {
         name: 'Thompson',
         description: 'A mid tier SMG that is a reliable choice in a gunfight.',
         emoji: '<:Thompson:1521922029790433525>',
+        ammo: ["pistol-ammo"], 
+        damagePercentage: 0.40,
+        durabilityPercentage: 0.40,
         price: 20000,
         sellPrice: 8500,
         dropWeight: 20, // Rare
+        usable: true,
         sellable: true
     },
     'semi-automatic-pistol': {
         name: 'Semi Automatic Pistol',
         description: 'A reliable handgun that can open the door to a snowball.',
-        emoji: '<:SemiAutomaticPistol:1521922027013931009>', 
+        emoji: '<:SemiAutomaticPistol:1521922027013931009>',
+        ammo: ["pistol-ammo"], 
+        damagePercentage: 0.30,
+        durabilityPercentage: 0.20,
         price: 3000,
         sellPrice: 2000, 
         dropWeight: 65, // Common
+        usable: true,
         sellable: true
     },
     'semi-automatic-rifle': {
         name: 'Semi Automatic Rifle',
-        description: 'High damaging semi rifle chambered in 5.56',
-        emoji: '<:SemiAutomaticRifle:1521922028368826398>', 
+        description: 'Medium damaging semi rifle chambered in 5.56',
+        emoji: '<:SemiAutomaticRifle:1521922028368826398>',
+        ammo: ["556-rifle-ammo"], 
+        damagePercentage: 0.45,
+        durabilityPercentage: 0.35,
         price: 15000,
         dropWeight: 30, // Rare
         shop: true,
+        usable: true,
         sellable: true
     },
     'supply-signal': {
         name: 'Supply Signal',
         description: 'Call in a supply drop. Use this item to receive 1-3 random items!',
         emoji: '<:SupplySignal:1521922411153326120>', 
-        price: 200000,
+        price: 850000,
         sellPrice: 50000,
         dropWeight: 3, // Epic
         usable: true,
+        sellable: true
+    },
+    '556-rifle-ammo': {
+        name: '5.56 Rifle Ammo',
+        description: 'Ammunition for medium caliber rifles.',
+        emoji: '<:556_Rifle:1523347950825246741>', 
+        price: 850000,
+        sellPrice: 50000,
+        dropWeight: 3, // Epic
+        usable: false,
+        sellable: true
+    },
+    '762x39-rifle-ammo': {
+        name: '7.62x39 Rifle Ammo',
+        description: 'Ammunition for higher caliber rifles.',
+        emoji: '<:762x39_Rifle:1523348831004262490>', 
+        price: 850000,
+        sellPrice: 50000,
+        dropWeight: 3, // Epic
+        usable: false,
+        sellable: true
+    },
+    'pistol-ammo': {
+        name: '9x19 Pistol Ammo',
+        description: 'Ammunition for higher caliber rifles.',
+        emoji: '<:Pistol_Ammo:1523350997202763806>', 
+        price: 850000,
+        sellPrice: 50000,
+        dropWeight: 3, // Epic
+        usable: false,
         sellable: true
     },
     'wet-willow': {
@@ -74,7 +124,7 @@ module.exports = {
         name: "Sock",
         description: "A damp wet sock..",
         emoji: '🧦', 
-        price: 500,
+        price: 850,
         dropWeight: 40, // Uncommon
         usable: false,
         sellable: true
