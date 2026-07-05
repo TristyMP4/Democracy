@@ -133,8 +133,8 @@ module.exports = {
         name: "Weed",
         description: "A small tuft of weed ready. Smoking it seems to bring a lucky reward..",
         emoji: '<:WeedDoob:1521922663705215126>', 
-        price: 50000,
-        sellPrice: 7500,
+        price: 125000,
+        sellPrice: 12500,
         dropWeight: 50, // Relatively Common
         usable: true,
         sellable: true
@@ -143,8 +143,8 @@ module.exports = {
         name: "Lucky Coin",
         description: "Flip the coin to see if it brings you fortune... or poverty.",
         emoji: '🪙', 
-        price: 75000,
-        sellPrice: 9500,
+        price: 175000,
+        sellPrice: 15000,
         dropWeight: 45,
         usable: true,
         sellable: true
