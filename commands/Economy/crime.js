@@ -29,11 +29,11 @@ module.exports = {
             await user.save(); // Save cooldown immediately so they can't spam while it processes
 
             const crimeConfig = EconomyConfig.crime;
-            const rollResult = await EconomyUtils.calculateLuckRoll(crimeConfig.successChance);
+            const rollResult = await EconomyUtils.calculateLuckRoll(crimeConfig.successChance, interaction.user.id);
 
             if (rollResult.isSuccess) {
                 let baseReward = Math.floor(Math.random() * (crimeConfig.maxReward - crimeConfig.minReward + 1)) + crimeConfig.minReward;
-                const moneyResult = await EconomyUtils.calculateMoney(baseReward);
+                const moneyResult = await EconomyUtils.calculateMoney(baseReward, interaction.user.id);
 
                 await EconomyUtils.addCash(interaction.user.id, moneyResult.finalAmount, 'wallet');
 

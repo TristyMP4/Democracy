@@ -289,7 +289,8 @@ module.exports = {
                 finalEmbed.setDescription(`### Result\n${resultMsg}`);
                 await interaction.editReply({ embeds: [finalEmbed], components: [] });
                 try {
-                    await interaction.channel.send({ content: `<@${interaction.user.id}> Your Blackjack game finished!`, embeds: [finalEmbed] });
+                    const gameMsg = await interaction.fetchReply();
+                    await interaction.channel.send({ content: `🃏 <@${interaction.user.id}> Your Blackjack game finished!\n> [Click here to view results](${gameMsg.url})` });
                 } catch (e) {}
 
             } else {
@@ -345,7 +346,8 @@ module.exports = {
                 finalEmbed.setDescription(`### Result\n${resultMsg}`);
                 await interaction.editReply({ embeds: [finalEmbed], components: [] });
                 try {
-                    await interaction.channel.send({ content: `<@${interaction.user.id}> The multiplayer Blackjack game finished!`, embeds: [finalEmbed] });
+                    const gameMsg = await interaction.fetchReply();
+                    await interaction.channel.send({ content: `🃏 <@${interaction.user.id}> The multiplayer Blackjack game finished!\n> [Click here to view results](${gameMsg.url})` });
                 } catch (e) {}
             }
 

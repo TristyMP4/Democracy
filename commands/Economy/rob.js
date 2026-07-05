@@ -55,7 +55,7 @@ module.exports = {
             await attackerData.save(); // Save the cooldown
 
             const robConfig = EconomyConfig.rob;
-            const rollResult = await EconomyUtils.calculateLuckRoll(robConfig.successChance);
+            const rollResult = await EconomyUtils.calculateLuckRoll(robConfig.successChance, interaction.user.id);
 
             if (rollResult.isSuccess) {
                 // Calculate steal amount based on target's wallet

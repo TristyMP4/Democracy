@@ -223,7 +223,7 @@ module.exports = {
 
         await message.edit(ComponentUtils.createContainerResponse(resultContainer));
         try {
-            await message.channel.send(ComponentUtils.createContainerResponse(resultContainer));
+            await message.channel.send({ content: `🏁 **The vote has concluded!**\n> [Click here to view the final results](${message.url})` });
         } catch (e) {}
     }
 };

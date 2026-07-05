@@ -217,7 +217,9 @@ module.exports = {
         const user = userId ? await this.getUser(userId) : { moneyMultiplier: 1.0 };
         
         // Additive stacking: Global 1.5x + User 1.5x = 2.0x (since base is 1.0)
-        let multiplier = Math.max(0, (settings.moneyMultiplier || 1.0) + ((user.moneyMultiplier || 1.0) - 1.0));
+        let globalMoney = settings.moneyMultiplier !== undefined ? settings.moneyMultiplier : 1.0;
+        let userMoney = user.moneyMultiplier !== undefined ? user.moneyMultiplier : 1.0;
+        let multiplier = Math.max(0, globalMoney + (userMoney - 1.0));
         const finalAmount = Math.floor(baseAmount * multiplier);
         
         return {
@@ -237,7 +239,18 @@ module.exports = {
         const settings = await this.getSettings();
         const user = userId ? await this.getUser(userId) : { luckMultiplier: 1.0 };
         
-        let multiplier = Math.max(0, (settings.luckMultiplier || 1.0) + ((user.luckMultiplier || 1.0) - 1.0));
+        let globalLuck = settings.luckMultiplier !== undefined ? settings.luckMultiplier : 1.0;
+        let userLuck = user.luckMultiplier !== undefined ? user.luckMultiplier : 1.0;
+        
+        let rawMulti = globalLuck + (userLuck - 1.0);
+        let multiplier;
+        
+        if (rawMulti >= 0.05) {
+            multiplier = rawMulti;
+        } else {
+            // Exponential decay for severe debuffs, so -2.5 is rare but possible, while -999999 is strictly 0.
+            multiplier = Math.max(0, 0.05 * Math.exp(rawMulti - 0.05));
+        }
         
         const chance = baseSuccessChance * multiplier;
         const roll = Math.random();
