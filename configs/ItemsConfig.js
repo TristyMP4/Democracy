@@ -164,6 +164,7 @@ module.exports = {
         description: "An expensive bottle of alcohol that brings good luck to an unlucky user.",
         emoji: '🍾', 
         price: 350000,
+        sellPrice: 85000,
         dropWeight: 15,
         usable: true,
         sellable: true
