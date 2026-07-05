@@ -77,7 +77,7 @@ module.exports = {
         emoji: '<:SupplySignal:1521922411153326120>', 
         price: 850000,
         sellPrice: 50000,
-        dropWeight: 3,
+        dropWeight: 5,
         usable: true,
         sellable: true
     },
