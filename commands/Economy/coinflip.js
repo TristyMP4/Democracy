@@ -53,7 +53,7 @@ module.exports = {
                 await EconomyUtils.addCash(interaction.user.id, winnings, 'wallet');
                 
                 embed.setColor(EconomyConfig.successColor)
-                     .setDescription(`${embed.data.description}\n\n🎉 You won **${EconomyConfig.currencySymbol}${winnings.toLocaleString()}**!`);
+                     .setDescription(`${embed.data.description}\n> 🎉 You won **${EconomyConfig.currencySymbol}${winnings.toLocaleString()}**!`);
             } else {
                 embed.setColor(EconomyConfig.failColor)
                      .setDescription(`${embed.data.description}\n\n💀 You lost your bet of **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`);
