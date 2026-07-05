@@ -77,7 +77,7 @@ module.exports = {
         emoji: '<:SupplySignal:1521922411153326120>', 
         price: 850000,
         sellPrice: 50000,
-        dropWeight: 3, // Epic
+        dropWeight: 3,
         usable: true,
         sellable: true
     },
@@ -85,9 +85,9 @@ module.exports = {
         name: '5.56 Rifle Ammo',
         description: 'Ammunition for medium caliber rifles.',
         emoji: '<:556_Rifle:1523347950825246741>', 
-        price: 850000,
-        sellPrice: 50000,
-        dropWeight: 3, // Epic
+        price: 35000,
+        sellPrice: 9500,
+        dropWeight: 25,
         usable: false,
         sellable: true
     },
@@ -95,9 +95,9 @@ module.exports = {
         name: '7.62x39 Rifle Ammo',
         description: 'Ammunition for higher caliber rifles.',
         emoji: '<:762x39_Rifle:1523348831004262490>', 
-        price: 850000,
+        price: 200000,
         sellPrice: 50000,
-        dropWeight: 3, // Epic
+        dropWeight: 8,
         usable: false,
         sellable: true
     },
@@ -105,9 +105,9 @@ module.exports = {
         name: '9x19 Pistol Ammo',
         description: 'Ammunition for higher caliber rifles.',
         emoji: '<:Pistol_Ammo:1523350997202763806>', 
-        price: 850000,
-        sellPrice: 50000,
-        dropWeight: 3, // Epic
+        price: 45000,
+        sellPrice: 12000,
+        dropWeight: 30,
         usable: false,
         sellable: true
     },

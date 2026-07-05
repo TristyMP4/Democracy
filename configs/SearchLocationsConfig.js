@@ -4,7 +4,7 @@ module.exports = [
         emoji: "🚪",
         minReward: 100,
         maxReward: 1000,
-        possibleItems: ['semi-automatic-pistol', 'wet-willow', 'sock'],
+        possibleItems: ['semi-automatic-pistol', 'wet-willow', 'sock', 'pistol-ammo'],
         successMessages: [
             { message: "You searched Jacob's Room and found **${amount}** hidden under a pile of clothes!", signature: "where's willow?" }, 
             { message: "You bravely entered Jacob's Room and snagged **${amount}** from the desk.", signature: "are you sure it's not monopoly money?" },
@@ -38,7 +38,7 @@ module.exports = [
         emoji: "🏚️",
         minReward: 500,
         maxReward: 2500,
-        possibleItems: ['thompson', 'semi-automatic-rifle'],
+        possibleItems: ['thompson', 'semi-automatic-rifle', 'pistol-ammo'],
         successMessages: [
             { message: "You opened a PC in the Old Bunker and found **${amount}**!", signature: "origin slug slammage" }, 
             { message: "You survived the Old Bunker and walked out with **${amount}**.", signature: "make sure theres no mat-49 wallbanger ready to pummel you." }
@@ -53,7 +53,7 @@ module.exports = [
         emoji: "⛺",
         minReward: 300,
         maxReward: 1500,
-        possibleItems: ['semi-automatic-pistol', 'thompson'],
+        possibleItems: ['semi-automatic-pistol', 'thompson', 'pistol-ammo'],
         successMessages: [
             { message: "You wandered into Outpost and grafted **${amount}** from someone's recycler.", signature: "ez recycler steal." }, 
             { message: "You pushed a guy away from refinery and sold his low grade for **${amount}**!", signature: "fuck you" }
@@ -68,7 +68,7 @@ module.exports = [
         emoji: "🛢️",
         minReward: 1000,
         maxReward: 5000,
-        possibleItems: ['ak-alpha', 'supply-signal'],
+        possibleItems: ['ak-alpha', 'supply-signal', '556-rifle-ammo', 'pistol-ammo'],
         successMessages: [
             { message: "You fought the heavies at the Oil Rig and claimed **${amount}** from the locked crate!", signature: "Heavy takedown." }, 
             { message: "You sniped the scientists and secured **${amount}** at the Oil Rig.", signature: "Sniper elite." }
@@ -83,7 +83,7 @@ module.exports = [
         emoji: "🚢",
         minReward: 800,
         maxReward: 4500,
-        possibleItems: ['xm-250', 'collector-armour-rig', 'ak-alpha', 'supply-signal'],
+        possibleItems: ['xm-250', 'collector-armour-rig', 'ak-alpha', 'supply-signal', '762x39-rifle-ammo', '556-rifle-ammo'],
         successMessages: [
             { message: "You boarded the Cargo Ship and sold the components you found for **${amount}**", signature: "Scrap run." }, 
             { message: "You contested Cargo and wiped out competition **${amount}**", signature: "well well well" }

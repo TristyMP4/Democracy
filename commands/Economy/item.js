@@ -68,6 +68,18 @@ module.exports = {
         const sellableField = ComponentUtils.createText(`**Sellable**\n${sellableStr}`);
         const usableField = ComponentUtils.createText(`**Usable**\n${usableStr}`);
 
+        let weaponStats = [];
+        if (item.ammo && item.ammo.length > 0) {
+            const requiredAmmo = EconomyConfig.items[item.ammo[0]];
+            const ammoDisplay = requiredAmmo ? `${requiredAmmo.emoji} ${requiredAmmo.name}` : item.ammo[0];
+            const ammoField = ComponentUtils.createText(`**Ammo Type**\n${ammoDisplay}`);
+            
+            const damageField = ComponentUtils.createText(`**Damage**\n${(item.damagePercentage * 100).toFixed(0)}%`);
+            const durabilityField = ComponentUtils.createText(`**Durability**\n${(item.durabilityPercentage * 100).toFixed(0)}%`);
+            
+            weaponStats = [ammoField, damageField, durabilityField];
+        }
+
         const container = new ContainerBuilder()
             .setAccentColor(0x2b2d31) // subtle grey
             .addTextDisplayComponents(titleDisplay)
@@ -76,6 +88,12 @@ module.exports = {
             .addSeparatorComponents(ComponentUtils.createSeparator())
             .addTextDisplayComponents(priceField, rarityField)
             .addTextDisplayComponents(sellableField, usableField);
+
+        if (weaponStats.length > 0) {
+            container.addSeparatorComponents(ComponentUtils.createSeparator());
+            // Group them to match columns if needed, but adding all three works
+            container.addTextDisplayComponents(weaponStats[0], weaponStats[1], weaponStats[2]);
+        }
 
         await interaction.reply(ComponentUtils.createContainerResponse(container));
     }
