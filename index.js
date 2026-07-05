@@ -67,6 +67,28 @@ async function InteractionHandler(interaction, type) {
         }
 
         if (component.economy) {
+            if (interaction.guild) {
+                const onlineCount = interaction.guild.members.cache.filter(m => !m.user.bot && ['online', 'idle', 'dnd'].includes(m.presence?.status)).size;
+                
+                let isMultiplayer = false;
+                if (interaction.commandName === 'bankrob') isMultiplayer = true;
+                if (interaction.commandName === 'blackjack' && interaction.options.getUser('opponent1')) isMultiplayer = true;
+                
+                if (onlineCount < 4 && !isMultiplayer) {
+                    const originalDefer = interaction.deferReply.bind(interaction);
+                    interaction.deferReply = async (options = {}) => {
+                        options.ephemeral = true;
+                        return originalDefer(options);
+                    };
+                    const originalReply = interaction.reply.bind(interaction);
+                    interaction.reply = async (options) => {
+                        if (typeof options === 'string') options = { content: options };
+                        options.ephemeral = true;
+                        return originalReply(options);
+                    };
+                }
+            }
+
             const GlobalSettings = require('./schemas/GlobalSettings.js');
             const settings = await GlobalSettings.findOne({ id: 'global' });
             if (settings && settings.economyDisabled) {
