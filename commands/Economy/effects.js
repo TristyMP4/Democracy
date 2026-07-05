@@ -89,6 +89,18 @@ module.exports = {
                 hasPersonal = true;
             }
 
+            if (userData.cooldownMultiplier && userData.cooldownMultiplier !== 1.0) {
+                const prefix = userData.cooldownMultiplier > 1.0 ? '+' : '';
+                const formatMulti = `${prefix}${(userData.cooldownMultiplier - 1.0).toFixed(1)}x`;
+                personalText += `**Cooldown:** ${formatMulti} `;
+                if (userData.cooldownExpiry) {
+                    personalText += `(Expires <t:${Math.floor(userData.cooldownExpiry.getTime() / 1000)}:R>)\n`;
+                } else {
+                    personalText += `(Permanent)\n`;
+                }
+                hasPersonal = true;
+            }
+
             if (hasPersonal) {
                 embed.addFields({ name: '👤 Personal Multipliers', value: personalText, inline: false });
             } else {

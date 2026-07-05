@@ -26,7 +26,7 @@ module.exports = {
                 .setRequired(true))
         .addIntegerOption(option =>
             option.setName('duration')
-                .setDescription('Duration in hours for this multiplier (leave blank for permanent)')
+                .setDescription('Duration in minutes for this multiplier (leave blank for permanent)')
                 .setRequired(false))
         .addBooleanOption(option =>
             option.setName('ephemeral')
@@ -46,7 +46,7 @@ module.exports = {
         
         let expiryDate = null;
         if (duration) {
-            expiryDate = new Date(Date.now() + duration * 60 * 60 * 1000);
+            expiryDate = new Date(Date.now() + duration * 60 * 1000);
         }
 
         let modifierName = '';
@@ -72,7 +72,7 @@ module.exports = {
         const { ContainerBuilder } = require('discord.js');
         const container = new ContainerBuilder()
             .setAccentColor(0x2ecc71)
-            .addTextDisplayComponents(ComponentUtils.createText(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **${value}x**.\n${timeStr}`));
+            .addTextDisplayComponents(ComponentUtils.createText(`✅ Successfully updated ${targetUser}'s **${modifierName} Multiplier** to **x${value}**.\n\n${timeStr}`));
             
         return interaction.followUp(ComponentUtils.createContainerResponse(container));
     }
