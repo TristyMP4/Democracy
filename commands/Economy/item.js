@@ -8,8 +8,8 @@ function getRarity(weight) {
     if (weight >= 60) return 'Common';
     if (weight >= 40) return 'Uncommon';
     if (weight >= 20) return 'Rare';
-    if (weight >= 5) return 'Epic';
-    if (weight >= 3) return 'Legendary';
+    if (weight >= 10) return 'Epic';
+    if (weight >= 4) return 'Legendary';
     return 'Exotic';
 }
 
