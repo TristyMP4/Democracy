@@ -80,25 +80,50 @@ module.exports = {
                     const settings = await EconomyUtils.getSettings();
 
                     const outcomesConfig = EconomyConfig.searchSettings.outcomes;
-                    const luckRoll = await EconomyUtils.calculateLuckRoll(1, interaction.user.id);
-                    const luckMulti = luckRoll.multiplier;
-                    const weights = [
-                        { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * luckMulti },
-                        { type: 'itemOnly', weight: outcomesConfig.itemOnly * luckMulti },
-                        { type: 'moneyOnly', weight: outcomesConfig.moneyOnly * luckMulti },
-                        { type: 'nothing', weight: outcomesConfig.nothing } // Luck doesn't boost bad outcomes
-                    ];
-
-                    const totalWeight = weights.reduce((acc, curr) => acc + curr.weight, 0);
-                    let random = Math.random() * totalWeight;
                     let selectedOutcome = 'nothing';
-
-                    for (const w of weights) {
-                        if (random < w.weight) {
-                            selectedOutcome = w.type;
-                            break;
+                    
+                    if (chosenLocation.successChance !== undefined) {
+                        // Custom success chance logic for harder locations
+                        const locationRoll = await EconomyUtils.calculateLuckRoll(chosenLocation.successChance, interaction.user.id);
+                        if (locationRoll.isSuccess) {
+                            const posWeights = [
+                                { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem },
+                                { type: 'itemOnly', weight: outcomesConfig.itemOnly },
+                                { type: 'moneyOnly', weight: outcomesConfig.moneyOnly }
+                            ];
+                            const totalPosWeight = posWeights.reduce((acc, curr) => acc + curr.weight, 0);
+                            let random = Math.random() * totalPosWeight;
+                            for (const w of posWeights) {
+                                if (random < w.weight) {
+                                    selectedOutcome = w.type;
+                                    break;
+                                }
+                                random -= w.weight;
+                            }
+                        } else {
+                            selectedOutcome = 'nothing';
                         }
-                        random -= w.weight;
+                    } else {
+                        // Default search luck logic
+                        const luckRoll = await EconomyUtils.calculateLuckRoll(1, interaction.user.id);
+                        const luckMulti = luckRoll.multiplier;
+                        const weights = [
+                            { type: 'moneyAndItem', weight: outcomesConfig.moneyAndItem * luckMulti },
+                            { type: 'itemOnly', weight: outcomesConfig.itemOnly * luckMulti },
+                            { type: 'moneyOnly', weight: outcomesConfig.moneyOnly * luckMulti },
+                            { type: 'nothing', weight: outcomesConfig.nothing } // Luck doesn't boost bad outcomes
+                        ];
+
+                        const totalWeight = weights.reduce((acc, curr) => acc + curr.weight, 0);
+                        let random = Math.random() * totalWeight;
+
+                        for (const w of weights) {
+                            if (random < w.weight) {
+                                selectedOutcome = w.type;
+                                break;
+                            }
+                            random -= w.weight;
+                        }
                     }
 
                     let rewardMoney = 0;

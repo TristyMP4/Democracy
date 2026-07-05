@@ -222,6 +222,32 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             }
 
+            if (itemId === 'sinsimito-tequila') {
+                const currentMultiplier = (userData.luckExpiry && userData.luckExpiry > new Date()) ? (userData.luckMultiplier || 1.0) : 1.0;
+                
+                const diff = 2.0;
+                
+                const expiry = new Date();
+                expiry.setMinutes(expiry.getMinutes() + 10);
+                
+                userData.luckMultiplier = currentMultiplier + diff;
+                userData.luckExpiry = expiry;
+                await userData.save();
+                
+                const textDesc = `You drank the Sinsimito Tequila and feel invincible! Your individual luck multiplier has **massively increased** (+2.0x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
+                
+                const titleDisplay = ComponentUtils.createText(`### 🥃 **You drank Sinsimito Tequila**`);
+                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(EconomyConfig.successColor)
+                    .addTextDisplayComponents(titleDisplay)
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(descDisplay);
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            }
+
             // Fallback for generic items
             const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
             const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);

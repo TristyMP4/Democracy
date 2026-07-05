@@ -60,7 +60,7 @@ module.exports = {
             if (isMultiplayer) {
                 const joinEmbed = new EmbedBuilder()
                     .setTitle('🃏 Multiplayer Blackjack')
-                    .setDescription(`${interaction.user} has invited ${participants.slice(1).join(', ')} to a game of Blackjack!\n\n**Bet:** ${EconomyConfig.currencySymbol}${bet.toLocaleString()}\n\nClick **Join** to accept the challenge!`)
+                    .setDescription(`${interaction.user} has invited ${participants.slice(1).join(', ')} to a game of Blackjack!\n\n**Host's Bet:** ${EconomyConfig.currencySymbol}${bet.toLocaleString()}\n\nClick **Join** to place your own bet and accept the challenge!`)
                     .setColor(EconomyConfig.embedColor);
 
                 const joinRow = new ActionRowBuilder().addComponents(
@@ -76,6 +76,7 @@ module.exports = {
 
                 const joinedUsers = new Set([interaction.user.id]);
                 const requiredUsers = new Set(participants.map(p => p.id));
+                let gameStarted = false;
 
                 const collector = msg.createMessageComponentCollector({
                     componentType: ComponentType.Button,
@@ -86,27 +87,73 @@ module.exports = {
                 const joinPromise = new Promise(resolve => {
                     collector.on('collect', async i => {
                         if (joinedUsers.has(i.user.id)) {
-                            return i.reply(ComponentUtils.createError('You have already joined!'));
+                            const errObj = ComponentUtils.createError('You have already joined!');
+                            errObj.ephemeral = true;
+                            return i.reply(errObj);
                         }
 
                         const pData = await EconomyUtils.getUser(i.user.id);
-                        if ((pData.wallet + pData.bank) < bet) {
-                            return i.reply(ComponentUtils.createError(`You do not have enough money to match the bet of **${EconomyConfig.currencySymbol}${bet.toLocaleString()}**.`));
+                        const maxMoney = pData.wallet + pData.bank;
+
+                        const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+                        const modal = new ModalBuilder()
+                            .setCustomId(`join_bj_modal_${i.id}`)
+                            .setTitle('Join Blackjack')
+                            .addComponents(
+                                new ActionRowBuilder().addComponents(
+                                    new TextInputBuilder()
+                                        .setCustomId('bet_input')
+                                        .setLabel('How much do you want to bet?')
+                                        .setPlaceholder(`Max: ${maxMoney.toLocaleString()}`)
+                                        .setStyle(TextInputStyle.Short)
+                                        .setRequired(true)
+                                )
+                            );
+
+                        await i.showModal(modal);
+
+                        const submitted = await i.awaitModalSubmit({
+                            time: 60000,
+                            filter: m => m.customId === `join_bj_modal_${i.id}` && m.user.id === i.user.id
+                        }).catch(() => null);
+
+                        if (!submitted) return;
+                        
+                        if (gameStarted) {
+                            return submitted.reply({ content: '❌ The setup phase has already ended!', ephemeral: true });
                         }
 
-                        await EconomyUtils.removeCash(i.user.id, bet, 'cascade');
-                        players.push({ user: i.user, hand: [], status: 'waiting', currentBet: bet });
-                        totalPot += bet;
+                        const parseAmount = require('../../utils/AmountParser.js');
+                        const pBet = parseAmount(submitted.fields.getTextInputValue('bet_input'), maxMoney);
+
+                        if (pBet < 100) {
+                            const errObj = ComponentUtils.createError(`The minimum bet is **${EconomyConfig.currencySymbol}100**.`);
+                            errObj.ephemeral = true;
+                            return submitted.reply(errObj);
+                        }
+
+                        if (maxMoney < pBet) {
+                            const errObj = ComponentUtils.createError(`You do not have enough money to bet **${EconomyConfig.currencySymbol}${pBet.toLocaleString()}**.`);
+                            errObj.ephemeral = true;
+                            return submitted.reply(errObj);
+                        }
+
+                        await EconomyUtils.removeCash(i.user.id, pBet, 'cascade');
+                        players.push({ user: i.user, hand: [], status: 'waiting', currentBet: pBet });
+                        totalPot += pBet;
                         joinedUsers.add(i.user.id);
 
-                        await i.reply({ content: `✅ You joined the game!`, ephemeral: true });
+                        await submitted.reply({ content: `✅ You joined the game with a bet of **${EconomyConfig.currencySymbol}${pBet.toLocaleString()}**!`, ephemeral: true });
 
                         if (joinedUsers.size === requiredUsers.size) {
                             collector.stop('all_joined');
                         }
                     });
 
-                    collector.on('end', () => resolve());
+                    collector.on('end', () => {
+                        gameStarted = true;
+                        resolve();
+                    });
                 });
 
                 await joinPromise;

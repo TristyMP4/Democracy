@@ -150,6 +150,24 @@ module.exports = {
         shop: false,
         sellable: true
     },
+    'pink-diamond': {
+        name: "Pink Diamond",
+        description: "An extremely rare jewel; prize of El Rubio's collection.",
+        emoji: '<:pink_diamond:1523464403125534800>', 
+        price: 1200000,
+        dropWeight: 8,
+        usable: false,
+        sellable: true
+    },
+    'sinsimito-tequila': {
+        name: "Sinsimito Tequila",
+        description: "An expensive bottle of alcohol that brings good luck to an unlucky user.",
+        emoji: '🍾', 
+        price: 350000,
+        dropWeight: 15,
+        usable: true,
+        sellable: true
+    },
     'crude-oil': {
         name: "Crude Oil",
         description: "A barrel of high quality oil.",

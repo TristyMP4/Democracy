@@ -38,7 +38,7 @@ module.exports = [
         emoji: "🏚️",
         minReward: 500,
         maxReward: 2500,
-        possibleItems: ['thompson', 'semi-automatic-rifle', 'pistol-ammo'],
+        possibleItems: ['thompson', 'semi-automatic-rifle', 'pistol-ammo', 'supply-signal'],
         successMessages: [
             { message: "You opened a PC in the Old Bunker and found **${amount}**!", signature: "origin slug slammage" }, 
             { message: "You survived the Old Bunker and walked out with **${amount}**.", signature: "make sure theres no mat-49 wallbanger ready to pummel you." }
@@ -49,18 +49,19 @@ module.exports = [
         ]
     },
     {
-        name: "Outpost",
-        emoji: "⛺",
-        minReward: 300,
-        maxReward: 1500,
-        possibleItems: ['semi-automatic-pistol', 'thompson', 'pistol-ammo'],
+        name: "Cayo Perico",
+        emoji: "🏝️",
+        successChance: 0.45,
+        minReward: 2500,
+        maxReward: 7500,
+        possibleItems: ['ak-alpha', 'thompson', '556-rifle-ammo', 'pink-diamond', 'sinsimito-tequila'],
         successMessages: [
-            { message: "You wandered into Outpost and grafted **${amount}** from someone's recycler.", signature: "ez recycler steal." }, 
-            { message: "You pushed a guy away from refinery and sold his low grade for **${amount}**!", signature: "fuck you" }
+            { message: "You snuck onto Cayo Perico and grafted **${amount}** from El Rubio's office safe.", signature: "don't forget the keycard" }, 
+            { message: "The primary target was tequila so you sold it for **${amount}**!", signature: "bottle of shit" }
         ],
         failMessages: [
-            { message: "You got your recycler loot robbed", signature: "karma's a bitch", deathChance: 0.05 }, 
-            { message: "No one was at the outpost", signature: "loner", deathChance: 0 }
+            { message: "The Juggernaut caught you and riddled you with bullets.", signature: "thats a shame", deathChance: 0.15 }, 
+            { message: "You fell off the island into the ocean while trying the roof strat.", signature: "jacob activities", deathChance: 0.10 }
         ]
     },
     {
