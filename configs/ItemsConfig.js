@@ -20,7 +20,7 @@ module.exports = {
         damagePercentage: 0.7,
         durabilityPercentage: 0.45,
         price: 85000,
-        dropWeight: 3, // Legendary
+        dropWeight: 5, // Legendary
         usable: true,
         sellable: true
     },
@@ -29,7 +29,7 @@ module.exports = {
         description: 'A heavy duty chest-rig belonging to the Collector.',
         emoji: '<:CollectorRig:1521922849898762310>', 
         price: 65000,
-        dropWeight: 3, // Legendary
+        dropWeight: 5, // Legendary
         sellable: true
     },
     'thompson': {
@@ -155,7 +155,7 @@ module.exports = {
         description: "An extremely rare jewel; prize of El Rubio's collection.",
         emoji: '<:pink_diamond:1523464403125534800>', 
         price: 1200000,
-        dropWeight: 8,
+        dropWeight: 3,
         usable: false,
         sellable: true
     },
