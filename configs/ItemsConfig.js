@@ -139,6 +139,16 @@ module.exports = {
         usable: true,
         sellable: true
     },
+    'lucky-coin': {
+        name: "Lucky Coin",
+        description: "Flip the coin to see if it brings you fortune... or poverty.",
+        emoji: '🪙', 
+        price: 75000,
+        sellPrice: 9500,
+        dropWeight: 45,
+        usable: true,
+        sellable: true
+    },
     'milk': {
         name: "Milk",
         description: "Carton of Milk - Clears all active personal effects.",

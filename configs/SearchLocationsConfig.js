@@ -4,7 +4,7 @@ module.exports = [
         emoji: "🚪",
         minReward: 100,
         maxReward: 1000,
-        possibleItems: ['semi-automatic-pistol', 'wet-willow', 'sock', 'pistol-ammo'],
+        possibleItems: ['semi-automatic-pistol', 'wet-willow', 'sock', 'pistol-ammo', 'lucky-coin'],
         successMessages: [
             { message: "You searched Jacob's Room and found **${amount}** hidden under a pile of clothes!", signature: "where's willow?" }, 
             { message: "You bravely entered Jacob's Room and snagged **${amount}** from the desk.", signature: "are you sure it's not monopoly money?" },
@@ -51,13 +51,13 @@ module.exports = [
     {
         name: "Cayo Perico",
         emoji: "🏝️",
-        successChance: 0.45,
+        successChance: 0.40,
         minReward: 2500,
         maxReward: 7500,
-        possibleItems: ['ak-alpha', 'thompson', '556-rifle-ammo', 'pink-diamond', 'sinsimito-tequila'],
+        possibleItems: ['ak-alpha', 'thompson', '556-rifle-ammo', 'pink-diamond', 'sinsimito-tequila', 'lucky-coin'],
         successMessages: [
             { message: "You snuck onto Cayo Perico and grafted **${amount}** from El Rubio's office safe.", signature: "don't forget the keycard" }, 
-            { message: "The primary target was tequila so you sold it for **${amount}**!", signature: "bottle of shit" }
+            { message: "The primary target was Tequila so you sold it for **${amount}**!", signature: "bottle of shit" }
         ],
         failMessages: [
             { message: "The Juggernaut caught you and riddled you with bullets.", signature: "thats a shame", deathChance: 0.15 }, 

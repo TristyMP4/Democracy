@@ -248,6 +248,38 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             }
 
+            if (itemId === 'lucky-coin') {
+                const currentMultiplier = (userData.moneyExpiry && userData.moneyExpiry > new Date()) ? (userData.moneyMultiplier || 1.0) : 1.0;
+                
+                const isPositive = Math.random() >= 0.5;
+                const diff = isPositive ? 0.5 : -0.5;
+                
+                const expiry = new Date();
+                expiry.setMinutes(expiry.getMinutes() + 10);
+                
+                userData.moneyMultiplier = currentMultiplier + diff;
+                userData.moneyExpiry = expiry;
+                await userData.save();
+                
+                let textDesc = '';
+                if (isPositive) {
+                    textDesc = `You flipped the Lucky Coin and it landed on **Heads**! Your individual money multiplier has **increased** (+0.5x) to a total of **${userData.moneyMultiplier.toFixed(1)}x** for the next 10 minutes!`;
+                } else {
+                    textDesc = `You flipped the Lucky Coin and it landed on **Tails**... Your individual money multiplier has **decreased** (-0.5x) to a total of **${userData.moneyMultiplier.toFixed(1)}x** for the next 10 minutes!`;
+                }
+                
+                const titleDisplay = ComponentUtils.createText(`### 🪙 **You flipped a Lucky Coin**`);
+                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(isPositive ? EconomyConfig.successColor : EconomyConfig.failColor)
+                    .addTextDisplayComponents(titleDisplay)
+                    .addSeparatorComponents(ComponentUtils.createSeparator())
+                    .addTextDisplayComponents(descDisplay);
+
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            }
+
             // Fallback for generic items
             const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
             const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);
