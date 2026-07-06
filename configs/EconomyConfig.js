@@ -25,6 +25,12 @@ module.exports = {
     // Dictionary of All Jobs in the Economy System
     jobs: JobsConfig,
 
+    // Bounty System configurations
+    bounty: {
+        minAmount: 1000,
+        systemKillBounty: 10000
+    },
+
     searchSettings: {
         // Base probabilities for search outcomes (luck multiplier will boost higher tier outcomes)
         outcomes: {

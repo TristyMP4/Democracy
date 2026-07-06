@@ -109,6 +109,18 @@ module.exports = {
                     } else {
                         actionText += `\n> **Their wallet and inventory were completely wiped.**`;
                     }
+
+                    // Claim Bounties
+                    const claimedBounty = await EconomyUtils.claimBounties(target.id, interaction.user.id);
+                    if (claimedBounty > 0) {
+                        actionText += `\n> 💰 **You claimed a massive bounty of ${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()} off their head!**`;
+                    }
+
+                    // Add System Bounty to shooter
+                    const systemBounty = EconomyConfig.bounty.systemKillBounty || 10000;
+                    await EconomyUtils.addBounty(interaction.user.id, systemBounty, 'System');
+                    actionText += `\n> 🚨 **A system bounty of ${EconomyConfig.currencySymbol}${systemBounty.toLocaleString()} has been placed on your head for murder!**`;
+
                 } else {
                     actionText = `💨 **WHOOSH!** You shot at <@${target.id}> with the ${itemConfig.name} but missed!`;
                 }

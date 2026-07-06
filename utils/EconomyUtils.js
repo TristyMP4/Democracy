@@ -385,5 +385,91 @@ module.exports = {
         } catch (error) {
             return false;
         }
+    },
+    /**
+     * Adds a bounty to a user
+     * @param {string} targetId 
+     * @param {number} amount 
+     * @param {string} placedBy 
+     */
+    async addBounty(targetId, amount, placedBy = 'System') {
+        const user = await this.getUser(targetId);
+        user.bounties.push({
+            amount: amount,
+            placedBy: placedBy,
+            timestamp: new Date()
+        });
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Gets total active bounty on a user
+     * @param {string} userId 
+     * @returns {Promise<number>}
+     */
+    async getTotalBounty(userId) {
+        const user = await this.getUser(userId);
+        if (!user.bounties || user.bounties.length === 0) return 0;
+        return user.bounties.reduce((sum, b) => sum + b.amount, 0);
+    },
+
+    /**
+     * Claims all bounties on a target and awards them to claimer
+     * @param {string} targetId 
+     * @param {string} claimerId 
+     * @returns {Promise<number>} Returns the amount claimed
+     */
+    async claimBounties(targetId, claimerId) {
+        const target = await this.getUser(targetId);
+        if (!target.bounties || target.bounties.length === 0) return 0;
+
+        const totalBounty = target.bounties.reduce((sum, b) => sum + b.amount, 0);
+        
+        // Clear target's bounties
+        target.bounties = [];
+        await target.save();
+
+        // Give money to claimer
+        await this.addCash(claimerId, totalBounty);
+        
+        return totalBounty;
+    },
+
+    /**
+     * Pays off a specific amount of a user's bounty
+     * @param {string} targetId 
+     * @param {number} amountToPay 
+     * @returns {Promise<number>} Amount actually paid off
+     */
+    async payoffBounty(targetId, amountToPay) {
+        const target = await this.getUser(targetId);
+        if (!target.bounties || target.bounties.length === 0) return 0;
+
+        let remainingToPay = amountToPay;
+        let actuallyPaid = 0;
+
+        // Sort by oldest first
+        target.bounties.sort((a, b) => a.timestamp - b.timestamp);
+
+        for (let i = 0; i < target.bounties.length; i++) {
+            if (remainingToPay <= 0) break;
+            
+            if (target.bounties[i].amount <= remainingToPay) {
+                remainingToPay -= target.bounties[i].amount;
+                actuallyPaid += target.bounties[i].amount;
+                target.bounties[i].amount = 0;
+            } else {
+                target.bounties[i].amount -= remainingToPay;
+                actuallyPaid += remainingToPay;
+                remainingToPay = 0;
+            }
+        }
+
+        // Filter out fully paid bounties
+        target.bounties = target.bounties.filter(b => b.amount > 0);
+        await target.save();
+
+        return actuallyPaid;
     }
 };

@@ -103,7 +103,7 @@ module.exports = {
                 const { actualRemoved } = await EconomyUtils.removeCash(interaction.user.id, fine, 'cascade');
 
                 const titleDisplay = ComponentUtils.createText(`### 🚓 **Busted!**`);
-                const descDisplay = ComponentUtils.createText(`**${targetUser}** caught you trying to reach into their wallet!\n\nYou were forced to pay a fine of **${EconomyConfig.currencySymbol}${actualRemoved.toLocaleString()}** to avoid the cops.`);
+                const descDisplay = ComponentUtils.createText(`**${targetUser}** caught you trying to reach into their wallet!\n> You were forced to pay a fine of **${EconomyConfig.currencySymbol}${actualRemoved.toLocaleString()}** to avoid the cops.`);
                 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.failColor)
