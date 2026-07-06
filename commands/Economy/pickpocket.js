@@ -58,7 +58,7 @@ module.exports = {
         const existingCooldown = await Cooldown.findOne({ userId: interaction.user.id, commandName });
 
         if (existingCooldown && existingCooldown.expiresAt > new Date()) {
-            return interaction.followUp(ComponentUtils.createError(`You cannot pickpocket again until <t:${Math.floor(existingCooldown.expiresAt.getTime() / 1000)}:R>.`));
+            return interaction.followUp(ComponentUtils.createError(`You can pickpocket again <t:${Math.floor(existingCooldown.expiresAt.getTime() / 1000)}:R>.`));
         }
 
         const settings = await EconomyUtils.getSettings();
