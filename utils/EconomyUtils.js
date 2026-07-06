@@ -1,6 +1,8 @@
 const EconomyUser = require('../schemas/EconomyUser.js');
 const EconomySettings = require('../schemas/EconomySettings.js');
+const GuildSettings = require('../schemas/GuildSettings.js');
 const EconomyConfig = require('../configs/EconomyConfig.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     /**
@@ -165,7 +167,7 @@ module.exports = {
             return { 
                 user, 
                 saved: true, 
-                message: "> **You died, but your 💝Life Saver saved you!**" 
+                message: "> **You died, but your 💝 Life Saver saved you!**" 
             };
         }
 
@@ -294,5 +296,46 @@ module.exports = {
             return `https://cdn.discordapp.com/emojis/${match[1]}.${isAnimated ? 'gif' : 'png'}`;
         }
         return null;
+    },
+
+    /**
+     * Gets a guild's settings from the database
+     * @param {string} guildId 
+     * @returns {Promise<GuildSettings>}
+     */
+    async getGuildSettings(guildId) {
+        let settings = await GuildSettings.findOne({ guildId });
+        if (!settings) {
+            settings = new GuildSettings({ guildId });
+            await settings.save();
+        }
+        return settings;
+    },
+
+    /**
+     * Posts a news event to the configured guild news channel, if set
+     * @param {Guild} guild Discord Guild object
+     * @param {string} eventText The text to display in the news embed
+     * @param {string} embedColor Color for the embed
+     */
+    async postNewsEvent(guild, eventText, embedColor = '#2b2d31') {
+        try {
+            if (!guild) return;
+            const settings = await this.getGuildSettings(guild.id);
+            if (!settings.newsChannelId) return;
+
+            const channel = await guild.channels.fetch(settings.newsChannelId).catch(() => null);
+            if (!channel) return;
+
+            const embed = new EmbedBuilder()
+                .setTitle('🚨 BREAKING NEWS 🚨')
+                .setDescription(eventText)
+                .setColor(embedColor)
+                .setTimestamp();
+
+            await channel.send({ embeds: [embed] });
+        } catch (error) {
+            console.error('Failed to post news event:', error);
+        }
     }
 };

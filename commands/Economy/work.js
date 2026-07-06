@@ -46,6 +46,10 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand.setName('quit')
                 .setDescription('Quit your current job (1 hour cooldown before reapplying).')
+        )
+        .addSubcommand(subcommand =>
+            subcommand.setName('stats')
+                .setDescription('View your career statistics and current job details.')
         ),
 
     async autocomplete(interaction) {
@@ -78,6 +82,8 @@ module.exports = {
             await this.handleList(interaction, userData);
         } else if (subcommand === 'quit') {
             await this.handleQuit(interaction, userData);
+        } else if (subcommand === 'stats') {
+            await this.handleStats(interaction, userData);
         }
     },
 
@@ -133,6 +139,50 @@ module.exports = {
             .setAccentColor(0x2ecc71)
             .addTextDisplayComponents(new TextDisplayBuilder().setContent(`You slammed your resignation letter on the boss's desk and quit your job as a **${oldJobName}**! You must wait **1 Hour** before you can apply for a new job.`));
         return interaction.followUp(ComponentUtils.createContainerResponse(quitContainer));
+    },
+
+    async handleStats(interaction, userData) {
+        const currentJobConfig = userData.currentJob ? EconomyConfig.jobs[userData.currentJob] : null;
+        
+        let nextUnlock = null;
+        let lowestReq = Infinity;
+        for (const [jobId, config] of Object.entries(EconomyConfig.jobs)) {
+            if (config.requiredShifts > userData.totalShiftsWorked && config.requiredShifts < lowestReq) {
+                lowestReq = config.requiredShifts;
+                nextUnlock = config;
+            }
+        }
+
+        const titleDisplay = ComponentUtils.createText(`### 📊 **Career Statistics for ${interaction.user.username}**`);
+        
+        let statsText = `**Current Job:** ${currentJobConfig ? currentJobConfig.name : 'Unemployed'}\n`;
+        if (currentJobConfig) {
+            statsText += `**Salary:** ${EconomyConfig.currencySymbol}${currentJobConfig.salary.toLocaleString()} per shift\n`;
+        }
+        
+        statsText += `\n**Total Shifts Worked:** ${userData.totalShiftsWorked.toLocaleString()}\n`;
+        
+        if (nextUnlock) {
+            const shiftsNeeded = nextUnlock.requiredShifts - userData.totalShiftsWorked;
+            statsText += `**Next Promotion:** ${nextUnlock.name} (in ${shiftsNeeded} shifts)\n`;
+        } else {
+            statsText += `**Next Promotion:** Max level reached!\n`;
+        }
+
+        if (userData.jobApplyCooldown && userData.jobApplyCooldown > new Date()) {
+            const timeStr = `<t:${Math.floor(userData.jobApplyCooldown.getTime() / 1000)}:R>`;
+            statsText += `\n**Job Apply Cooldown Ends:** ${timeStr}`;
+        }
+
+        const descDisplay = ComponentUtils.createText(`-# ${statsText}`);
+
+        const container = new ContainerBuilder()
+            .setAccentColor(EconomyConfig.embedColor)
+            .addTextDisplayComponents(titleDisplay)
+            .addSeparatorComponents(ComponentUtils.createSeparator())
+            .addTextDisplayComponents(descDisplay);
+
+        return interaction.followUp(ComponentUtils.createContainerResponse(container));
     },
 
     async handleList(interaction, userData) {

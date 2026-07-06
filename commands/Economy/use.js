@@ -99,7 +99,20 @@ module.exports = {
                 if (isHit) {
                     // Kill target
                     const deathResult = await EconomyUtils.handleDeath(target.id);
-                    actionText = `💥 **BOOM!** You shot <@${target.id}> with the ${itemConfig.name} and killed them!\n${deathResult.message}`;
+                    actionText = `💥 **BOOM!** You shot <@${target.id}> with the ${itemConfig.name} and killed them!`;
+                    
+                    // Broadcast News Event
+                    await EconomyUtils.postNewsEvent(
+                        interaction.guild,
+                        `# 🩸 ASSASSINATION\n**${interaction.user.username}** just gunned down **${target.username}** using a **${itemConfig.name}**!`,
+                        EconomyConfig.failColor
+                    );
+
+                    if (deathResult.saved) {
+                        actionText += `\n> **However, their 💝Life Saver protected their wallet and inventory!**`;
+                    } else {
+                        actionText += `\n> **Their wallet and inventory were completely wiped.**`;
+                    }
                 } else {
                     actionText = `💨 **WHOOSH!** You shot at <@${target.id}> with the ${itemConfig.name} but missed!`;
                 }

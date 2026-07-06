@@ -321,6 +321,14 @@ module.exports = {
                     if (p.status === 'blackjack') winAmount = Math.floor(p.currentBet * 2.5); // 3:2 payout for natural blackjack
                     await EconomyUtils.addCash(p.user.id, winAmount, 'wallet');
                     
+                    if (winAmount >= 100000) {
+                        await EconomyUtils.postNewsEvent(
+                            interaction.guild,
+                            `# 🎰 MASSIVE CASINO WIN\n**${interaction.user.username}** just beat the dealer in Blackjack and won ${EconomyConfig.currencySymbol}**${winAmount.toLocaleString()}**!`,
+                            EconomyConfig.successColor
+                        );
+                    }
+
                     resultMsg = `🎉 You won **${EconomyConfig.currencySymbol}${winAmount.toLocaleString()}**!`;
                     finalEmbed.setColor(EconomyConfig.successColor);
                 } else if (pScore === dealerScore) {
@@ -394,8 +402,17 @@ module.exports = {
                         } else {
                             // Winners beat dealer
                             const splitAmount = Math.floor(totalPot / winners.length);
-                            for (const w of winners) await EconomyUtils.addCash(w.user.id, splitAmount, 'wallet');
-                            resultMsg = `🎉 ${winners.map(w => w.user.username).join(', ')} win the pot and take **${EconomyConfig.currencySymbol}${splitAmount.toLocaleString()}** each!`;
+                            for (const w of winners) {
+                                await EconomyUtils.addCash(w.user.id, splitAmount, 'wallet');
+                                if (splitAmount >= 100000) {
+                                    await EconomyUtils.postNewsEvent(
+                                        interaction.guild,
+                                        `# 🎰 MASSIVE CASINO WIN\n**${w.user.username}** just beat the table in multiplayer Blackjack and took home ${EconomyConfig.currencySymbol}**${splitAmount.toLocaleString()}**!`,
+                                        EconomyConfig.successColor
+                                    );
+                                }
+                            }
+                            resultMsg = `🎉 ${winners.map(w => w.user.username).join(', ')} wins the pot and takes **${EconomyConfig.currencySymbol}${splitAmount.toLocaleString()}**!`;
                             finalEmbed.setColor(EconomyConfig.successColor);
                         }
                     }

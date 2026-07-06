@@ -163,6 +163,14 @@ module.exports = {
 
                             droppedItem = EconomyConfig.items[randomItemKey];
                             await EconomyUtils.addItem(interaction.user.id, randomItemKey, 1);
+
+                            if ((droppedItem.dropWeight || 100) <= 4) {
+                                await EconomyUtils.postNewsEvent(
+                                    interaction.guild,
+                                    `# 🌟 EXOTIC ITEM FOUND\n**${interaction.user.username}** just searched the **${chosenLocation.name}** and found a **${droppedItem.name}**!`,
+                                    EconomyConfig.successColor
+                                );
+                            }
                         } else if (selectedOutcome === 'itemOnly') {
                             // Fallback to money if no items exist for this location
                             selectedOutcome = 'moneyOnly';

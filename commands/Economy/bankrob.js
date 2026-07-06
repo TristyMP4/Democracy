@@ -148,6 +148,13 @@ module.exports = {
                 yesVotes, noVotes: new Set(), requiredVotes: 1
             });
 
+            // Broadcast News Event
+            await EconomyUtils.postNewsEvent(
+                interaction.guild,
+                `# 💰 HEIST SUCCESSFUL\nA crew just broke into ${target}'s vault and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!`,
+                EconomyConfig.successColor
+            );
+
         } else {
             let totalLost = 0;
             for (const participantId of yesVotes) {
