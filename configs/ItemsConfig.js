@@ -56,6 +56,7 @@ module.exports = {
         sellPrice: 2000, 
         dropWeight: 65, // Common
         usable: true,
+        shop: true,
         sellable: true
     },
     'semi-automatic-rifle': {
@@ -67,7 +68,6 @@ module.exports = {
         durabilityPercentage: 0.35,
         price: 15000,
         dropWeight: 30, // Rare
-        shop: true,
         usable: true,
         sellable: true
     },
