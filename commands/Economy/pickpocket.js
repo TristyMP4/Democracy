@@ -95,7 +95,7 @@ module.exports = {
 
         if (result.reason === 'failed') {
             await EconomyUtils.dmUser(target, ComponentUtils.createError(`⚠️ **PICKPOCKET ATTEMPT!** ⚠️\n**${interaction.user.username}** tried to pickpocket your ${itemConfig.emoji} **${itemConfig.name}**, but they failed and were caught!`));
-            return interaction.followUp(ComponentUtils.createError(`❌ You tried to steal **${itemConfig.name}** from ${target}, but you failed to grab it!`));
+            return interaction.followUp(ComponentUtils.createError(`❌ You tried to steal **${itemConfig.emoji} ${itemConfig.name}** from ${target}, but you failed to grab it!`));
         }
 
         if (result.reason === 'success') {
@@ -108,7 +108,7 @@ module.exports = {
             if (dropW <= 4) {
                 await EconomyUtils.postNewsEvent(
                     interaction.guild,
-                    `# 🚨 EXOTIC HEIST\n**${interaction.user}** just successfully pickpocketed a massive ${itemConfig.emoji} **${itemConfig.name}** right out of **${target}**'s pockets!`,
+                    `# 🚨 EXOTIC HEIST\n**${interaction.user}** just successfully pickpocketed ${itemConfig.emoji} **${itemConfig.name}** right out of **${target}**'s pockets!`,
                     EconomyConfig.failColor
                 );
             }
