@@ -133,7 +133,18 @@ module.exports = {
         if (!user.inventory) user.inventory = new Map();
         
         const currentCount = user.inventory.get(itemKey) || 0;
-        user.inventory.set(itemKey, currentCount + amount);
+        let newCount = currentCount + amount;
+
+        const EconomyConfig = require('../configs/EconomyConfig.js');
+        const itemConfig = EconomyConfig.items[itemKey];
+
+        if (itemConfig && itemConfig.maxOwned !== undefined) {
+            if (newCount > itemConfig.maxOwned) {
+                newCount = itemConfig.maxOwned;
+            }
+        }
+
+        user.inventory.set(itemKey, newCount);
         await user.save();
         return user;
     },
@@ -202,7 +213,8 @@ module.exports = {
                 }
 
                 // If keeping rare items is enabled and the dropWeight is sufficiently low (rare)
-                if (keepRareItems && (itemData.dropWeight || 100) <= protectedWeight) {
+                const w = itemData.dropWeight !== undefined ? itemData.dropWeight : 100;
+                if (keepRareItems && w <= protectedWeight) {
                     continue; // Preserve this item
                 } else {
                     user.inventory.delete(itemKey); // Wipe it
@@ -449,6 +461,7 @@ module.exports = {
         let remainingToPay = amountToPay;
         let actuallyPaid = 0;
 
+
         // Sort by oldest first
         target.bounties.sort((a, b) => a.timestamp - b.timestamp);
 
@@ -471,5 +484,61 @@ module.exports = {
         await target.save();
 
         return actuallyPaid;
+    },
+
+    /**
+     * Executes a pickpocket attempt with luck scaling and zipper protection
+     * @param {string} targetId 
+     * @param {string} thiefId 
+     * @param {string} itemKey 
+     * @returns {Promise<{success: boolean, reason: string, itemConfig: Object}>}
+     */
+    async pickpocketItem(targetId, thiefId, itemKey) {
+        const EconomyConfig = require('../configs/EconomyConfig.js');
+        const itemConfig = EconomyConfig.items[itemKey];
+        if (!itemConfig || itemConfig.stealable === false) return { success: false, reason: 'invalid_item', itemConfig: null };
+
+        const targetProfile = await this.getUser(targetId);
+        if (!targetProfile.inventory || !targetProfile.inventory[itemKey] || targetProfile.inventory[itemKey] < 1) {
+            return { success: false, reason: 'no_item', itemConfig };
+        }
+
+        let dropW = itemConfig.dropWeight !== undefined ? itemConfig.dropWeight : 100;
+        if (dropW === 0) dropW = 100;
+
+        // Pocket Zipper check: protects Exotic (<=4) and Legendary (<12)
+        if (dropW < 12) {
+            if (targetProfile.inventory['zipper'] && targetProfile.inventory['zipper'] > 0) {
+                // Break the zipper
+                await this.removeItem(targetId, 'zipper', 1);
+                return { success: false, reason: 'zipper', itemConfig };
+            }
+        }
+
+        // Luck calculations
+        const luckRoll = await this.calculateLuckRoll(1.0, thiefId);
+        const targetLuckRoll = await this.calculateLuckRoll(1.0, targetId);
+        
+        const safeTargetLuck = Math.max(0.001, targetLuckRoll.multiplier);
+        const relativeLuckRatio = luckRoll.multiplier / safeTargetLuck;
+        
+        // High curve (squared)
+        const curveMult = Math.pow(relativeLuckRatio, 2);
+        
+        // Base chance: Common = 40%, Rare = ~6%, Exotic = ~0.6%
+        const baseChance = Math.min(0.60, Math.max(0.01, dropW / 150));
+        
+        let finalChance = baseChance * curveMult;
+        finalChance = Math.max(0, Math.min(1.0, finalChance));
+        
+        const isSuccess = Math.random() <= finalChance;
+        
+        if (isSuccess) {
+            await this.removeItem(targetId, itemKey, 1);
+            await this.addItem(thiefId, itemKey, 1);
+            return { success: true, reason: 'success', itemConfig };
+        } else {
+            return { success: false, reason: 'failed', itemConfig };
+        }
     }
 };

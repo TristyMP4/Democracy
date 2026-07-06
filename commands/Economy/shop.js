@@ -136,6 +136,15 @@ module.exports = {
                         
                         // Refetch user to get up to date balance
                         user = await EconomyUtils.getUser(interaction.user.id);
+
+                        // Check maxOwned limit
+                        if (itemData.maxOwned !== undefined) {
+                            const currentOwned = user.inventory ? (user.inventory.get(itemKey) || 0) : 0;
+                            if (currentOwned + quantity > itemData.maxOwned) {
+                                return modalSubmit.reply(ComponentUtils.createError(`You can only own a maximum of **${itemData.maxOwned}** ${itemData.name}(s). You currently have **${currentOwned}**.`));
+                            }
+                        }
+
                         const totalBalance = user.wallet + user.bank;
 
                         if (totalBalance < totalCost) {
