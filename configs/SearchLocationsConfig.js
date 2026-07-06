@@ -38,7 +38,7 @@ module.exports = [
         emoji: "🏚️",
         minReward: 500,
         maxReward: 2500,
-        possibleItems: ['thompson', 'semi-automatic-rifle', 'pistol-ammo', 'supply-signal'],
+        possibleItems: ['thompson', 'semi-automatic-rifle', 'pistol-ammo', 'supply-signal', '762x39-rifle-ammo'],
         successMessages: [
             { message: "You opened a PC in the Old Bunker and found **${amount}**!", signature: "origin slug slammage" }, 
             { message: "You survived the Old Bunker and walked out with **${amount}**.", signature: "make sure theres no mat-49 wallbanger ready to pummel you." }
