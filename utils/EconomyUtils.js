@@ -317,8 +317,9 @@ module.exports = {
      * @param {Guild} guild Discord Guild object
      * @param {string} eventText The text to display in the news embed
      * @param {string} embedColor Color for the embed
+     * @param {string} rawContent Optional content to send outside the embed (e.g. pings)
      */
-    async postNewsEvent(guild, eventText, embedColor = '#2b2d31') {
+    async postNewsEvent(guild, eventText, embedColor = '#2b2d31', rawContent = null) {
         try {
             if (!guild) return;
             const settings = await this.getGuildSettings(guild.id);
@@ -327,13 +328,18 @@ module.exports = {
             const channel = await guild.channels.fetch(settings.newsChannelId).catch(() => null);
             if (!channel) return;
 
+            const formattedText = eventText.replace(/^#\s/, '## ');
             const embed = new EmbedBuilder()
-                .setTitle('🚨 BREAKING NEWS 🚨')
-                .setDescription(eventText)
+                .setDescription(`# 🚨 BREAKING NEWS 🚨\n\n${formattedText}`)
                 .setColor(embedColor)
                 .setTimestamp();
 
-            await channel.send({ embeds: [embed] });
+            const messagePayload = { embeds: [embed] };
+            if (rawContent) {
+                messagePayload.content = rawContent;
+            }
+
+            await channel.send(messagePayload);
         } catch (error) {
             console.error('Failed to post news event:', error);
         }
