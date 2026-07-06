@@ -42,7 +42,7 @@ module.exports = {
 
                 let footerText = outcomeObj.signature;
                 if (moneyResult.multiplier > 1 && moneyResult.bonus > 0) {
-                    footerText += ` | Money Multiplier: ${moneyResult.multiplier} (+ ${EconomyConfig.currencySymbol}${moneyResult.bonus.toLocaleString()})`;
+                    footerText += ` | Money Multiplier: ${moneyResult.multiplier}x (+ ${moneyResult.bonus.toLocaleString()})`;
                 }
 
                 const embed = new EmbedBuilder()

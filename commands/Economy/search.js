@@ -128,12 +128,14 @@ module.exports = {
 
                     let rewardMoney = 0;
                     let baseReward = 0;
+                    let finalMulti = 1.0;
                     let droppedItem = null;
 
                     if (selectedOutcome === 'moneyAndItem' || selectedOutcome === 'moneyOnly') {
                         baseReward = Math.floor(Math.random() * (chosenLocation.maxReward - chosenLocation.minReward + 1)) + chosenLocation.minReward;
                         const moneyResult = await EconomyUtils.calculateMoney(baseReward, interaction.user.id);
                         rewardMoney = moneyResult.finalAmount;
+                        finalMulti = moneyResult.multiplier;
                         
                         await EconomyUtils.addCash(interaction.user.id, rewardMoney, 'wallet');
                     }
@@ -178,6 +180,7 @@ module.exports = {
                             const moneyResult = await EconomyUtils.calculateMoney(reward, interaction.user.id);
                             rewardMoney = moneyResult.finalAmount;
                             baseReward = reward; // For footer display
+                            finalMulti = moneyResult.multiplier;
                             
                             await EconomyUtils.addCash(interaction.user.id, rewardMoney, 'wallet');
                         }
@@ -223,10 +226,9 @@ module.exports = {
                         }
 
                         let footerText = outcomeObj.signature;
-                        const moneyMulti = settings.moneyMultiplier || 1.0;
-                        if (moneyMulti > 1 && rewardMoney > baseReward) {
+                        if (finalMulti > 1 && rewardMoney > baseReward) {
                             const bonusAmount = rewardMoney - baseReward;
-                            footerText += ` | Money Multiplier: ${moneyMulti}x (+ ${bonusAmount.toLocaleString()})`;
+                            footerText += ` | Money Multiplier: ${finalMulti}x (+ ${bonusAmount.toLocaleString()})`;
                         }
 
                         const resultEmbed = new EmbedBuilder()

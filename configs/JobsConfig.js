@@ -9,7 +9,7 @@ module.exports = {
     },
     "goffs-doob-dealer": {
         name: "Goff's Doob Dealer",
-        salary: 20000,
+        salary: 15000,
         cooldown: 80 * 60 * 1000,
         requiredShifts:  25,
         shiftsPerDay: 0,
@@ -27,7 +27,7 @@ module.exports = {
         name: "Discord Moderator",
         salary: 50000,
         cooldown: 95 * 60 * 1000,
-        requiredShifts: 80,
+        requiredShifts: 65,
         shiftsPerDay: 2,
         emoji: '💻'
     }

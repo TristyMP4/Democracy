@@ -3,7 +3,7 @@ const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
 
-const MINIGAME_WORDS = ["APPLE", "TIGER", "OCEAN", "CLOUD", "BREAD", "RIVER", "CHAIR", "GHOST", "PIZZA", "SNAKE", "HOUSE", "FLAME", "TRAIN", "PAPER", "BLADE"];
+const MINIGAME_WORDS = ["DOOB", "MAYONNAISE", "PACKET", "FENT", "KIDS", "GOFF", "DISCORD", "HODGE", "CAROLINE", "CLAIRE", "CATHERINE", "DINA", "CHODE", "NODE", "RUST"];
 const MINIGAME_COLORS = [
     { name: "Red", style: ButtonStyle.Danger, emoji: "🟥" },
     { name: "Blue", style: ButtonStyle.Primary, emoji: "🟦" },
