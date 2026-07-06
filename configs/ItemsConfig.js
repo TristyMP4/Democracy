@@ -245,7 +245,7 @@ module.exports = {
     'zipper': {
         name: "Pocket Zipper",
         description: "This zipper seals your pockets tight and prevents a rare item from getting stolen from your inventory!",
-        emoji: '💝', 
+        emoji: '<:zipper:1523820690359324843>', 
         price: 250000,
         sellPrice: 15000,
         dropWeight: 0, // Unobtainable
