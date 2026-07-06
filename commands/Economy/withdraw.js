@@ -22,6 +22,13 @@ module.exports = {
 
         try {
             const userData = await EconomyUtils.getUser(interaction.user.id);
+
+            // Block withdraw if currently being bankrobbed
+            if (userData.activeBankrobExpiry && userData.activeBankrobExpiry > new Date()) {
+                const remaining = Math.ceil((userData.activeBankrobExpiry.getTime() - Date.now()) / 1000);
+                return interaction.followUp(ComponentUtils.createError(`🚨 **LOCKDOWN!** 🚨\nYour bank is currently under attack by a heist crew! You cannot withdraw money for the next **${remaining}s**!`));
+            }
+
             if (userData.bank <= 0) {
                 return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your bank to withdraw!'));
             }

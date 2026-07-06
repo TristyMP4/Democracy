@@ -73,111 +73,120 @@ module.exports = {
             return null;
         };
 
-        const voteResult = await VoteManager.startVote(interaction, {
-            title: '🏦 **Bank Heist**',
-            description: `A heist is being organized against ${target}'s bank account!\n> You need ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.\n> If the heist fails, you will lose **${config.finePercentage * 100}%** of your money!`,
-            fixedRequiredVotes: 2,
-            duration: 150_000,
-            requireOnline: true,
-            targetId: target.id,
-            pingType: 'everyone',
-            yesLabel: 'Join Heist',
-            noLabel: 'Opt Out',
-            yesEmoji: '🔫',
-            noEmoji: '🚪',
-            customValidate
-        });
+        targetProfile.activeBankrobExpiry = new Date(Date.now() + 150_000);
+        await targetProfile.save();
 
-        if (!voteResult) return;
-
-        const { passed, yesVotes, message } = voteResult;
-
-        if (!passed || yesVotes.size === 0) {
-            return VoteManager.displayResult(message, {
-                passed: false,
-                title: 'Heist Cancelled',
-                description: `Nobody joined the crew. The heist against ${target} was cancelled.`,
-                yesVotes, noVotes: new Set(), requiredVotes: 1
+        try {
+            const voteResult = await VoteManager.startVote(interaction, {
+                title: '🏦 **Bank Heist**',
+                description: `A heist is being organized against ${target}'s bank account!\n> You need ${EconomyConfig.currencySymbol}**${config.minBalanceToJoin.toLocaleString()}** to join the crew.\n> If the heist fails, you will lose **${config.finePercentage * 100}%** of your money!`,
+                fixedRequiredVotes: 2,
+                duration: 150_000,
+                requireOnline: true,
+                targetId: target.id,
+                pingType: 'everyone',
+                yesLabel: 'Join Heist',
+                noLabel: 'Opt Out',
+                yesEmoji: '🔫',
+                noEmoji: '🚪',
+                customValidate
             });
-        }
 
-        const extraPeople = Math.max(0, yesVotes.size - 2);
-        const bonusChance = extraPeople * 0.05; // +5% per extra person beyond the first 2
-        const baseChance = Math.min(0.80, config.successChance + bonusChance);
+            if (!voteResult) return;
 
-        const rollResult = await EconomyUtils.calculateLuckRoll(baseChance, interaction.user.id);
+            const { passed, yesVotes, message } = voteResult;
 
-        if (rollResult.isSuccess) {
-            const currentTargetProfile = await EconomyUtils.getUser(target.id);
-            const targetBank = currentTargetProfile.bank;
-            
-            const bonusSteal = extraPeople * 0.0625; // +6.25% steal per extra person
-            const calculatedMinSteal = Math.min(0.80, config.minStealPercentage + bonusSteal);
-            const calculatedMaxSteal = Math.min(1.0, config.maxStealPercentage + bonusSteal);
-
-            const randomStealPct = Math.random() * (calculatedMaxSteal - calculatedMinSteal) + calculatedMinSteal;
-            let stolenAmount = Math.floor(targetBank * randomStealPct);
-            
-            if (stolenAmount <= 0) {
-                 return VoteManager.displayResult(message, {
+            if (!passed || yesVotes.size === 0) {
+                return VoteManager.displayResult(message, {
                     passed: false,
-                    title: 'Heist Failed',
-                    description: `The crew broke in, but ${target}'s vault was completely empty!`,
+                    title: 'Heist Cancelled',
+                    description: `Nobody joined the crew. The heist against ${target} was cancelled.`,
                     yesVotes, noVotes: new Set(), requiredVotes: 1
                 });
             }
 
-            const splitAmount = Math.floor(stolenAmount / yesVotes.size);
+            const extraPeople = Math.max(0, yesVotes.size - 2);
+            const bonusChance = extraPeople * 0.05; // +5% per extra person beyond the first 2
+            const baseChance = Math.min(0.80, config.successChance + bonusChance);
 
-            await EconomyUtils.removeCash(target.id, stolenAmount, 'bank');
+            const rollResult = await EconomyUtils.calculateLuckRoll(baseChance, interaction.user.id);
 
-            for (const participantId of yesVotes) {
-                await EconomyUtils.addCash(participantId, splitAmount, 'wallet');
+            if (rollResult.isSuccess) {
+                const currentTargetProfile = await EconomyUtils.getUser(target.id);
+                const targetBank = currentTargetProfile.bank;
+                
+                const bonusSteal = extraPeople * 0.0625; // +6.25% steal per extra person
+                const calculatedMinSteal = Math.min(0.80, config.minStealPercentage + bonusSteal);
+                const calculatedMaxSteal = Math.min(1.0, config.maxStealPercentage + bonusSteal);
+
+                const randomStealPct = Math.random() * (calculatedMaxSteal - calculatedMinSteal) + calculatedMinSteal;
+                let stolenAmount = Math.floor(targetBank * randomStealPct);
+                
+                if (stolenAmount <= 0) {
+                     return VoteManager.displayResult(message, {
+                        passed: false,
+                        title: 'Heist Failed',
+                        description: `The crew broke in, but ${target}'s vault was completely empty!`,
+                        yesVotes, noVotes: new Set(), requiredVotes: 1
+                    });
+                }
+
+                const splitAmount = Math.floor(stolenAmount / yesVotes.size);
+
+                await EconomyUtils.removeCash(target.id, stolenAmount, 'bank');
+
+                for (const participantId of yesVotes) {
+                    await EconomyUtils.addCash(participantId, splitAmount, 'wallet');
+                }
+
+                const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
+
+                    await EconomyUtils.dmUser(target, ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\nA crew broke into your bank account and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n\n**The Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
+
+                await VoteManager.displayResult(message, {
+                    passed: true,
+                    title: 'Heist Successful',
+                    description: `The crew successfully broke into ${target}'s vault!\n> They made off with ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n> Each member received ${EconomyConfig.currencySymbol}**${splitAmount.toLocaleString()}**.`,
+                    yesVotes, noVotes: new Set(), requiredVotes: 1
+                });
+
+                // Broadcast News Event
+                await EconomyUtils.postNewsEvent(
+                    interaction.guild,
+                    `# 💰 HEIST SUCCESSFUL\nA crew just broke into ${target}'s vault and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!`,
+                    EconomyConfig.successColor
+                );
+
+            } else {
+                let totalLost = 0;
+                for (const participantId of yesVotes) {
+                    const pProfile = await EconomyUtils.getUser(participantId);
+                    const fine = Math.floor((pProfile.wallet + pProfile.bank) * config.finePercentage);
+                    const { actualRemoved } = await EconomyUtils.removeCash(participantId, fine, 'cascade');
+                    totalLost += actualRemoved;
+                }
+
+                if (totalLost > 0) {
+                    await EconomyUtils.addCash(target.id, totalLost, 'bank');
+                }
+
+                const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
+                await EconomyUtils.dmUser(target, {
+                    components: [new ContainerBuilder().setAccentColor(0x2ecc71).addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ 🛡️ **BANK HEIST THWARTED!** 🛡️\nA crew tried to rob your bank, but security stopped them! You were awarded ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}** from their fines as restitution.\n\n**The Failed Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`))],
+                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+                });
+
+                await VoteManager.displayResult(message, {
+                    passed: false,
+                    title: 'Heist Failed',
+                    description: `The crew was caught!\n> Everyone lost **${config.finePercentage * 100}%** of their balance.\n> Restitution Paid to ${target}: ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}**`,
+                    yesVotes, noVotes: new Set(), requiredVotes: 1
+                });
             }
-
-            const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
-
-                await EconomyUtils.dmUser(target, ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\nA crew broke into your bank account and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n\n**The Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
-
-            await VoteManager.displayResult(message, {
-                passed: true,
-                title: 'Heist Successful',
-                description: `The crew successfully broke into ${target}'s vault!\n\n> Stolen: ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**\n> Split: ${EconomyConfig.currencySymbol}**${splitAmount.toLocaleString()}** per member!`,
-                yesVotes, noVotes: new Set(), requiredVotes: 1
-            });
-
-            // Broadcast News Event
-            await EconomyUtils.postNewsEvent(
-                interaction.guild,
-                `# 💰 HEIST SUCCESSFUL\nA crew just broke into ${target}'s vault and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!`,
-                EconomyConfig.successColor
-            );
-
-        } else {
-            let totalLost = 0;
-            for (const participantId of yesVotes) {
-                const pProfile = await EconomyUtils.getUser(participantId);
-                const fine = Math.floor((pProfile.wallet + pProfile.bank) * config.finePercentage);
-                const { actualRemoved } = await EconomyUtils.removeCash(participantId, fine, 'cascade');
-                totalLost += actualRemoved;
-            }
-
-            if (totalLost > 0) {
-                await EconomyUtils.addCash(target.id, totalLost, 'bank');
-            }
-
-            const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
-            await EconomyUtils.dmUser(target, {
-                components: [new ContainerBuilder().setAccentColor(0x2ecc71).addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ 🛡️ **BANK HEIST THWARTED!** 🛡️\nA crew tried to rob your bank, but security stopped them! You were awarded ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}** from their fines as restitution.\n\n**The Failed Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`))],
-                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
-            });
-
-            await VoteManager.displayResult(message, {
-                passed: false,
-                title: 'Heist Failed',
-                description: `The crew was caught!\n> Everyone lost **${config.finePercentage * 100}%** of their balance.\n> Restitution Paid to ${target}: ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}**`,
-                yesVotes, noVotes: new Set(), requiredVotes: 1
-            });
+        } finally {
+            const resetProfile = await EconomyUtils.getUser(target.id);
+            resetProfile.activeBankrobExpiry = null;
+            await resetProfile.save();
         }
     }
 };

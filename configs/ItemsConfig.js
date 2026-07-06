@@ -85,9 +85,10 @@ module.exports = {
         name: '5.56 Rifle Ammo',
         description: 'Ammunition for medium caliber rifles.',
         emoji: '<:556_Rifle:1523347950825246741>', 
-        price: 35000,
+        price: 80000,
         sellPrice: 9500,
         dropWeight: 25,
+        shop: true,
         usable: false,
         sellable: true
     },
@@ -164,11 +165,11 @@ module.exports = {
         name: "Milk",
         description: "Carton of Milk - Clears all active personal effects.",
         emoji: '<:Milk:1523456911629090857>', 
-        price: 15000,
+        price: 25000,
         sellPrice: 2500,
         dropWeight: 35,
         usable: true,
-        shop: false,
+        shop: true,
         sellable: true
     },
     'pink-diamond': {

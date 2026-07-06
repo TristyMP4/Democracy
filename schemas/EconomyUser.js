@@ -21,6 +21,7 @@ const economyUserSchema = new mongoose.Schema({
     moneyExpiry: { type: Date, default: null },
     cooldownMultiplier: { type: Number, default: 1.0 },
     cooldownExpiry: { type: Date, default: null },
+    activeBankrobExpiry: { type: Date, default: null },
     bounties: {
         type: [{
             amount: Number,
