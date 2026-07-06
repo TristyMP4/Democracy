@@ -90,7 +90,7 @@ module.exports = {
                     .setCustomId(`qty_${itemInput}`)
                     .setLabel(`Quantity of ${itemConfig.name}`)
                     .setStyle(TextInputStyle.Short)
-                    .setValue('1')
+                    .setPlaceholder('e.g. max, 1k, 100, 50%')
                     .setRequired(true);
 
                 modal.addComponents(new ActionRowBuilder().addComponents(quantityInput));
