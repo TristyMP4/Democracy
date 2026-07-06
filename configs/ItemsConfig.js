@@ -153,7 +153,7 @@ module.exports = {
         name: "Bank Note",
         description: "Use this bank note to persuade the bank to enlarge the capacity of your account.",
         emoji: '<:bankNote:1523781252778557521>', 
-        price: 250000,
+        price: 175000,
         sellPrice: 25000,
         dropWeight: 0,
         shop: true,
