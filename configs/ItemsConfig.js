@@ -115,7 +115,7 @@ module.exports = {
         name: "Wet Willow",
         description: "Wet Willow's dead corpse - Found in the depths of Jacob's Room",
         emoji: '👼', 
-        price: 1000000,
+        price: 1500000,
         dropWeight: 2, // Exotic
         usable: false,
         sellable: true
