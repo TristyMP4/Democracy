@@ -161,7 +161,7 @@ module.exports = {
             let footerDisplay = null;
             if (moneyResult.multiplier > 1) {
                 const bonusAmount = finalValue - totalValue;
-                footerDisplay = ComponentUtils.createText(`-# Money Multiplier: ${moneyResult.multiplier} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`);
+                footerDisplay = ComponentUtils.createText(`-# Money Multiplier: ${moneyResult.multiplier}x (+ ${bonusAmount.toLocaleString()})`);
             }
 
             const container = new ContainerBuilder()

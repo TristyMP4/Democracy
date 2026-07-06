@@ -137,9 +137,7 @@ module.exports = {
 
             const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
 
-            try {
-                await target.send(ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\nA crew broke into your bank account and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n\n**The Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
-            } catch (err) {}
+                await EconomyUtils.dmUser(target, ComponentUtils.createError(`🚨 **YOUR BANK WAS ROBBED!** 🚨\nA crew broke into your bank account and stole ${EconomyConfig.currencySymbol}**${stolenAmount.toLocaleString()}**!\n\n**The Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`));
 
             await VoteManager.displayResult(message, {
                 passed: true,
@@ -169,12 +167,10 @@ module.exports = {
             }
 
             const participantsMentions = [...yesVotes].map(id => `- <@${id}>`).join('\n');
-            try {
-                await target.send({
-                    components: [new ContainerBuilder().setAccentColor(0x2ecc71).addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ 🛡️ **BANK HEIST THWARTED!** 🛡️\nA crew tried to rob your bank, but security stopped them! You were awarded ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}** from their fines as restitution.\n\n**The Failed Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`))],
-                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
-                });
-            } catch (err) {}
+            await EconomyUtils.dmUser(target, {
+                components: [new ContainerBuilder().setAccentColor(0x2ecc71).addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ 🛡️ **BANK HEIST THWARTED!** 🛡️\nA crew tried to rob your bank, but security stopped them! You were awarded ${EconomyConfig.currencySymbol}**${totalLost.toLocaleString()}** from their fines as restitution.\n\n**The Failed Crew:**\n${participantsMentions}\n\n[View Heist Message](${message.url})`))],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+            });
 
             await VoteManager.displayResult(message, {
                 passed: false,

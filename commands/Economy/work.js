@@ -321,7 +321,7 @@ module.exports = {
             let bonusText = '';
             if (salaryResult.multiplier > 1) {
                 const bonus = salaryResult.finalAmount - jobConfig.salary;
-                bonusText = `\n-# 💸 Money Multiplier: ${salaryResult.multiplier} (+ ${EconomyConfig.currencySymbol}${bonus.toLocaleString()})`;
+                bonusText = `\n-# 💸 Money Multiplier: ${salaryResult.multiplier}x (+ ${bonus.toLocaleString()})`;
             }
 
             const shiftContainer = new ContainerBuilder()

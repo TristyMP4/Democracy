@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ContainerBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const { SlashCommandBuilder, ContainerBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
@@ -178,6 +178,13 @@ module.exports = {
                 .addTextDisplayComponents(descDisplay);
 
             await submitted.followUp(ComponentUtils.createContainerResponse(container));
+
+            const dmEmbed = new EmbedBuilder()
+                .setTitle('🎁 Items Received!')
+                .setDescription(`**${interaction.user.username}** has given you the following items in **${interaction.guild.name}**:\n\n${summaryText}`)
+                .setColor(EconomyConfig.successColor);
+            
+            await EconomyUtils.dmUser(targetUser, { embeds: [dmEmbed] });
 
         } catch (error) {
             console.error('Give error:', error);

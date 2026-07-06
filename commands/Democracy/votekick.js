@@ -3,6 +3,7 @@ const Stat = require('../../schemas/stats.js');
 const Cooldown = require('../../schemas/cooldown.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const VoteManager = require('../../utils/VoteManager.js');
+const EconomyUtils = require('../../utils/EconomyUtils.js');
 const cooldownMinutes = 10;
 
 module.exports = {
@@ -103,9 +104,7 @@ module.exports = {
                     { upsert: true }
                 );
                 
-                try {
-                    await target.send(ComponentUtils.createError(`You were kicked in **${interaction.guild.name}** via a community vote.\n\n> 📋 Initial Voter: **${interaction.user.tag}**`));
-                } catch (err) { }
+                await EconomyUtils.dmUser(target, ComponentUtils.createError(`You were kicked in **${interaction.guild.name}** via a community vote.\n\n> 📋 Initial Voter: **${interaction.user.tag}**`));
 
                 await Stat.findOneAndUpdate(
                     { userId: target.id },

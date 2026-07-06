@@ -56,15 +56,11 @@ module.exports = {
             await EconomyUtils.addCash(targetUser.id, amount, 'bank');
 
             // Attempt to DM the target user
-            try {
-                const dmEmbed = new EmbedBuilder()
-                    .setTitle('💸 Payment Received')
-                    .setDescription(`**${interaction.user.username}** has sent you **${EconomyConfig.currencySymbol}${amount.toLocaleString()}**!\n\nThe money has been deposited directly into your bank.`)
-                    .setColor(EconomyConfig.successColor);
-                await targetUser.send({ embeds: [dmEmbed] });
-            } catch (err) {
-                // Ignore if DMs are closed
-            }
+            const dmEmbed = new EmbedBuilder()
+                .setTitle('💸 Payment Received')
+                .setDescription(`**${interaction.user.username}** has sent you **${EconomyConfig.currencySymbol}${amount.toLocaleString()}**!\n\nThe money has been deposited directly into your bank.`)
+                .setColor(EconomyConfig.successColor);
+            await EconomyUtils.dmUser(targetUser, { embeds: [dmEmbed] });
 
             const titleDisplay = ComponentUtils.createText(`### 💸 **Payment Successful**`);
             const descDisplay = ComponentUtils.createText(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!\n\n*(It was deposited directly into their bank account)*`);

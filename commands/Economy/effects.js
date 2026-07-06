@@ -37,25 +37,27 @@ module.exports = {
             let globalText = '';
             let hasGlobal = false;
             
+            let expiryText = '';
+            if (settings.multiplierExpiry) {
+                expiryText = ` (Expires <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>)`;
+            } else {
+                expiryText = ` (Permanent)`;
+            }
+
             if (settings.moneyMultiplier !== 1.0) {
-                globalText += `**Money:** x${settings.moneyMultiplier}\n`;
+                globalText += `**Money:** ${settings.moneyMultiplier}x${expiryText}\n`;
                 hasGlobal = true;
             }
             if (settings.luckMultiplier !== 1.0) {
-                globalText += `**Luck:** x${settings.luckMultiplier}\n`;
+                globalText += `**Luck:** ${settings.luckMultiplier}x${expiryText}\n`;
                 hasGlobal = true;
             }
             if (settings.cooldownMultiplier !== 1.0) {
-                globalText += `**Cooldown:** x${settings.cooldownMultiplier}\n`;
+                globalText += `**Cooldown:** ${settings.cooldownMultiplier}x${expiryText}\n`;
                 hasGlobal = true;
             }
 
             if (hasGlobal) {
-                if (settings.multiplierExpiry) {
-                    globalText += `*Expires: <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>*`;
-                } else {
-                    globalText += `*Expires: Never (Permanent)*`;
-                }
                 embed.addFields({ name: '🌍 Global Multipliers', value: globalText, inline: false });
             } else {
                 embed.addFields({ name: '🌍 Global Multipliers', value: '*None active.*', inline: false });
@@ -120,7 +122,7 @@ module.exports = {
             
             embed.addFields({ 
                 name: '📊 Total Effective Rates', 
-                value: `**Money:** x${totalMoney.toFixed(2)}\n**Luck:** x${totalLuck.toFixed(2)}`,
+                value: `**Money:** ${totalMoney.toFixed(2)}x\n**Luck:** ${totalLuck.toFixed(2)}x`,
                 inline: false 
             });
 

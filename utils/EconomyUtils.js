@@ -343,5 +343,19 @@ module.exports = {
         } catch (error) {
             console.error('Failed to post news event:', error);
         }
+    },
+
+    /**
+     * Safely attempts to send a Direct Message to a user
+     * @param {User|GuildMember} user The target user or member
+     * @param {Object|string} payload The message payload
+     */
+    async dmUser(user, payload) {
+        try {
+            await user.send(payload);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 };

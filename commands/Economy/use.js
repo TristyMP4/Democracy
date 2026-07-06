@@ -81,20 +81,16 @@ module.exports = {
 
                 let actionText = '';
                 
-                try {
-                    const dmEmbed = new EmbedBuilder()
-                        .setTitle('🔫 You were shot at!')
-                        .setColor(isHit ? EconomyConfig.failColor : EconomyConfig.successColor);
+                const dmEmbed = new EmbedBuilder()
+                    .setTitle('🔫 You were shot at!')
+                    .setColor(isHit ? EconomyConfig.failColor : EconomyConfig.successColor);
 
-                    if (isHit) {
-                        dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!`);
-                    } else {
-                        dmEmbed.setDescription(`**${interaction.user.username}** shot at you with their ${itemConfig.name} but **missed**! You survived!`);
-                    }
-                    await target.send({ embeds: [dmEmbed] });
-                } catch (e) {
-                    // Ignore DM errors
+                if (isHit) {
+                    dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!`);
+                } else {
+                    dmEmbed.setDescription(`**${interaction.user.username}** shot at you with their ${itemConfig.name} but **missed**! You survived!`);
                 }
+                await EconomyUtils.dmUser(target, { embeds: [dmEmbed] });
                 
                 if (isHit) {
                     // Kill target

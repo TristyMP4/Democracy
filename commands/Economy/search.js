@@ -167,7 +167,7 @@ module.exports = {
                             if ((droppedItem.dropWeight || 100) <= 4) {
                                 await EconomyUtils.postNewsEvent(
                                     interaction.guild,
-                                    `# 🌟 EXOTIC ITEM FOUND\n**${interaction.user.username}** just searched the **${chosenLocation.name}** and found **${droppedItem.name}**!`,
+                                    `# 🌟 EXOTIC ITEM FOUND\n**${interaction.user.username}** just searched the **${chosenLocation.name}** and found **${droppedItem.emoji} ${droppedItem.name}**!`,
                                     EconomyConfig.successColor
                                 );
                             }
@@ -226,7 +226,7 @@ module.exports = {
                         const moneyMulti = settings.moneyMultiplier || 1.0;
                         if (moneyMulti > 1 && rewardMoney > baseReward) {
                             const bonusAmount = rewardMoney - baseReward;
-                            footerText += ` | Money Multiplier: ${moneyMulti} (+ ${EconomyConfig.currencySymbol}${bonusAmount.toLocaleString()})`;
+                            footerText += ` | Money Multiplier: ${moneyMulti}x (+ ${bonusAmount.toLocaleString()})`;
                         }
 
                         const resultEmbed = new EmbedBuilder()

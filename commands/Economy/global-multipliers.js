@@ -64,7 +64,7 @@ module.exports = {
 
             await settings.save();
 
-            let desc = `The economy scaling has been adjusted globally.\n\n**Money Multiplier:** x${settings.moneyMultiplier}\n**Luck Multiplier:** x${settings.luckMultiplier}\n**Cooldown Multiplier:** x${settings.cooldownMultiplier || 1.0}`;
+            let desc = `The economy scaling has been adjusted globally.\n\n**Money Multiplier:** ${settings.moneyMultiplier}x\n**Luck Multiplier:** ${settings.luckMultiplier}x\n**Cooldown Multiplier:** ${settings.cooldownMultiplier || 1.0}x`;
             if (settings.multiplierExpiry) {
                 desc += `\n**Expires:** <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>`;
             } else {
