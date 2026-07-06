@@ -18,7 +18,7 @@ module.exports = {
 
             const globalMultiplier = settings.cooldownMultiplier || 1.0;
             const userMultiplier = user.cooldownMultiplier || 1.0;
-            const cooldownTime = (60 * 1000) * globalMultiplier * userMultiplier;
+            const cooldownTime = (20 * 1000) * globalMultiplier * userMultiplier;
             
             if (user.lastCrime && (Date.now() - user.lastCrime.getTime()) < cooldownTime) {
                 const remaining = Math.ceil((cooldownTime - (Date.now() - user.lastCrime.getTime())) / 1000);
