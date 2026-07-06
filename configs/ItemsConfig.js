@@ -52,7 +52,7 @@ module.exports = {
         ammo: ["pistol-ammo"], 
         damagePercentage: 0.30,
         durabilityPercentage: 0.20,
-        price: 3000,
+        price: 6000,
         sellPrice: 2000, 
         dropWeight: 65, // Common
         usable: true,
@@ -153,7 +153,7 @@ module.exports = {
         name: "Bank Note",
         description: "Use this bank note to persuade the bank to enlarge the capacity of your account.",
         emoji: '<:bankNote:1523781252778557521>', 
-        price: 325000,
+        price: 250000,
         sellPrice: 25000,
         dropWeight: 0,
         shop: true,
