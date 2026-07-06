@@ -499,7 +499,7 @@ module.exports = {
         if (!itemConfig || itemConfig.stealable === false) return { success: false, reason: 'invalid_item', itemConfig: null };
 
         const targetProfile = await this.getUser(targetId);
-        if (!targetProfile.inventory || !targetProfile.inventory[itemKey] || targetProfile.inventory[itemKey] < 1) {
+        if (!targetProfile.inventory || !targetProfile.inventory.get(itemKey) || targetProfile.inventory.get(itemKey) < 1) {
             return { success: false, reason: 'no_item', itemConfig };
         }
 
@@ -508,7 +508,7 @@ module.exports = {
 
         // Pocket Zipper check: protects Exotic (<=4) and Legendary (<12)
         if (dropW < 12) {
-            if (targetProfile.inventory['zipper'] && targetProfile.inventory['zipper'] > 0) {
+            if (targetProfile.inventory.get('zipper') && targetProfile.inventory.get('zipper') > 0) {
                 // Break the zipper
                 await this.removeItem(targetId, 'zipper', 1);
                 return { success: false, reason: 'zipper', itemConfig };

@@ -29,12 +29,12 @@ module.exports = {
             const userProfile = await EconomyUtils.getUser(targetUser);
             if (!userProfile || !userProfile.inventory) return interaction.respond([]);
 
-            const inventoryKeys = Object.keys(userProfile.inventory);
+            const inventoryKeys = Array.from(userProfile.inventory.keys());
             
             const items = inventoryKeys.map(key => {
                 const itemConfig = EconomyConfig.items[key];
                 if (!itemConfig || itemConfig.stealable === false) return null;
-                const quantity = userProfile.inventory[key];
+                const quantity = userProfile.inventory.get(key);
                 if (quantity < 1) return null;
                 return { name: `${itemConfig.name} (x${quantity})`, value: key };
             }).filter(Boolean);
@@ -58,7 +58,7 @@ module.exports = {
         const existingCooldown = await Cooldown.findOne({ userId: interaction.user.id, commandName });
 
         if (existingCooldown && existingCooldown.expiresAt > new Date()) {
-            return interaction.followUp(ComponentUtils.createError(`You cannot pickpocket again until <t:${Math.floor(existingCooldown.expiresAt.getTime() / 1000)}:f>.`));
+            return interaction.followUp(ComponentUtils.createError(`You cannot pickpocket again until <t:${Math.floor(existingCooldown.expiresAt.getTime() / 1000)}:R>.`));
         }
 
         const settings = await EconomyUtils.getSettings();
