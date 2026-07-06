@@ -167,7 +167,7 @@ module.exports = {
                             if ((droppedItem.dropWeight || 100) <= 4) {
                                 await EconomyUtils.postNewsEvent(
                                     interaction.guild,
-                                    `# 🌟 EXOTIC ITEM FOUND\n**${interaction.user.username}** just searched the **${chosenLocation.name}** and found a **${droppedItem.name}**!`,
+                                    `# 🌟 EXOTIC ITEM FOUND\n**${interaction.user.username}** just searched the **${chosenLocation.name}** and found **${droppedItem.name}**!`,
                                     EconomyConfig.successColor
                                 );
                             }

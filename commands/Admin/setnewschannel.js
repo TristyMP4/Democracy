@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ChannelType, PermissionsBitField } = require('discord.js');
+const { SlashCommandBuilder, ChannelType, PermissionsBitField, ContainerBuilder, TextDisplayBuilder, MessageFlags } = require('discord.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 
@@ -24,8 +24,9 @@ module.exports = {
         settings.newsChannelId = channel.id;
         await settings.save();
 
-        return interaction.followUp(
-            ComponentUtils.createSuccess(`Successfully set the news channel to ${channel}! Big events like assassinations, massive casino wins, and exotic item drops will now be broadcasted here.`)
-        );
+        return interaction.followUp({
+            components: [new ContainerBuilder().setAccentColor(0x2ecc71).addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ Successfully set the news channel to ${channel}! Big events like assassinations, massive casino wins, and exotic item drops will now be broadcasted here.`))],
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+        });
     }
 };
