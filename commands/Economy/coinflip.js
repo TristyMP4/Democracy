@@ -58,6 +58,14 @@ module.exports = {
             if (won) {
                 const winnings = bet * 2;
                 await EconomyUtils.addCash(interaction.user.id, winnings, 'wallet');
+
+                if (winnings >= 500000) {
+                    await EconomyUtils.postNewsEvent(
+                        interaction.guild,
+                        `# 🪙 MASSIVE COINFLIP WIN\n**${interaction.user.username}** just flipped a coin and won ${EconomyConfig.currencySymbol}**${winnings.toLocaleString()}**!`,
+                        EconomyConfig.successColor
+                    );
+                }
                 
                 embed.setColor(EconomyConfig.successColor)
                      .setDescription(`${embed.data.description}\n> 🎉 You won **${EconomyConfig.currencySymbol}${winnings.toLocaleString()}**!`);

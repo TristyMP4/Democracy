@@ -104,7 +104,7 @@ module.exports = {
                     // Broadcast News Event
                     await EconomyUtils.postNewsEvent(
                         interaction.guild,
-                        `# 🩸 ASSASSINATION\n**${interaction.user.username}** just gunned down **${target.username}** using a **${itemConfig.name}**!`,
+                        `# 🩸 ASSASSINATION\n**${interaction.user}** just gunned down **${target}** using a **${itemConfig.name}**!`,
                         EconomyConfig.failColor
                     );
 
