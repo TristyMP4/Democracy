@@ -13,6 +13,8 @@ const economyUserSchema = new mongoose.Schema({
     lastDaily: { type: Date, default: null },
     lastSearch: { type: Date, default: null },
     lastCrime: { type: Date, default: null },
+    lastWork: { type: Date, default: null },
+    lastBeg: { type: Date, default: null },
     luckMultiplier: { type: Number, default: 1.0 },
     luckExpiry: { type: Date, default: null },
     moneyMultiplier: { type: Number, default: 1.0 },

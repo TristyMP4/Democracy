@@ -65,7 +65,7 @@ module.exports = {
                 const requiredAmmo = itemConfig.ammo[0];
                 if (!userData.inventory || !userData.inventory.get(requiredAmmo) || userData.inventory.get(requiredAmmo) < 1) {
                     const ammoName = EconomyConfig.items[requiredAmmo].name;
-                    return interaction.followUp(ComponentUtils.createError(`You need at least 1x **${ammoName}** to fire the ${itemConfig.name}!`));
+                    return interaction.followUp(ComponentUtils.createError(`You need at least 1x **${EconomyConfig.items[requiredAmmo].emoji}${ammoName}** to fire the ${itemConfig.name}!`));
                 }
 
                 // Consume 1 ammo
@@ -114,6 +114,13 @@ module.exports = {
                     const claimedBounty = await EconomyUtils.claimBounties(target.id, interaction.user.id);
                     if (claimedBounty > 0) {
                         actionText += `\n> 💰 **You claimed a massive bounty of ${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()} off their head!**`;
+
+                        // Broadcast News Event for Claimed Bounty
+                        await EconomyUtils.postNewsEvent(
+                            interaction.guild,
+                            `# 💰 BOUNTY CLAIMED\n**${interaction.user}** just claimed the massive **${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()}** bounty resting on **${target}**'s head!`,
+                            EconomyConfig.successColor
+                        );
                     }
 
                     // Add System Bounty to shooter

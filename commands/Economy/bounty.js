@@ -51,13 +51,17 @@ module.exports = {
                 const userData = await EconomyUtils.getUser(interaction.user.id);
                 const amount = parseAmount(amountStr, userData.wallet);
 
+                if (amount === 0 && (amountStr.toLowerCase() === 'max' || amountStr.toLowerCase() === 'all')) {
+                    return interaction.followUp(ComponentUtils.createError('Your wallet is empty! You have no money to place a bounty.'));
+                }
+
                 if (amount <= 0 || isNaN(amount)) {
                     return interaction.followUp(ComponentUtils.createError('Please provide a valid amount to place as a bounty.'));
                 }
 
                 const minBounty = EconomyConfig.bounty.minAmount || 1000;
                 if (amount < minBounty) {
-                    return interaction.followUp(ComponentUtils.createError(`The minimum bounty you can place is **${EconomyConfig.currencySymbol}${minBounty.toLocaleString()}**.`));
+                    return interaction.followUp(ComponentUtils.createError(`The minimum bounty amount is **${EconomyConfig.currencySymbol}${minBounty.toLocaleString()}**.`));
                 }
 
                 if (userData.wallet < amount) {
@@ -67,6 +71,13 @@ module.exports = {
                 // Deduct money and place bounty
                 await EconomyUtils.removeCash(interaction.user.id, amount);
                 await EconomyUtils.addBounty(target.id, amount, interaction.user.id);
+
+                // Broadcast News Event
+                await EconomyUtils.postNewsEvent(
+                    interaction.guild,
+                    `# 🎯 BOUNTY PLACED\n**${interaction.user}** just placed a **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** bounty on **${target}**'s head!`,
+                    EconomyConfig.failColor
+                );
 
                 const embed = new EmbedBuilder()
                     .setTitle('🎯 Bounty Placed!')
@@ -156,16 +167,27 @@ module.exports = {
 
                 const userData = await EconomyUtils.getUser(interaction.user.id);
                 
-                // Allow "all" or "max" to mean paying off the full bounty (limited by their wallet)
                 let amountToPay;
                 if (amountStr.toLowerCase() === 'all' || amountStr.toLowerCase() === 'max') {
+                    if (userData.wallet <= 0) {
+                        return interaction.followUp(ComponentUtils.createError('Your wallet is empty! You have no money to pay off the bounty.'));
+                    }
                     amountToPay = Math.min(totalBounty, userData.wallet);
                 } else {
                     amountToPay = parseAmount(amountStr, userData.wallet);
                 }
 
+                if (amountToPay === 0 && (amountStr.toLowerCase() === 'max' || amountStr.toLowerCase() === 'all')) {
+                    return interaction.followUp(ComponentUtils.createError('Your wallet is empty! You have no money to pay off the bounty.'));
+                }
+
                 if (amountToPay <= 0 || isNaN(amountToPay)) {
                     return interaction.followUp(ComponentUtils.createError('Please provide a valid amount to pay off.'));
+                }
+
+                const minBounty = EconomyConfig.bounty.minAmount || 1000;
+                if (amountToPay < minBounty && amountToPay < totalBounty) {
+                    return interaction.followUp(ComponentUtils.createError(`The minimum payoff amount is **${EconomyConfig.currencySymbol}${minBounty.toLocaleString()}** (unless the remaining bounty is lower).`));
                 }
 
                 if (userData.wallet < amountToPay) {

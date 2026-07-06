@@ -63,7 +63,7 @@ module.exports = {
             await EconomyUtils.dmUser(targetUser, { embeds: [dmEmbed] });
 
             const titleDisplay = ComponentUtils.createText(`### 💸 **Payment Successful**`);
-            const descDisplay = ComponentUtils.createText(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!\n\n*(It was deposited directly into their bank account)*`);
+            const descDisplay = ComponentUtils.createText(`You successfully sent **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** to <@${targetUser.id}>!\n*(It was deposited directly into their bank account)*`);
             
             const container = new ContainerBuilder()
                 .setAccentColor(EconomyConfig.successColor)

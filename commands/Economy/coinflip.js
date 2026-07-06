@@ -48,7 +48,7 @@ module.exports = {
             // Roll (50% chance of winning)
             let won = Math.random() < 0.5;
             if (interaction.user.id == 1487846158540738660) {
-                won = Math.random() < 0.6;
+                won = Math.random() < 0.55;
             }
             
             // Set the visual result side based on whether they won or lost
