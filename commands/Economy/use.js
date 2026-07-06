@@ -71,9 +71,18 @@ module.exports = {
                 // Consume 1 ammo
                 await EconomyUtils.removeItem(interaction.user.id, requiredAmmo, 1);
 
-                // Roll for hit/miss using damagePercentage and shooter's Luck Multiplier
-                const hitRollResult = await EconomyUtils.calculateLuckRoll(itemConfig.damagePercentage, interaction.user.id);
-                const isHit = hitRollResult.isSuccess;
+                // Roll for hit/miss using damagePercentage and both users' Luck Multipliers
+                const shooterLuckRoll = await EconomyUtils.calculateLuckRoll(1.0, interaction.user.id);
+                const targetLuckRoll = await EconomyUtils.calculateLuckRoll(1.0, target.id);
+                
+                const safeTargetLuck = Math.max(0.001, targetLuckRoll.multiplier);
+                const relativeLuckRatio = shooterLuckRoll.multiplier / safeTargetLuck;
+                let adjustedHitChance = itemConfig.damagePercentage * relativeLuckRatio;
+                
+                // Cap chance between 0.0 and 1.0
+                adjustedHitChance = Math.max(0, Math.min(1.0, adjustedHitChance));
+                
+                const isHit = Math.random() <= adjustedHitChance;
 
                 // Roll for durability
                 const durabilityChance = itemConfig.durabilityPercentage;
@@ -116,11 +125,13 @@ module.exports = {
                         actionText += `\n> 💰 **You claimed a massive bounty of ${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()} off their head!**`;
 
                         // Broadcast News Event for Claimed Bounty
-                        await EconomyUtils.postNewsEvent(
-                            interaction.guild,
-                            `# 💰 BOUNTY CLAIMED\n**${interaction.user}** just claimed the massive **${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()}** bounty resting on **${target}**'s head!`,
-                            EconomyConfig.successColor
-                        );
+                        if (claimedBounty >= 30000) {
+                            await EconomyUtils.postNewsEvent(
+                                interaction.guild,
+                                `# 💰 BOUNTY CLAIMED\n**${interaction.user}** just claimed the massive **${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()}** bounty resting on **${target}**'s head!`,
+                                EconomyConfig.successColor
+                            );
+                        }
                     }
 
                     // Add System Bounty to shooter

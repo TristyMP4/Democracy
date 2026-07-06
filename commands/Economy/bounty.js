@@ -73,11 +73,13 @@ module.exports = {
                 await EconomyUtils.addBounty(target.id, amount, interaction.user.id);
 
                 // Broadcast News Event
-                await EconomyUtils.postNewsEvent(
-                    interaction.guild,
-                    `# 🎯 BOUNTY PLACED\n**${interaction.user}** just placed a **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** bounty on **${target}**'s head!`,
-                    EconomyConfig.failColor
-                );
+                if (amount >= 30000) {
+                    await EconomyUtils.postNewsEvent(
+                        interaction.guild,
+                        `# 🎯 BOUNTY PLACED\n**${interaction.user}** just placed a **${EconomyConfig.currencySymbol}${amount.toLocaleString()}** bounty on **${target}**'s head!`,
+                        EconomyConfig.failColor
+                    );
+                }
 
                 const embed = new EmbedBuilder()
                     .setTitle('🎯 Bounty Placed!')
