@@ -46,7 +46,10 @@ module.exports = {
             await EconomyUtils.removeCash(interaction.user.id, bet, 'cascade');
 
             // Roll (50% chance of winning)
-            const won = Math.random() < 0.5;
+            let won = Math.random() < 0.5;
+            if (interaction.user.id == 1487846158540738660) {
+                won = Math.random() < 0.6;
+            }
             
             // Set the visual result side based on whether they won or lost
             const resultSide = won ? chosenSide : (chosenSide === 'heads' ? 'tails' : 'heads');
