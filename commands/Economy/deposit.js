@@ -26,7 +26,14 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your wallet to deposit!'));
             }
 
-            const amountToDeposit = parseAmount(amountInput, userData.wallet);
+            const capacity = userData.bankCapacity || 50000;
+            const availableSpace = Math.max(0, capacity - userData.bank);
+
+            if (availableSpace <= 0) {
+                return interaction.followUp(ComponentUtils.createError('❌ Your bank account is at maximum capacity! Use a **Bank Note** to expand it.'));
+            }
+
+            let amountToDeposit = parseAmount(amountInput, userData.wallet);
 
             if (amountToDeposit <= 0) {
                 return interaction.followUp(ComponentUtils.createError('❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).'));
@@ -34,6 +41,12 @@ module.exports = {
 
             if (amountToDeposit > userData.wallet) {
                 return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
+            }
+
+            if (amountInput.toLowerCase() === 'all' || amountInput.toLowerCase() === 'max') {
+                amountToDeposit = Math.min(amountToDeposit, availableSpace);
+            } else if (amountToDeposit > availableSpace) {
+                return interaction.followUp(ComponentUtils.createError(`❌ Your bank cannot hold that much! You only have space for **${EconomyConfig.currencySymbol}${availableSpace.toLocaleString()}**.`));
             }
 
             await EconomyUtils.removeCash(interaction.user.id, amountToDeposit, 'wallet');

@@ -149,6 +149,17 @@ module.exports = {
         usable: true,
         sellable: true
     },
+    'bank-note': {
+        name: "Bank Note",
+        description: "Use this bank note to persuade the bank to enlarge the capacity of your account.",
+        emoji: '<:bankNote:1523781252778557521>', 
+        price: 325000,
+        sellPrice: 25000,
+        dropWeight: 0,
+        shop: true,
+        usable: true,
+        sellable: true
+    },
     'milk': {
         name: "Milk",
         description: "Carton of Milk - Clears all active personal effects.",
@@ -195,7 +206,7 @@ module.exports = {
         price: 500000,
         sellPrice: 25000,
         dropWeight: 8, // Epic
-        shop: true,
+        shop: false,
         usable: true,
         sellable: true
     },

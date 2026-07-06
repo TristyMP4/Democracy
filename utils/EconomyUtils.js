@@ -57,7 +57,20 @@ module.exports = {
      */
     async addCash(userId, amount, type = 'wallet') {
         const user = await this.getUser(userId);
-        user[type] += amount;
+        
+        if (type === 'bank') {
+            const capacity = user.bankCapacity || 50000;
+            if (user.bank + amount > capacity) {
+                const overflow = (user.bank + amount) - capacity;
+                user.bank = capacity;
+                user.wallet += overflow;
+            } else {
+                user.bank += amount;
+            }
+        } else {
+            user[type] += amount;
+        }
+        
         await user.save();
         return user;
     },

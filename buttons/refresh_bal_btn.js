@@ -47,7 +47,8 @@ module.exports = {
 
             const titleDisplay = ComponentUtils.createText(`### **${username}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol} **${userData.wallet.toLocaleString()}**\n🏦 **${userData.bank.toLocaleString()}**`);
+            const capacity = userData.bankCapacity || 50000;
+            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\` Scrap**\n🏦 **\`${userData.bank.toLocaleString()} / ${capacity.toLocaleString()}\` Scrap**`);
 
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),

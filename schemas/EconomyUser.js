@@ -4,6 +4,7 @@ const economyUserSchema = new mongoose.Schema({
     userId: { type: String, required: true, unique: true },
     wallet: { type: Number, default: 0 },
     bank: { type: Number, default: 0 },
+    bankCapacity: { type: Number, default: 50000 },
     inventory: { 
         type: Map, 
         of: Number, 

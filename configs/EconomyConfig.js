@@ -17,6 +17,7 @@ module.exports = {
     StartArrow: "<:StartArrow:1521618283034579075>",
 
     currencySymbol: '<:Scrap:1521924158399971409> ',
+    currencyName: 'Scrap',
     
     // Dictionary of All Items in the Economy System
     items: ItemsConfig,

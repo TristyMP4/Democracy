@@ -129,7 +129,18 @@ module.exports = {
             }
 
             // Execute custom logic based on item
-            if (itemId === 'supply-signal') {
+            if (itemId === 'bank-note') {
+                const capacity = userData.bankCapacity || 50000;
+                const newCapacity = Math.floor(capacity * 1.05);
+                userData.bankCapacity = newCapacity;
+                await userData.save();
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(EconomyConfig.successColor)
+                    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`✅ **Bank Capacity Expanded!**\nYou used your ${itemConfig.emoji} **${itemConfig.name}** to bribe the bank teller.\n\n> 📈 **New Capacity:** ${EconomyConfig.currencySymbol}**${newCapacity.toLocaleString()}** *(+5%)*`));
+                
+                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+            } else if (itemId === 'supply-signal') {
                 // Determine 1 to 3 items
                 const numItems = Math.floor(Math.random() * 3) + 1;
                 // Pre-calculate global total item weight for the drops
