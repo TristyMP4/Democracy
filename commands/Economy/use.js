@@ -148,7 +148,14 @@ module.exports = {
                 let totalWeight = 0;
                 const itemWeights = [];
                 for (const key of allItemKeys) {
-                    const w = EconomyConfig.items[key].dropWeight || 100;
+                    let w = EconomyConfig.items[key].dropWeight;
+                    
+                    if (w === undefined) {
+                        w = 100;
+                    } else if (w === 0) {
+                        w = Math.floor(Math.random() * 10) + 1; // Random weight between 1 and 10
+                    }
+
                     totalWeight += w;
                     itemWeights.push({ key, weight: w });
                 }
