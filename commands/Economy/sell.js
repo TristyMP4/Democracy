@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ContainerBuilder, ModalBuilder, TextInputBuilder, T
 const EconomyConfig = require('../../configs/EconomyConfig.js');
 const ComponentUtils = require('../../utils/ComponentUtils.js');
 const EconomyUtils = require('../../utils/EconomyUtils.js');
-
+const parseAmount = require('../../utils/AmountParser.js');
 module.exports = {
     economy: true,
     data: new SlashCommandBuilder()
@@ -118,9 +118,10 @@ module.exports = {
 
             for (const validItem of validItems) {
                 let amountStr = submitted.fields.getTextInputValue(`qty_${validItem.id}`);
-                let amount = parseInt(amountStr);
+                let currentInventory = userData.inventory ? (userData.inventory.get(validItem.id) || 0) : 0;
+                let amount = parseAmount(amountStr, currentInventory);
                 
-                if (isNaN(amount) || amount <= 0) {
+                if (amount <= 0) {
                     receiptLines.push(`❌ Invalid quantity for ${validItem.config.name}`);
                     continue;
                 }
