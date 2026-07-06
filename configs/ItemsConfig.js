@@ -17,7 +17,7 @@ module.exports = {
         description: 'Devastating heavy machine gun, tears through anything you throw its way. - Dropped by the Collector.',
         emoji: '<:XM250:1521922031241789510>', 
         ammo: ["762x39-rifle-ammo"], 
-        damagePercentage: 0.7,
+        damagePercentage: 0.8,
         durabilityPercentage: 0.45,
         price: 85000,
         dropWeight: 5, // Legendary
@@ -98,7 +98,7 @@ module.exports = {
         emoji: '<:762x39_Rifle:1523348831004262490>', 
         price: 200000,
         sellPrice: 50000,
-        dropWeight: 8,
+        dropWeight: 10,
         usable: false,
         sellable: true
     },

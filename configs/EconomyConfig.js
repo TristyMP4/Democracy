@@ -71,7 +71,7 @@ module.exports = {
         maxStealPercentage: 0.10, // Steal up to 10% of target bank
         finePercentage: 0.05, // Lose 5% of your own bank/wallet on fail
         minTargetBank: 10000, // Target must have at least 10,000 in bank
-        minBalanceToJoin: 5000, // Participants must have at least 5,000 in bank or wallet
+        minBalanceToJoin: 10000, // Participants must have at least 5,000 in bank or wallet
         cooldown: 7200 * 1000 // 2 hours (7200 seconds)
     },
 

@@ -84,9 +84,11 @@ module.exports = {
                 
                 const isHit = Math.random() <= adjustedHitChance;
 
-                // Roll for durability
-                const durabilityChance = itemConfig.durabilityPercentage;
-                const breaks = Math.random() >= durabilityChance;
+                // Roll for durability (Higher durability = lower break chance)
+                // We calculate base break chance as (1.0 - durabilityPercentage), then divide by 10 
+                // so a 0.20 durability pistol has an 8% chance to break, and a 0.50 AK has a 5% chance.
+                const breakChance = (1.0 - itemConfig.durabilityPercentage) / 10;
+                const breaks = Math.random() < breakChance;
 
                 let actionText = '';
                 
@@ -173,6 +175,15 @@ module.exports = {
             } else if (itemId === 'supply-signal') {
                 // Determine 1 to 3 items
                 const numItems = Math.floor(Math.random() * 3) + 1;
+                // Calculate luck multiplier for drops (does not affect quantity)
+                const luckRoll = await EconomyUtils.calculateLuckRoll(1.0, interaction.user.id);
+                let luckMult = Math.max(0.1, Math.min(10.0, luckRoll.multiplier));
+                
+                // We use luckMult to compress or expand the differences in weight.
+                // We linearly map: 1.0 luck -> 1.0 power, 2.5 luck -> 0.5 power.
+                let weightPower = 1.0 - ((luckMult - 1.0) / 3.0);
+                weightPower = Math.max(0.1, Math.min(3.0, weightPower));
+
                 // Pre-calculate global total item weight for the drops
                 const allItemKeys = Object.keys(EconomyConfig.items);
                 let totalWeight = 0;
@@ -185,6 +196,9 @@ module.exports = {
                     } else if (w === 0) {
                         w = Math.floor(Math.random() * 10) + 1; // Random weight between 1 and 10
                     }
+
+                    // Apply the luck curve
+                    w = Math.pow(w, weightPower);
 
                     totalWeight += w;
                     itemWeights.push({ key, weight: w });
