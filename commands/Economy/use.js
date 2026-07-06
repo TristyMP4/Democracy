@@ -137,7 +137,7 @@ module.exports = {
 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.successColor)
-                    .addTextDisplayComponents(ComponentUtils.createText(`✅ **Bank Capacity Expanded!**\nYou used your ${itemConfig.emoji} **${itemConfig.name}** to bribe the bank teller.\n\n> 📈 **New Capacity:** ${EconomyConfig.currencySymbol}**${newCapacity.toLocaleString()}** *(+125,000)*`));
+                    .addTextDisplayComponents(ComponentUtils.createText(`✅ **Bank Capacity Expanded!**\nYou used your ${itemConfig.emoji} **${itemConfig.name}** to bribe the bank teller.\n> 📈 **New Capacity:** ${EconomyConfig.currencySymbol}**${newCapacity.toLocaleString()}** *(+125,000)*`));
                 
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             } else if (itemId === 'supply-signal') {

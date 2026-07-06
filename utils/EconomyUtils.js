@@ -230,11 +230,26 @@ module.exports = {
             return settings;
         }
 
-        if (settings.multiplierExpiry && new Date() > settings.multiplierExpiry) {
+        let changed = false;
+        const now = new Date();
+        
+        if (settings.moneyExpiry && now > settings.moneyExpiry) {
             settings.moneyMultiplier = 1.0;
+            settings.moneyExpiry = null;
+            changed = true;
+        }
+        if (settings.luckExpiry && now > settings.luckExpiry) {
             settings.luckMultiplier = 1.0;
+            settings.luckExpiry = null;
+            changed = true;
+        }
+        if (settings.cooldownExpiry && now > settings.cooldownExpiry) {
             settings.cooldownMultiplier = 1.0;
-            settings.multiplierExpiry = null;
+            settings.cooldownExpiry = null;
+            changed = true;
+        }
+
+        if (changed) {
             await settings.save();
         }
 

@@ -50,26 +50,37 @@ module.exports = {
                 settings = new EconomySettings();
             }
 
-            if (moneyOpt !== null) settings.moneyMultiplier = moneyOpt;
-            if (luckOpt !== null) settings.luckMultiplier = luckOpt;
-            if (cooldownOpt !== null) settings.cooldownMultiplier = cooldownOpt;
-            
+            let expiryDate = null;
             if (duration !== null && duration > 0) {
-                const expiry = new Date();
-                expiry.setMinutes(expiry.getMinutes() + duration);
-                settings.multiplierExpiry = expiry;
-            } else {
-                settings.multiplierExpiry = null;
+                expiryDate = new Date();
+                expiryDate.setMinutes(expiryDate.getMinutes() + duration);
+            }
+
+            if (moneyOpt !== null) {
+                settings.moneyMultiplier = moneyOpt;
+                settings.moneyExpiry = expiryDate;
+            }
+            if (luckOpt !== null) {
+                settings.luckMultiplier = luckOpt;
+                settings.luckExpiry = expiryDate;
+            }
+            if (cooldownOpt !== null) {
+                settings.cooldownMultiplier = cooldownOpt;
+                settings.cooldownExpiry = expiryDate;
             }
 
             await settings.save();
 
-            let desc = `The economy scaling has been adjusted globally.\n\n**Money Multiplier:** ${settings.moneyMultiplier}x\n**Luck Multiplier:** ${settings.luckMultiplier}x\n**Cooldown Multiplier:** ${settings.cooldownMultiplier || 1.0}x`;
-            if (settings.multiplierExpiry) {
-                desc += `\n**Expires:** <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>`;
-            } else {
-                desc += `\n**Expires:** Never (Permanent)`;
-            }
+            let desc = `The economy scaling has been adjusted globally.\n\n`;
+            
+            const moneyExpText = settings.moneyExpiry ? ` (Expires: <t:${Math.floor(settings.moneyExpiry.getTime() / 1000)}:R>)` : '';
+            desc += `**Money Multiplier:** ${settings.moneyMultiplier}x${moneyExpText}\n`;
+            
+            const luckExpText = settings.luckExpiry ? ` (Expires: <t:${Math.floor(settings.luckExpiry.getTime() / 1000)}:R>)` : '';
+            desc += `**Luck Multiplier:** ${settings.luckMultiplier}x${luckExpText}\n`;
+            
+            const cdExpText = settings.cooldownExpiry ? ` (Expires: <t:${Math.floor(settings.cooldownExpiry.getTime() / 1000)}:R>)` : '';
+            desc += `**Cooldown Multiplier:** ${settings.cooldownMultiplier || 1.0}x${cdExpText}`;
 
             const embed = new EmbedBuilder()
                 .setTitle('⚖️ Global Multipliers Updated')
