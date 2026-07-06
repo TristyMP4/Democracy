@@ -131,13 +131,13 @@ module.exports = {
             // Execute custom logic based on item
             if (itemId === 'bank-note') {
                 const capacity = userData.bankCapacity || 50000;
-                const newCapacity = Math.floor(capacity * 1.25);
+                const newCapacity = capacity + 125000;
                 userData.bankCapacity = newCapacity;
                 await userData.save();
 
                 const container = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.successColor)
-                    .addTextDisplayComponents(ComponentUtils.createText(`✅ **Bank Capacity Expanded!**\nYou used your ${itemConfig.emoji} **${itemConfig.name}** to bribe the bank teller.\n\n> 📈 **New Capacity:** ${EconomyConfig.currencySymbol}**${newCapacity.toLocaleString()}** *(+15%)*`));
+                    .addTextDisplayComponents(ComponentUtils.createText(`✅ **Bank Capacity Expanded!**\nYou used your ${itemConfig.emoji} **${itemConfig.name}** to bribe the bank teller.\n\n> 📈 **New Capacity:** ${EconomyConfig.currencySymbol}**${newCapacity.toLocaleString()}** *(+125,000)*`));
                 
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             } else if (itemId === 'supply-signal') {
