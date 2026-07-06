@@ -37,23 +37,19 @@ module.exports = {
             let globalText = '';
             let hasGlobal = false;
             
-            let expiryText = '';
-            if (settings.multiplierExpiry) {
-                expiryText = ` (Expires <t:${Math.floor(settings.multiplierExpiry.getTime() / 1000)}:R>)`;
-            } else {
-                expiryText = ` (Permanent)`;
-            }
-
             if (settings.moneyMultiplier !== 1.0) {
-                globalText += `**Money:** ${settings.moneyMultiplier}x${expiryText}\n`;
+                const moneyExp = settings.moneyExpiry ? ` (Expires <t:${Math.floor(settings.moneyExpiry.getTime() / 1000)}:R>)` : ` (Permanent)`;
+                globalText += `**Money:** ${settings.moneyMultiplier}x${moneyExp}\n`;
                 hasGlobal = true;
             }
             if (settings.luckMultiplier !== 1.0) {
-                globalText += `**Luck:** ${settings.luckMultiplier}x${expiryText}\n`;
+                const luckExp = settings.luckExpiry ? ` (Expires <t:${Math.floor(settings.luckExpiry.getTime() / 1000)}:R>)` : ` (Permanent)`;
+                globalText += `**Luck:** ${settings.luckMultiplier}x${luckExp}\n`;
                 hasGlobal = true;
             }
             if (settings.cooldownMultiplier !== 1.0) {
-                globalText += `**Cooldown:** ${settings.cooldownMultiplier}x${expiryText}\n`;
+                const cdExp = settings.cooldownExpiry ? ` (Expires <t:${Math.floor(settings.cooldownExpiry.getTime() / 1000)}:R>)` : ` (Permanent)`;
+                globalText += `**Cooldown:** ${settings.cooldownMultiplier}x${cdExp}\n`;
                 hasGlobal = true;
             }
 
