@@ -12,12 +12,19 @@ module.exports = {
         const amountInput = interaction.fields.getTextInputValue('amount');
 
         try {
-            let userData = await EconomyUser.findOne({ userId: interaction.user.id });
-            if (!userData || userData.wallet <= 0) {
+            let userData = await EconomyUtils.getUser(interaction.user.id);
+            if (userData.wallet <= 0) {
                 return interaction.followUp(ComponentUtils.createError('❌ You do not have any money in your wallet to deposit!'));
             }
 
-            const amountToDeposit = parseAmount(amountInput, userData.wallet);
+            const capacity = userData.bankCapacity || 50000;
+            const availableSpace = Math.max(0, capacity - userData.bank);
+
+            if (availableSpace <= 0) {
+                return interaction.followUp(ComponentUtils.createError('❌ Your bank account is at maximum capacity! Use a **Bank Note** to expand it.'));
+            }
+
+            let amountToDeposit = parseAmount(amountInput, userData.wallet);
 
             if (amountToDeposit <= 0) {
                 return interaction.followUp(ComponentUtils.createError('❌ Invalid amount. Please enter a valid number, shorthand (e.g. 2k), or percentage (e.g. 50%).'));
@@ -27,10 +34,17 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createError(`You only have **${EconomyConfig.currencySymbol}${userData.wallet.toLocaleString()}** in your wallet!`));
             }
 
-            userData.wallet -= amountToDeposit;
-            userData.bank += amountToDeposit;
+            if (amountInput.toLowerCase() === 'all' || amountInput.toLowerCase() === 'max') {
+                amountToDeposit = Math.min(amountToDeposit, availableSpace);
+            } else if (amountToDeposit > availableSpace) {
+                return interaction.followUp(ComponentUtils.createError(`❌ Your bank cannot hold that much! You only have space for **${EconomyConfig.currencySymbol}${availableSpace.toLocaleString()}**.`));
+            }
 
-            await userData.save();
+            await EconomyUtils.removeCash(interaction.user.id, amountToDeposit, 'wallet');
+            await EconomyUtils.addCash(interaction.user.id, amountToDeposit, 'bank');
+
+            // Refetch to get updated balances for display
+            userData = await EconomyUtils.getUser(interaction.user.id);
 
             const embed = new EmbedBuilder()
                 .setTitle('🏦 Deposit Successful')
@@ -51,8 +65,8 @@ module.exports = {
 
             const titleDisplay = ComponentUtils.createText(`### **${interaction.user.username}'s Balances**`);
             const rankDisplay = ComponentUtils.createText(`-# Net Worth: **${EconomyConfig.currencySymbol}${netWorth.toLocaleString()}**`);
-            const capacity = userData.bankCapacity || 50000;
-            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\`**\n🏦 **\`${userData.bank.toLocaleString()} / ${capacity.toLocaleString()}\`**`);
+            const displayCapacity = userData.bankCapacity || 50000;
+            const balancesDisplay = ComponentUtils.createText(`${EconomyConfig.currencySymbol}**\`${userData.wallet.toLocaleString()}\` Scrap**\n🏦 **\`${userData.bank.toLocaleString()} / ${displayCapacity.toLocaleString()}\` Scrap**`);
 
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('withdraw_btn').setLabel('Withdraw').setStyle(ButtonStyle.Secondary).setDisabled(false),
