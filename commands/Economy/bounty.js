@@ -83,7 +83,7 @@ module.exports = {
                 const bounties = targetData.bounties || [];
 
                 if (bounties.length === 0) {
-                    return interaction.followUp(ComponentUtils.createSuccess(`<@${target.id}> is clean! They have no active bounties on their head.`));
+                    return interaction.followUp({ embeds: [new EmbedBuilder().setDescription(`✅ <@${target.id}> is clean! They have no active bounties on their head.`).setColor(EconomyConfig.successColor)] });
                 }
 
                 const totalBounty = bounties.reduce((sum, b) => sum + b.amount, 0);
@@ -123,7 +123,7 @@ module.exports = {
                 }).filter(u => u.totalBounty > 0).sort((a, b) => b.totalBounty - a.totalBounty).slice(0, 10);
 
                 if (wantedList.length === 0) {
-                    return interaction.followUp(ComponentUtils.createSuccess('The server is peaceful... There are no active bounties!'));
+                    return interaction.followUp({ embeds: [new EmbedBuilder().setDescription('✅ The server is peaceful... There are no active bounties!').setColor(EconomyConfig.successColor)] });
                 }
 
                 const embed = new EmbedBuilder()
