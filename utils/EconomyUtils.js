@@ -570,14 +570,11 @@ module.exports = {
         const safeTargetLuck = Math.max(0.001, targetLuckRoll.multiplier);
         const relativeLuckRatio = luckRoll.multiplier / safeTargetLuck;
         
-        // Lowered curve: instead of squaring the ratio immediately, we power it to 1.5 
-        // to make it less "stupidly hard" but still reward high luck heavily
-        const curveMult = Math.pow(relativeLuckRatio, 1.5);
+        // Base chance: dropWeight percentage. Exotic (3) = 3%, Common (50) = 50%
+        let baseChance = dropW / 100.0;
         
-        // Base chance: Common = 40%, Rare = ~6%, Exotic = ~0.6%
-        let baseChance = Math.min(0.60, Math.max(0.01, dropW / 150));
-        
-        let finalChance = baseChance * curveMult;
+        // Linear multiplier based strictly on relative luck
+        let finalChance = baseChance * relativeLuckRatio;
         
         // Apply Drunk vulnerability multiplier
         if (isDrunk) {
