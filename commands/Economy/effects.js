@@ -57,8 +57,8 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setTitle(`${effectConfig.emoji} ${effectConfig.name}`)
-                    .setDescription(effectConfig.description)
+                    .setTitle(`📖 Effect Information`)
+                    .setDescription(`### ${effectConfig.emoji} **${effectConfig.name}**\n\n-# ${effectConfig.description}`)
                     .setColor(effectConfig.color || EconomyConfig.embedColor);
 
                 return interaction.followUp({ embeds: [embed] });
