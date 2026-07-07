@@ -65,7 +65,7 @@ module.exports = {
         const userData = await EconomyUtils.getUser(interaction.user.id);
         const globalMultiplier = settings.cooldownMultiplier || 1.0;
         const userMultiplier = userData.cooldownMultiplier || 1.0;
-        const cooldownTime = 300_000 * globalMultiplier * userMultiplier; // 5 mins
+        const cooldownTime = 30_000 * globalMultiplier * userMultiplier; // 5 mins
 
         await Cooldown.findOneAndUpdate(
             { userId: interaction.user.id, commandName },
