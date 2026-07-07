@@ -90,7 +90,7 @@ module.exports = {
 
         if (result.reason === 'zipper') {
             await EconomyUtils.dmUser(target, ComponentUtils.createError(`🚨 **PICKPOCKET THWARTED!** 🚨\n**${interaction.user.username}** tried to pickpocket your ${itemConfig.emoji} **${itemConfig.name}**, but your **Pocket Zipper** protected it! Your Zipper was destroyed in the process.`));
-            return interaction.followUp(ComponentUtils.createError(`❌ You tried to steal **${itemConfig.name}** from ${target}, but they had a **Pocket Zipper**! You failed and their Zipper broke.`));
+            return interaction.followUp(ComponentUtils.createError(`❌ You tried to steal **${itemConfig.emoji} ${itemConfig.name}** from ${target}, but they had a **Pocket Zipper**! You failed and their Zipper broke.`));
         }
 
         if (result.reason === 'failed') {
