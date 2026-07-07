@@ -2,7 +2,7 @@ module.exports = {
     'Drunk': {
         name: 'Drunk',
         emoji: '🥴',
-        description: 'Your heavy drinking addiction finally caught up to you, You are wasted!\nYour luck protection against pickpockets is ignored, and it is `3x` easier for others to steal from your inventory.',
+        description: 'Your heavy drinking addiction finally caught up to you, You are wasted!\n> Your luck protection against pickpockets is ignored, and it is `3x` easier for others to steal from your inventory.',
         color: '#ff69b4'
     },
     'Luck Multiplier': {
