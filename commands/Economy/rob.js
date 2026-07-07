@@ -55,7 +55,15 @@ module.exports = {
             await attackerData.save(); // Save the cooldown
 
             const robConfig = EconomyConfig.rob;
-            const rollResult = await EconomyUtils.calculateLuckRoll(robConfig.successChance, interaction.user.id);
+            
+            let baseChance = robConfig.successChance;
+            const isDrunk = await EconomyUtils.hasEffect(targetUser.id, 'Drunk');
+            if (isDrunk) {
+                baseChance *= 3.0;
+                baseChance = Math.min(1.0, baseChance); // Cap at 100%
+            }
+            
+            const rollResult = await EconomyUtils.calculateLuckRoll(baseChance, interaction.user.id);
 
             if (rollResult.isSuccess) {
                 // Calculate steal amount based on target's wallet

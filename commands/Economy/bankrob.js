@@ -107,7 +107,13 @@ module.exports = {
 
             const extraPeople = Math.max(0, yesVotes.size - 2);
             const bonusChance = extraPeople * 0.05; // +5% per extra person beyond the first 2
-            const baseChance = Math.min(0.80, config.successChance + bonusChance);
+            let baseChance = Math.min(0.80, config.successChance + bonusChance);
+            
+            const isDrunk = await EconomyUtils.hasEffect(target.id, 'Drunk');
+            if (isDrunk) {
+                baseChance *= 3.0; // 3x easier to rob if they are drunk
+                baseChance = Math.min(1.0, baseChance); // Cap at 100%
+            }
 
             const rollResult = await EconomyUtils.calculateLuckRoll(baseChance, interaction.user.id);
 
