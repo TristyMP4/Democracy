@@ -138,7 +138,17 @@ module.exports = {
         sellPrice: 12500,
         dropWeight: 50, // Relatively Common
         usable: true,
-        sellable: true
+        sellable: true,
+        effects: [
+            { 
+                type: 'luck', 
+                amount: 0.5, 
+                rng: true, 
+                durationMinutes: 10, 
+                positiveMsg: `You smoked the Weed and suddenly feel hyper-focused! Your individual luck multiplier has **increased** (+0.5x)`, 
+                negativeMsg: `You smoked the Weed but it was laced with something foul... You feel sluggish and your individual luck multiplier has **decreased** (-0.5x)`
+            }
+        ]
     },
     'lucky-coin': {
         name: "Lucky Coin",
@@ -148,7 +158,17 @@ module.exports = {
         sellPrice: 15000,
         dropWeight: 45,
         usable: true,
-        sellable: true
+        sellable: true,
+        effects: [
+            { 
+                type: 'money', 
+                amount: 0.5, 
+                rng: true, 
+                durationMinutes: 10, 
+                positiveMsg: `You flipped the Lucky Coin and it landed on **Heads**! Your individual money multiplier has **increased** (+0.5x)`, 
+                negativeMsg: `You flipped the Lucky Coin and it landed on **Tails**... Your individual money multiplier has **decreased** (-0.5x)`
+            }
+        ]
     },
     'bank-note': {
         name: "Bank Note",
@@ -170,7 +190,13 @@ module.exports = {
         dropWeight: 35,
         usable: true,
         shop: true,
-        sellable: true
+        sellable: true,
+        effects: [
+            { 
+                type: 'clear_all', 
+                msg: `Ah, refreshing! All of your active personal effects (luck, money, and cooldown multipliers) have been completely neutralized and wiped clean.`
+            }
+        ]
     },
     'pink-diamond': {
         name: "Pink Diamond",
@@ -189,7 +215,11 @@ module.exports = {
         sellPrice: 85000,
         dropWeight: 15,
         usable: true,
-        sellable: true
+        sellable: true,
+        effects: [
+            { type: 'luck', amount: 2.0, rng: false, durationMinutes: 10, msg: `You drank the Sinsimito Tequila and feel invincible! Your individual luck multiplier has **massively increased** (+2.0x)` },
+            { type: 'status', name: 'Drunk', durationMinutes: 15 }
+        ]
     },
     'crude-oil': {
         name: "Crude Oil",

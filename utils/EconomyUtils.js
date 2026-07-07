@@ -487,6 +487,57 @@ module.exports = {
     },
 
     /**
+     * Adds an effect to a user
+     * @param {string} userId
+     * @param {string} effectName
+     * @param {number} durationMinutes
+     */
+    async addEffect(userId, effectName, durationMinutes) {
+        const user = await this.getUser(userId);
+        if (!user.effects) user.effects = [];
+        
+        // Remove existing effect of same name
+        user.effects = user.effects.filter(e => e.name !== effectName);
+        
+        const expiry = new Date();
+        expiry.setMinutes(expiry.getMinutes() + durationMinutes);
+        
+        user.effects.push({ name: effectName, expiry });
+        await user.save();
+        return user;
+    },
+
+    /**
+     * Checks if user has a specific effect active
+     * @param {string} userId
+     * @param {string} effectName
+     * @returns {Promise<boolean>}
+     */
+    async hasEffect(userId, effectName) {
+        const user = await this.getUser(userId);
+        if (!user.effects) return false;
+        
+        const effect = user.effects.find(e => e.name === effectName);
+        if (!effect) return false;
+        
+        if (effect.expiry < new Date()) {
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * Clears all effects from a user
+     * @param {string} userId
+     */
+    async clearEffects(userId) {
+        const user = await this.getUser(userId);
+        user.effects = [];
+        await user.save();
+        return user;
+    },
+
+    /**
      * Executes a pickpocket attempt with luck scaling and zipper protection
      * @param {string} targetId 
      * @param {string} thiefId 
@@ -506,34 +557,43 @@ module.exports = {
         let dropW = itemConfig.dropWeight !== undefined ? itemConfig.dropWeight : 100;
         if (dropW === 0) dropW = 100;
 
-        // Pocket Zipper check: protects Exotic (<=4) and Legendary (<12)
-        if (dropW < 12) {
-            if (targetProfile.inventory.get('zipper') && targetProfile.inventory.get('zipper') > 0) {
-                // Break the zipper
-                await this.removeItem(targetId, 'zipper', 1);
-                return { success: false, reason: 'zipper', itemConfig };
-            }
-        }
-
         // Luck calculations
         const luckRoll = await this.calculateLuckRoll(1.0, thiefId);
-        const targetLuckRoll = await this.calculateLuckRoll(1.0, targetId);
+        let targetLuckRoll = await this.calculateLuckRoll(1.0, targetId);
+        
+        // Drunk Check: 3x easier to steal from, completely ignores their luck protection
+        const isDrunk = await this.hasEffect(targetId, 'Drunk');
+        if (isDrunk) {
+            targetLuckRoll.multiplier = 0.001; // Treat as having extremely low luck protection
+        }
         
         const safeTargetLuck = Math.max(0.001, targetLuckRoll.multiplier);
         const relativeLuckRatio = luckRoll.multiplier / safeTargetLuck;
         
-        // High curve (squared)
-        const curveMult = Math.pow(relativeLuckRatio, 2);
+        // Lowered curve: instead of squaring the ratio immediately, we power it to 1.5 
+        // to make it less "stupidly hard" but still reward high luck heavily
+        const curveMult = Math.pow(relativeLuckRatio, 1.5);
         
         // Base chance: Common = 40%, Rare = ~6%, Exotic = ~0.6%
-        const baseChance = Math.min(0.60, Math.max(0.01, dropW / 150));
+        let baseChance = Math.min(0.60, Math.max(0.01, dropW / 150));
         
         let finalChance = baseChance * curveMult;
-        finalChance = Math.max(0, Math.min(1.0, finalChance));
         
+        // Apply Drunk vulnerability multiplier
+        if (isDrunk) {
+            finalChance *= 3.0;
+        }
+        
+        finalChance = Math.max(0, Math.min(1.0, finalChance));
         const isSuccess = Math.random() <= finalChance;
         
         if (isSuccess) {
+            // Pocket Zipper check: only triggers (and breaks) on a SUCCESSFUL steal of a rare item
+            if (dropW < 12 && targetProfile.inventory.get('zipper') && targetProfile.inventory.get('zipper') > 0) {
+                await this.removeItem(targetId, 'zipper', 1);
+                return { success: false, reason: 'zipper', itemConfig };
+            }
+            
             await this.removeItem(targetId, itemKey, 1);
             await this.addItem(thiefId, itemKey, 1);
             return { success: true, reason: 'success', itemConfig };

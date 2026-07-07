@@ -30,6 +30,13 @@ const economyUserSchema = new mongoose.Schema({
         }],
         default: []
     },
+    effects: {
+        type: [{
+            name: String,
+            expiry: Date
+        }],
+        default: []
+    },
     
     // Jobs System
     currentJob: { type: String, default: null },

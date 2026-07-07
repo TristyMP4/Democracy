@@ -237,131 +237,79 @@ module.exports = {
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
             }
 
-            if (itemId === 'weed') {
-                const currentMultiplier = (userData.luckExpiry && userData.luckExpiry > new Date()) ? (userData.luckMultiplier || 1.0) : 1.0;
+            // Apply dynamic config effects if present
+            if (itemConfig.effects && itemConfig.effects.length > 0) {
+                let titleDisplayStr = `### ${itemConfig.emoji} **You used ${itemConfig.name}**`;
+                let descDisplayStr = '';
+                let isPositiveOutcome = true;
                 
-                const isPositive = Math.random() >= 0.5;
-                const diff = isPositive ? 0.5 : -0.5;
-                
-                const expiry = new Date();
-                expiry.setMinutes(expiry.getMinutes() + 10);
-                
-                userData.luckMultiplier = currentMultiplier + diff;
-                userData.luckExpiry = expiry;
-                await userData.save();
-                
-                let textDesc = '';
-                if (isPositive) {
-                    textDesc = `You smoked the Weed and suddenly feel hyper-focused! Your individual luck multiplier has **increased** (+0.5x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
-                } else {
-                    textDesc = `You smoked the Weed but it was laced with something foul... You feel sluggish and your individual luck multiplier has **decreased** (-0.5x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
+                for (const eff of itemConfig.effects) {
+                    if (eff.type === 'status') {
+                        await EconomyUtils.addEffect(interaction.user.id, eff.name, eff.durationMinutes);
+                    } else if (eff.type === 'clear_all') {
+                        userData.luckMultiplier = 1.0;
+                        userData.luckExpiry = null;
+                        userData.moneyMultiplier = 1.0;
+                        userData.moneyExpiry = null;
+                        userData.cooldownMultiplier = 1.0;
+                        userData.cooldownExpiry = null;
+                        userData.effects = [];
+                        if (eff.msg) descDisplayStr += `-# ${eff.msg}\n`;
+                    } else if (eff.type === 'luck' || eff.type === 'money') {
+                        const isLuck = eff.type === 'luck';
+                        const currentExpiry = isLuck ? userData.luckExpiry : userData.moneyExpiry;
+                        const currentMult = (currentExpiry && currentExpiry > new Date()) ? (isLuck ? (userData.luckMultiplier || 1.0) : (userData.moneyMultiplier || 1.0)) : 1.0;
+                        
+                        let isPositive = true;
+                        let diff = eff.amount;
+                        if (eff.rng) {
+                            isPositive = Math.random() >= 0.5;
+                            diff = isPositive ? eff.amount : -eff.amount;
+                        }
+
+                        const expiry = new Date();
+                        expiry.setMinutes(expiry.getMinutes() + eff.durationMinutes);
+                        
+                        const newTotal = currentMult + diff;
+                        if (isLuck) {
+                            userData.luckMultiplier = newTotal;
+                            userData.luckExpiry = expiry;
+                        } else {
+                            userData.moneyMultiplier = newTotal;
+                            userData.moneyExpiry = expiry;
+                        }
+
+                        if (!isPositive) isPositiveOutcome = false;
+
+                        if (eff.rng) {
+                            descDisplayStr += `-# ${isPositive ? eff.positiveMsg : eff.negativeMsg} to a total of **${newTotal.toFixed(1)}x** for the next ${eff.durationMinutes} minutes!\n`;
+                        } else {
+                            descDisplayStr += `-# ${eff.msg} to a total of **${newTotal.toFixed(1)}x** for the next ${eff.durationMinutes} minutes!\n`;
+                        }
+                    }
                 }
+                await userData.save();
                 
-                const titleDisplay = ComponentUtils.createText(`### 🌿 **You smoked some Weed**`);
-                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
-
+                const titleDisplay = ComponentUtils.createText(titleDisplayStr);
+                const descDisplay = ComponentUtils.createText(descDisplayStr);
                 const container = new ContainerBuilder()
-                    .setAccentColor(isPositive ? EconomyConfig.successColor : EconomyConfig.failColor)
+                    .setAccentColor(isPositiveOutcome ? EconomyConfig.successColor : EconomyConfig.failColor)
                     .addTextDisplayComponents(titleDisplay)
                     .addSeparatorComponents(ComponentUtils.createSeparator())
                     .addTextDisplayComponents(descDisplay);
-
                 return interaction.followUp(ComponentUtils.createContainerResponse(container));
-            }
-
-            if (itemId === 'milk') {
-                userData.luckMultiplier = 1.0;
-                userData.luckExpiry = null;
-                
-                userData.moneyMultiplier = 1.0;
-                userData.moneyExpiry = null;
-                
-                userData.cooldownMultiplier = 1.0;
-                userData.cooldownExpiry = null;
-                
-                await userData.save();
-                
-                const titleDisplay = ComponentUtils.createText(`### 🥛 **You drank some Milk**`);
-                const descDisplay = ComponentUtils.createText(`-# Ah, refreshing! All of your active personal effects (luck, money, and cooldown multipliers) have been completely neutralized and wiped clean.`);
-
-                const container = new ContainerBuilder()
+            } else {
+                // Fallback for generic items
+                const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
+                const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);
+                const fallbackContainer = new ContainerBuilder()
                     .setAccentColor(EconomyConfig.successColor)
-                    .addTextDisplayComponents(titleDisplay)
+                    .addTextDisplayComponents(fallbackTitle)
                     .addSeparatorComponents(ComponentUtils.createSeparator())
-                    .addTextDisplayComponents(descDisplay);
+                    .addTextDisplayComponents(fallbackDesc);
 
-                return interaction.followUp(ComponentUtils.createContainerResponse(container));
+                return interaction.followUp(ComponentUtils.createContainerResponse(fallbackContainer));
             }
-
-            if (itemId === 'sinsimito-tequila') {
-                const currentMultiplier = (userData.luckExpiry && userData.luckExpiry > new Date()) ? (userData.luckMultiplier || 1.0) : 1.0;
-                
-                const diff = 2.0;
-                
-                const expiry = new Date();
-                expiry.setMinutes(expiry.getMinutes() + 10);
-                
-                userData.luckMultiplier = currentMultiplier + diff;
-                userData.luckExpiry = expiry;
-                await userData.save();
-                
-                const textDesc = `You drank the Sinsimito Tequila and feel invincible! Your individual luck multiplier has **massively increased** (+2.0x) to a total of **${userData.luckMultiplier.toFixed(1)}x** for the next 10 minutes!`;
-                
-                const titleDisplay = ComponentUtils.createText(`### 🥃 **You drank Sinsimito Tequila**`);
-                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
-
-                const container = new ContainerBuilder()
-                    .setAccentColor(EconomyConfig.successColor)
-                    .addTextDisplayComponents(titleDisplay)
-                    .addSeparatorComponents(ComponentUtils.createSeparator())
-                    .addTextDisplayComponents(descDisplay);
-
-                return interaction.followUp(ComponentUtils.createContainerResponse(container));
-            }
-
-            if (itemId === 'lucky-coin') {
-                const currentMultiplier = (userData.moneyExpiry && userData.moneyExpiry > new Date()) ? (userData.moneyMultiplier || 1.0) : 1.0;
-                
-                const isPositive = Math.random() >= 0.5;
-                const diff = isPositive ? 0.5 : -0.5;
-                
-                const expiry = new Date();
-                expiry.setMinutes(expiry.getMinutes() + 10);
-                
-                userData.moneyMultiplier = currentMultiplier + diff;
-                userData.moneyExpiry = expiry;
-                await userData.save();
-                
-                let textDesc = '';
-                if (isPositive) {
-                    textDesc = `You flipped the Lucky Coin and it landed on **Heads**! Your individual money multiplier has **increased** (+0.5x) to a total of **${userData.moneyMultiplier.toFixed(1)}x** for the next 10 minutes!`;
-                } else {
-                    textDesc = `You flipped the Lucky Coin and it landed on **Tails**... Your individual money multiplier has **decreased** (-0.5x) to a total of **${userData.moneyMultiplier.toFixed(1)}x** for the next 10 minutes!`;
-                }
-                
-                const titleDisplay = ComponentUtils.createText(`### 🪙 **You flipped a Lucky Coin**`);
-                const descDisplay = ComponentUtils.createText(`-# ${textDesc}`);
-
-                const container = new ContainerBuilder()
-                    .setAccentColor(isPositive ? EconomyConfig.successColor : EconomyConfig.failColor)
-                    .addTextDisplayComponents(titleDisplay)
-                    .addSeparatorComponents(ComponentUtils.createSeparator())
-                    .addTextDisplayComponents(descDisplay);
-
-                return interaction.followUp(ComponentUtils.createContainerResponse(container));
-            }
-
-            // Fallback for generic items
-            const fallbackTitle = ComponentUtils.createText(`### ✅ **Item Used**`);
-            const fallbackDesc = ComponentUtils.createText(`-# You used **${itemConfig.name}**.`);
-            const fallbackContainer = new ContainerBuilder()
-                .setAccentColor(EconomyConfig.successColor)
-                .addTextDisplayComponents(fallbackTitle)
-                .addSeparatorComponents(ComponentUtils.createSeparator())
-                .addTextDisplayComponents(fallbackDesc);
-
-            await interaction.followUp(ComponentUtils.createContainerResponse(fallbackContainer));
-
         } catch (error) {
             console.error('Use Error:', error);
             await interaction.followUp(ComponentUtils.createError('An error occurred while using the item.'));
