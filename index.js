@@ -71,6 +71,7 @@ async function InteractionHandler(interaction, type) {
                 const onlineCount = interaction.guild.members.cache.filter(m => !m.user.bot && ['online', 'idle', 'dnd'].includes(m.presence?.status)).size;
                 
                 let isMultiplayer = false;
+                if (interaction.commandName === 'poker') isMultiplayer = true;
                 if (interaction.commandName === 'bankrob') isMultiplayer = true;
                 if (interaction.commandName === 'blackjack' && interaction.options.getUser('opponent1')) isMultiplayer = true;
                 
