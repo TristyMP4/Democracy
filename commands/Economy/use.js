@@ -119,20 +119,20 @@ module.exports = {
                         actionText += `\n> **However, their 💝Life Saver protected their wallet and inventory!**`;
                     } else {
                         actionText += `\n> **Their wallet and inventory were completely wiped.**`;
-                    }
 
-                    // Claim Bounties
-                    const claimedBounty = await EconomyUtils.claimBounties(target.id, interaction.user.id);
-                    if (claimedBounty > 0) {
-                        actionText += `\n> 💰 **You claimed a massive bounty of ${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()} off their head!**`;
+                        // Claim Bounties
+                        const claimedBounty = await EconomyUtils.claimBounties(target.id, interaction.user.id);
+                        if (claimedBounty > 0) {
+                            actionText += `\n> 💰 **You claimed a massive bounty of ${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()} off their head!**`;
 
-                        // Broadcast News Event for Claimed Bounty
-                        if (claimedBounty >= 30000) {
-                            await EconomyUtils.postNewsEvent(
-                                interaction.guild,
-                                `# 💰 BOUNTY CLAIMED\n**${interaction.user}** just claimed the massive **${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()}** bounty resting on **${target}**'s head!`,
-                                EconomyConfig.successColor
-                            );
+                            // Broadcast News Event for Claimed Bounty
+                            if (claimedBounty >= 30000) {
+                                await EconomyUtils.postNewsEvent(
+                                    interaction.guild,
+                                    `# 💰 BOUNTY CLAIMED\n**${interaction.user}** just claimed the massive **${EconomyConfig.currencySymbol}${claimedBounty.toLocaleString()}** bounty resting on **${target}**'s head!`,
+                                    EconomyConfig.successColor
+                                );
+                            }
                         }
                     }
 
