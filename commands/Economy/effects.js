@@ -10,6 +10,15 @@ module.exports = {
         .setName('effects')
         .setDescription('Manage and view economy effects.')
         .addSubcommand(subcommand =>
+            subcommand.setName('active')
+                .setDescription('View active economy effects and multipliers')
+                .addUserOption(option => 
+                    option.setName('user')
+                        .setDescription('The user to check effects for (defaults to yourself)')
+                        .setRequired(false)
+                )
+        )
+        .addSubcommand(subcommand =>
             subcommand.setName('info')
                 .setDescription('View information about a specific effect')
                 .addStringOption(option =>
@@ -17,15 +26,6 @@ module.exports = {
                         .setDescription('The effect to check')
                         .setRequired(true)
                         .setAutocomplete(true)
-                )
-        )
-        .addSubcommand(subcommand =>
-            subcommand.setName('active')
-                .setDescription('View active economy effects and multipliers')
-                .addUserOption(option => 
-                    option.setName('user')
-                        .setDescription('The user to check effects for (defaults to yourself)')
-                        .setRequired(false)
                 )
         ),
 
