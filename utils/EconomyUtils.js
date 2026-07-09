@@ -554,8 +554,9 @@ module.exports = {
             return { success: false, reason: 'no_item', itemConfig };
         }
 
-        let dropW = itemConfig.dropWeight !== undefined ? itemConfig.dropWeight : 100;
-        if (dropW === 0) dropW = 100;
+        const unobtainableDropW = Math.random(5,100)
+        let dropW = itemConfig.dropWeight !== undefined ? itemConfig.dropWeight : unobtainableDropW;
+        if (dropW === 0) dropW = unobtainableDropW;
 
         // Luck calculations
         const luckRoll = await this.calculateLuckRoll(1.0, thiefId);
