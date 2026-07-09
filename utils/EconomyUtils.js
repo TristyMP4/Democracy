@@ -554,7 +554,7 @@ module.exports = {
             return { success: false, reason: 'no_item', itemConfig };
         }
 
-        const unobtainableDropW = Math.random(5,100)
+        const unobtainableDropW = Math.random(30,100)
         let dropW = itemConfig.dropWeight !== undefined ? itemConfig.dropWeight : unobtainableDropW;
         if (dropW === 0) dropW = unobtainableDropW;
 

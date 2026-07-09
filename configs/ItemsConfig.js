@@ -268,6 +268,7 @@ module.exports = {
         emoji: '💝', 
         price: 250000,
         sellPrice: 15000,
+        maxOwned: 3,
         dropWeight: 0, // Unobtainable
         shop: true,
         usable: false,
