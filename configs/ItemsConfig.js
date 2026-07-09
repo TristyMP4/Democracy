@@ -37,7 +37,7 @@ module.exports = {
         description: 'A mid tier SMG that is a reliable choice in a gunfight.',
         emoji: '<:Thompson:1521922029790433525>',
         ammo: ["pistol-ammo"], 
-        damagePercentage: 0.40,
+        damagePercentage: 0.35,
         durabilityPercentage: 0.40,
         price: 20000,
         sellPrice: 8500,
@@ -63,7 +63,7 @@ module.exports = {
         description: 'Medium damaging semi rifle chambered in 5.56',
         emoji: '<:SemiAutomaticRifle:1521922028368826398>',
         ammo: ["556-rifle-ammo"], 
-        damagePercentage: 0.45,
+        damagePercentage: 0.4,
         durabilityPercentage: 0.35,
         price: 15000,
         dropWeight: 30, // Rare
