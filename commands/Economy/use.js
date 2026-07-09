@@ -92,20 +92,28 @@ module.exports = {
 
                 let actionText = '';
                 
+                let deathResult = null;
+                if (isHit) {
+                    // Kill target first so we know if they were saved
+                    deathResult = await EconomyUtils.handleDeath(target.id);
+                }
+
                 const dmEmbed = new EmbedBuilder()
                     .setTitle('🔫 You were shot at!')
                     .setColor(isHit ? EconomyConfig.failColor : EconomyConfig.successColor);
 
                 if (isHit) {
-                    dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!`);
+                    if (deathResult.saved) {
+                        dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!\n> 💝 **However, your Life Saver shattered and protected your wallet and inventory!**`);
+                    } else {
+                        dmEmbed.setDescription(`**${interaction.user.username}** shot you with their ${itemConfig.name} and **killed you**!\n> ☠️ **Your wallet and inventory were completely wiped!**`);
+                    }
                 } else {
                     dmEmbed.setDescription(`**${interaction.user.username}** shot at you with their ${itemConfig.name} but **missed**! You survived!`);
                 }
                 await EconomyUtils.dmUser(target, { embeds: [dmEmbed] });
                 
                 if (isHit) {
-                    // Kill target
-                    const deathResult = await EconomyUtils.handleDeath(target.id);
                     actionText = `💥 **BOOM!** You shot <@${target.id}> with the ${itemConfig.name} and killed them!`;
 
                     if (deathResult.saved) {
