@@ -112,13 +112,21 @@ module.exports = {
         if (pingType === 'everyone' || pingType === 'here') {
             const pingStr = pingType === 'everyone' ? '@everyone' : '@here';
             try {
-                await interaction.channel.send({ content: `${pingStr} A new vote has started!`, allowedMentions: { parse: ['everyone'] } });
+                const targetChannel = options.channel || interaction.channel;
+                await targetChannel.send({ content: `${pingStr} A new vote has started!`, allowedMentions: { parse: ['everyone'] } });
             } catch (e) {}
         }
         
         const { container } = buildContainer(yesVotes, noVotes);
         const payload = ComponentUtils.createContainerResponse(container);
-        const message = await interaction.reply({ ...payload, fetchReply: true });
+        
+        let message;
+        if (options.channel) {
+            message = await options.channel.send({ ...payload, fetchReply: true });
+            await interaction.reply(ComponentUtils.createSuccess(`✅ Poll successfully posted in <#${options.channel.id}>! [Click to view](${message.url})`));
+        } else {
+            message = await interaction.reply({ ...payload, fetchReply: true });
+        }
 
         return new Promise((resolve) => {
             const collector = message.createMessageComponentCollector({ time: duration });

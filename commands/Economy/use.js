@@ -107,18 +107,18 @@ module.exports = {
                     // Kill target
                     const deathResult = await EconomyUtils.handleDeath(target.id);
                     actionText = `💥 **BOOM!** You shot <@${target.id}> with the ${itemConfig.name} and killed them!`;
-                    
-                    // Broadcast News Event
-                    await EconomyUtils.postNewsEvent(
-                        interaction.guild,
-                        `# 🩸 ASSASSINATION\n**${interaction.user}** just gunned down **${target}** using a **${itemConfig.name}**!`,
-                        EconomyConfig.failColor
-                    );
 
                     if (deathResult.saved) {
                         actionText += `\n> **However, their 💝Life Saver protected their wallet and inventory!**`;
                     } else {
                         actionText += `\n> **Their wallet and inventory were completely wiped.**`;
+                        
+                        // Broadcast News Event
+                        await EconomyUtils.postNewsEvent(
+                            interaction.guild,
+                            `# 🩸 ASSASSINATION\n**${interaction.user}** just gunned down **${target}** using a **${itemConfig.name}**!`,
+                            EconomyConfig.failColor
+                        );
 
                         // Claim Bounties
                         const claimedBounty = await EconomyUtils.claimBounties(target.id, interaction.user.id);
