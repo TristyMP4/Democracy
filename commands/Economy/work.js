@@ -120,7 +120,7 @@ module.exports = {
         } else {
             userData.jobApplyCooldown = new Date(Date.now() + 60 * 60 * 1000); // 1 hour cooldown
             await userData.save();
-            return interaction.followUp(ComponentUtils.createError(`❌ The interview did not go well. They decided to go with another candidate. You must wait **1 Hour** before you can apply for a job again.`));
+            return interaction.followUp(ComponentUtils.createError(`❌ The interview did not go well. They decided to go with another candidate. You must wait \`1 hour\` before you can apply for a job again.`));
         }
     },
 
