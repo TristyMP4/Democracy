@@ -137,7 +137,7 @@ module.exports = {
 
         const quitContainer = new ContainerBuilder()
             .setAccentColor(0x2ecc71)
-            .addTextDisplayComponents(new TextDisplayBuilder().setContent(`You slammed your resignation letter on the boss's desk and quit your job as a **${oldJobName}**! You must wait **1 Hour** before you can apply for a new job.`));
+            .addTextDisplayComponents(new TextDisplayBuilder().setContent(`You slammed your resignation letter on the boss's desk and quit your job as a **${oldJobName}**! You must wait \`1 hour\` before you can apply for a new job.`));
         return interaction.followUp(ComponentUtils.createContainerResponse(quitContainer));
     },
 
