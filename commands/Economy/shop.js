@@ -141,7 +141,7 @@ module.exports = {
                         if (itemData.maxOwned !== undefined) {
                             const currentOwned = user.inventory ? (user.inventory.get(itemKey) || 0) : 0;
                             if (currentOwned + quantity > itemData.maxOwned) {
-                                return modalSubmit.reply(ComponentUtils.createError(`You can only own a maximum of **${itemData.maxOwned}** ${itemData.name}(s). You currently have **${currentOwned}**.`));
+                                return modalSubmit.reply(ComponentUtils.createError(`You can only own a maximum of **${itemData.maxOwned}** ${itemData.emoji}${itemData.name}(s). You currently have **${currentOwned}**.`));
                             }
                         }
 
