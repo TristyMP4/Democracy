@@ -121,7 +121,7 @@ module.exports = {
         price: 1500000,
         dropWeight: 2, // Exotic
         usable: false,
-        sellable: true
+        sellable: false
     },
     'sock': {
         name: "Sock",
