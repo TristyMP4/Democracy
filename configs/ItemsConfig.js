@@ -42,6 +42,7 @@ module.exports = {
         price: 20000,
         sellPrice: 8500,
         dropWeight: 20, // Rare
+        shop: true,
         usable: true,
         sellable: true
     },
@@ -67,7 +68,7 @@ module.exports = {
         durabilityPercentage: 0.35,
         price: 15000,
         dropWeight: 30, // Rare
-        shop: true,
+        shop: false,
         usable: true,
         sellable: true
     },
@@ -98,7 +99,7 @@ module.exports = {
         price: 200000,
         sellPrice: 50000,
         dropWeight: 10,
-        shop: true,
+        shop: false,
         usable: false,
         sellable: true
     },
@@ -109,6 +110,7 @@ module.exports = {
         price: 45000,
         sellPrice: 12000,
         dropWeight: 30,
+        shop: true,
         usable: false,
         sellable: true
     },
@@ -189,7 +191,7 @@ module.exports = {
         sellPrice: 2500,
         dropWeight: 35,
         usable: true,
-        shop: true,
+        shop: false,
         sellable: true,
         effects: [
             { 
